@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>SimilarSounds</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%230b0b0f'/%3E%3Ccircle cx='37' cy='60' r='21' fill='%23f2f2f5'/%3E%3Ccircle cx='84' cy='60' r='17.5' fill='none' stroke='%23c6ff3d' stroke-width='7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
@@ -16,11 +17,14 @@
   body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 Inter, system-ui, sans-serif; }
   a { color: inherit; }
   .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
-  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
-  .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+  header { display: flex; align-items: center; justify-content: flex-end; gap: 16px; flex-wrap: wrap; }
+  /* Logo: the Echo mark (dot + ring) sized to the capital-S height, a hair from the S */
+  .logo { display: inline-block; font-weight: 800; letter-spacing: -0.03em; line-height: 1; white-space: nowrap;
+          font-size: clamp(40px, 10vw, 84px); margin: 34px 0 0; }
   .logo span { color: var(--accent); }
+  .logo .mark { display: inline-block; height: 0.73em; width: 1.547em; margin-right: 0.045em; vertical-align: baseline; overflow: visible; }
   .stats { color: var(--muted); font-size: 13px; }
-  h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.03em; margin: 40px 0 10px; font-weight: 800; }
+  h1 { font-size: clamp(18px, 2.6vw, 24px); line-height: 1.25; letter-spacing: -0.01em; margin: 18px 0 6px; font-weight: 700; }
   h1 em { font-style: normal; color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
 
@@ -148,14 +152,14 @@
 <body>
 <div class="wrap">
   <header>
-    <div class="logo">Similar<span>Sounds</span></div>
     <div class="header-right">
       <div class="stats" id="stats"></div>
       <button type="button" class="set-toggle" id="set-open">Build your set <span class="count" id="set-count">0</span></button>
     </div>
   </header>
 
-  <h1>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h1>
+  <div class="logo" role="img" aria-label="SimilarSounds"><svg class="mark" viewBox="16 39 89 42" aria-hidden="true"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<span>Sounds</span></div>
+  <h1>Paste a track. Get <em>this month's</em> house that mixes with it.</h1>
   <p class="sub">Matched on sound, key (Camelot), BPM and energy - with the newest releases ranked first.</p>
 
   <div class="search-wrap">

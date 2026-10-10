@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SimilarSounds lockup</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+  :root { --white: #f2f2f5; --green: #c6ff3d; --ink: #0b0b0f; --muted: #8d8da0; --line: #23232e; }
+  body { margin: 0; background: #050507; color: var(--white); font: 15px/1.5 Inter, system-ui, sans-serif; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 36px 16px 80px; }
+  h1 { font-size: 15px; font-weight: 600; color: var(--muted); margin: 0 0 18px; }
+
+  /* The lockup: Echo mark sized to the capital-S height, sitting on the baseline */
+  .lockup { display: inline-block; font-weight: 800; letter-spacing: -0.02em; white-space: nowrap; line-height: 1; }
+  /* height = capital-S height (Inter caps are ~0.73em); width keeps the mark's 89:42 shape */
+  .lockup .mark { display: inline-block; height: 0.73em; width: 1.547em; vertical-align: baseline; overflow: visible; }
+  .lockup b { color: var(--green); font-weight: 800; }
+  .gap-a .mark { margin-right: 0.10em; }
+  .gap-b .mark { margin-right: 0.045em; }
+  .gap-c .mark { height: 0.86em; width: 1.823em; margin-right: 0.07em; vertical-align: -0.065em; }
+
+  .opt { background: #101016; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 16px; overflow: hidden; }
+  .stage { background: var(--ink); padding: 44px 24px; display: grid; place-items: center; border-bottom: 1px solid var(--line); overflow: hidden; }
+  .stage .lockup { font-size: clamp(34px, 9vw, 76px); }
+  .meta { padding: 14px 18px 16px; }
+  .meta .t { font-weight: 800; }
+  .meta .t span { color: var(--green); font: 700 12px ui-monospace, monospace; margin-right: 8px; }
+  .meta p { color: var(--muted); margin: 2px 0 12px; font-size: 14px; }
+  .sizes { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; background: var(--ink); border-radius: 6px; padding: 12px 16px; }
+  .sizes .lockup.s1 { font-size: 22px; }
+  .sizes .lockup.s2 { font-size: 15px; }
+  .sizes .mono, .sizes .mono b { color: var(--white); }
+  .sizes .mono .ring { stroke: var(--white); }
+
+  /* Site-header preview */
+  .header { background: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 22px 20px; margin-bottom: 26px; }
+  .header .bar { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .header .lockup { font-size: 22px; }
+  .header .stats { color: var(--muted); font-size: 13px; }
+  .header .btn { background: #14141b; border: 1px solid #2a2a36; border-radius: 10px; padding: 8px 12px; font-weight: 600; font-size: 13px; }
+  .header .btn i { font-style: normal; background: var(--green); color: var(--ink); border-radius: 99px; padding: 1px 7px; margin-left: 6px; font-weight: 800; font-size: 12px; }
+  .header h2 { font-size: clamp(26px, 5vw, 40px); line-height: 1.05; letter-spacing: -0.03em; margin: 28px 0 0; font-weight: 800; }
+  .header h2 em { font-style: normal; color: var(--green); }
+  .label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0 0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- Echo mark cropped tight (viewBox 16 39 89 42): white dot + green ring, as in logo-02 -->
+
+  <p class="label">In the site header</p>
+  <div class="header">
+    <div class="bar">
+      <span class="lockup gap-b"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+      <span class="btn">Build your set<i>5</i></span>
+    </div>
+    <h2>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h2>
+  </div>
+
+  <h1>Three spacing options. The mark is sized to the height of the capital S and sits on the same line as the text.</h1>
+
+  <section class="opt">
+    <div class="stage"><span class="lockup gap-b"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span></div>
+    <div class="meta">
+      <div class="t"><span>A</span>Nearly touching</div>
+      <p>The ring sits a hair's width from the S, so the mark and the word read as one piece.</p>
+      <div class="sizes">
+        <span class="lockup gap-b s1"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+        <span class="lockup gap-b s2"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+        <span class="lockup gap-b s1 mono"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#f2f2f5" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div class="stage"><span class="lockup gap-a"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span></div>
+    <div class="meta">
+      <div class="t"><span>B</span>A little more air</div>
+      <p>Slightly wider gap, about the same as the space between two letters. Easier to read at small sizes.</p>
+      <div class="sizes">
+        <span class="lockup gap-a s1"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+        <span class="lockup gap-a s2"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="opt">
+    <div class="stage"><span class="lockup gap-c"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span></div>
+    <div class="meta">
+      <div class="t"><span>C</span>Bigger mark</div>
+      <p>The circles are a touch larger than the capitals and dip just below the line, so the mark leads more strongly.</p>
+      <div class="sizes">
+        <span class="lockup gap-c s1"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+        <span class="lockup gap-c s2"><svg class="mark" viewBox="16 39 89 42"><circle cx="37" cy="60" r="21" fill="#f2f2f5"/><circle cx="84" cy="60" r="17.5" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<b>Sounds</b></span>
+      </div>
+    </div>
+  </section>
+</div>
+</body>
+</html>
