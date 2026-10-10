@@ -10,6 +10,7 @@
 <meta property="og:title" content="SimilarSounds - find new house music that mixes with any track">
 <meta property="og:description" content="Paste a track. Get this month's house that matches its key, BPM, energy and sound - then build a set that flows.">
 <meta property="og:url" content="https://www.similarsounds.com/">
+<link rel="canonical" href="https://www.similarsounds.com/">
 <meta property="og:image" content="https://www.similarsounds.com/static/og.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -78,6 +79,12 @@
 
   .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
   .msg.err { border-color: #5a2c22; color: var(--warn); }
+  .clear { align-self: center; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; width: 36px; height: 36px; border-radius: 8px; }
+  .clear:hover { color: var(--text); background: var(--panel-2); }
+  .shared-note { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
+                 padding: 10px 12px 10px 16px; border-radius: 12px; border: 1px dashed #3b4a16; background: rgba(198,255,61,.05); color: var(--muted); font-size: 14px; }
+  .shared-note b { color: var(--text); }
+  .shared-note + .query { margin-top: 12px; }
   .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
   .problem-title { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
   .problem p { color: var(--muted); margin: 0 0 12px; }
@@ -314,6 +321,7 @@
     <form class="search" id="form">
       <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required aria-keyshortcuts="/"
              role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+      <button type="button" class="clear" id="clear" aria-label="Clear search and start again" hidden>×</button>
       <kbd class="kbd" aria-hidden="true" title="Press / to search">/</kbd>
       <button class="go" id="go">Find</button>
     </form>
@@ -379,6 +387,9 @@
 
 <script>
 const $ = s => document.querySelector(s);
+const startHTML = document.getElementById("out").innerHTML;
+// Opened from a shared results link (e.g. ?t=393116082)? Say so, so the filled-in box isn't a surprise.
+let sharedArrival = /[?&]t=\d+/.test(location.search);
 const announce = text => { const el = document.getElementById("live"); if (el) el.textContent = text; };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
@@ -486,6 +497,7 @@ async function run(exactUrl, fromHistory = false) {
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
     if (exactUrl) { $("#url").value = label; picked = { text: label, url: exactUrl }; }
+    updateClear();
     if (new URLSearchParams(location.search).get("t") != t)
       history[fromHistory ? "replaceState" : "pushState"]({ t, label }, "", `?t=${t}`);
     document.title = `${label} - similar house tracks | SimilarSounds`;
@@ -526,9 +538,13 @@ function showProblem(err, attempted) {
 
 function render({ source, query, results }) {
   const embed = source.embed_html ? `<div class="embed">${source.embed_html}</div>` : "";
+  const shared = sharedArrival
+    ? `<div class="shared-note" role="status"><span>You're viewing a shared search for <b>${esc(query.artist)} – ${esc(query.title)}</b>.</span>
+        <button type="button" class="icon" id="new-search">New search</button></div>` : "";
+  sharedArrival = false;
   const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
   const year = query.release_date ? query.release_date.slice(0, 4) : "";
-  let html = `<section class="query">
+  let html = shared + `<section class="query">
       <div class="row qrow" data-id="${query.deezer_id}">
         <button type="button" class="cover play" data-id="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
           <img src="${esc(query.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
@@ -679,6 +695,20 @@ function rememberSearch(q) {
 function recentSearches() {
   try { return JSON.parse(localStorage.getItem("ss_recent") || "[]"); } catch { return []; }
 }
+function newSearch(pushHistory = true) {
+  $("#url").value = ""; picked = { text: null, url: null }; lastResults = []; sharedArrival = false;
+  $("#out").innerHTML = startHTML;
+  if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
+  if (pushHistory && location.search) history.pushState(null, "", location.pathname);
+  document.title = "SimilarSounds";
+  updateClear(); closeSuggest();
+  $("#url").focus();
+}
+function updateClear() { $("#clear").hidden = !$("#url").value; }
+document.addEventListener("click", e => {
+  if (e.target.closest("#clear, #new-search")) newSearch();
+});
+
 function openFromUrl(fromHistory) {
   const t = new URLSearchParams(location.search).get("t");
   if (!t || !/^\d+$/.test(t)) return false;
@@ -688,7 +718,7 @@ function openFromUrl(fromHistory) {
   return true;
 }
 window.addEventListener("popstate", () => {
-  if (!openFromUrl(true)) { location.reload(); }
+  if (!openFromUrl(true)) newSearch(false);
 });
 document.addEventListener("click", async e => {
   if (!e.target.closest("#copy-link")) return;
@@ -777,6 +807,7 @@ function choose(i) {
   }
 }
 
+input.addEventListener("input", updateClear);
 input.addEventListener("input", () => {
   clearTimeout(sgTimer);
   sgTimer = setTimeout(fetchSuggest, input.value.trim().length <= 1 ? 0 : 150);
