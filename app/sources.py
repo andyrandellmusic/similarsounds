@@ -79,7 +79,7 @@ def resolve_link(url: str) -> dict:
             raise ValueError("Couldn't read that YouTube link (is the video public?).")
         d = r.json()
         return {"source": "youtube", "title": d["title"], "author": d.get("author_name", ""),
-                "embed_html": d.get("html")}
+                "author_url": d.get("author_url"), "url": url, "embed_html": d.get("html")}
 
     if "soundcloud.com" in host:
         r = client.get("https://soundcloud.com/oembed", params={"url": url, "format": "json", "maxheight": 166})
@@ -89,7 +89,7 @@ def resolve_link(url: str) -> dict:
         # SoundCloud oEmbed titles look like "Track Name by Artist"
         title = re.sub(rf"\s+by\s+{re.escape(d.get('author_name', ''))}$", "", d["title"])
         return {"source": "soundcloud", "title": title, "author": d.get("author_name", ""),
-                "embed_html": d.get("html")}
+                "author_url": d.get("author_url"), "url": url, "embed_html": d.get("html")}
 
     if "beatport.com" in host:
         m = re.search(r"/track/([^/]+)/\d+", url)
