@@ -78,3 +78,11 @@ Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobil
   for anyone, with "Keep mine" to undo if it would replace theirs (new /api/tracks endpoint).
 - Results: "Show 30 more matches" (up to 90) keeps your scroll position.
 Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9
+
+### Round 8: 8.9 → 9.1 (kept)  [first round reviewed at 1280px laptop width as well]
+- Visual: removed the description line that repeated the 3 steps (headline now carries the promise,
+  slightly larger), subtle lime glow behind the logo for depth, larger example cards with hover lift.
+- Clarity: example cards show the full title (2 lines), remix/version split onto the artist line,
+  and freshness - NEW badge, sub-genre and "1d ago" - so the site's selling point is visible
+  before the first search.
+Scores: Visual 9 · Clarity 9 · Search 9 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9
