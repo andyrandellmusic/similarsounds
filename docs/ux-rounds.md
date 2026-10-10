@@ -37,3 +37,11 @@ Scores: Visual 7.5 · Clarity 7.5 · Search 7.5 · Results 7.5 · Set 7 · Mobil
 - Loading: spinner + skeleton result rows + honest "new tracks can take ~10 seconds" hint.
 - Polish: meta description, social share title/description, theme colour, friendlier footer.
 Scores: Visual 7.5 · Clarity 7.5 · Search 8 · Results 7.5 · Set 7.5 · Mobile 7 · Access 8 · Polish 7.5
+
+### Round 3: 7.5 → 8.0 (kept)
+- Build your set: "✦ Smart order" reorders the set for the smoothest key/BPM/energy transitions
+  and a gentle energy build (test set: 1 smooth/3 workable → 4 smooth/0 clashing), with Undo.
+  Energy-flow line now scaled to the set's own range with round, coloured dots and a start→end label.
+- Mobile: sticky "Your set" bar at the bottom (count + clash status, one tap to open), cramped top bar
+  removed, filters fold into a one-line "Filters" summary showing the current choices.
+Scores: Visual 8 · Clarity 7.5 · Search 8 · Results 7.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 8

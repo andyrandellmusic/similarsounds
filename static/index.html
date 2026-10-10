@@ -161,8 +161,33 @@
   .close { background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; }
   .set-summary { color: var(--muted); font-size: 13px; margin-top: 4px; }
   .flow { margin-top: 12px; }
-  .flow svg { width: 100%; height: 54px; display: block; }
-  .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .flow svg { width: 100%; height: auto; display: block; margin-top: 4px; }
+  .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); display: flex; justify-content: space-between; }
+  .flow-label span { letter-spacing: 0; font: 700 11px "JetBrains Mono", monospace; color: var(--text); }
+  .icon.smart { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+  .toast.has-action { pointer-events: auto; display: flex; gap: 12px; align-items: center; }
+  .toast button { background: none; border: 0; color: var(--bg); font-weight: 800; text-decoration: underline; padding: 0; }
+
+  .filters-sum { display: none; }
+  .set-fab { display: none; }
+  @media (max-width: 640px) {
+    header { display: none; }
+    .logo { margin-top: 20px; }
+    .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+    .filters-sum { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; list-style: none; font-weight: 600; font-size: 14px; }
+    .filters-sum::-webkit-details-marker { display: none; }
+    .filters-sum::after { content: "▾"; color: var(--muted); }
+    .filters-wrap[open] .filters-sum::after { content: "▴"; }
+    .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
+    .set-fab:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 15; align-items: center; gap: 10px;
+      background: var(--text); color: var(--bg); border: 0; border-radius: 14px; padding: 13px 16px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.5); text-align: left; }
+    .fab-main b { background: var(--accent); color: var(--accent-ink); border-radius: 99px; padding: 1px 8px; margin-left: 4px; }
+    .fab-sub { flex: 1; font-weight: 500; font-size: 13px; color: #4b4b5a; }
+    .fab-sub.bad { color: #c0392b; }
+    body:has(.set-fab:not([hidden])) .wrap { padding-bottom: 100px; }
+    .toast { bottom: 84px; }
+  }
   .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
   .set-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
   .set-empty { color: var(--muted); text-align: center; padding: 40px 16px; }
@@ -226,6 +251,8 @@
     <div class="suggest" id="suggest" role="listbox" hidden></div>
   </div>
 
+  <details class="filters-wrap" id="filters-wrap" open>
+    <summary class="filters-sum"><span>Filters</span><span class="fs-val" id="filters-sum"></span></summary>
   <div class="filters" role="group" aria-label="Filters">
     <div class="fld"><span class="fl">Released</span>
       <div class="seg" id="age" role="radiogroup" aria-label="Released">
@@ -240,6 +267,7 @@
       <select id="bpm"><option value="3">±3</option><option value="6" selected>±6</option><option value="10">±10</option></select></div>
     <label class="chk fld"><input type="checkbox" id="strict"> Harmonic matches only</label>
   </div>
+  </details>
 
   <div id="out">
     <section class="start" id="start">
@@ -260,6 +288,7 @@
       <div class="set-summary" id="set-summary"></div>
       <div class="flow" id="set-flow"></div>
       <div class="set-tools">
+        <button type="button" class="icon smart" id="set-smart" title="Reorder for the smoothest mixes and a steady energy build">✦ Smart order</button>
         <button type="button" class="icon" id="set-copy">Copy tracklist</button>
         <button type="button" class="icon" id="set-clear">Clear set</button>
       </div>
@@ -269,6 +298,9 @@
       <div class="set-empty" id="set-empty">Add tracks with <b>+ Set</b>, then drag them into order.<br>Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</div>
     </div>
   </aside>
+  <button type="button" class="set-fab" id="set-fab" hidden aria-controls="set-panel">
+    <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go">Open ›</span>
+  </button>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 
@@ -303,9 +335,18 @@ let age = "365";
 document.querySelectorAll("#age button").forEach(b => b.onclick = () => {
   document.querySelectorAll("#age button").forEach(x => x.classList.remove("on"));
   document.querySelectorAll("#age button").forEach(x => x.setAttribute("aria-checked", x === b));
-  b.classList.add("on"); age = b.dataset.v; if ($("#url").value) run();
+  b.classList.add("on"); age = b.dataset.v; updateFilterSummary(); if ($("#url").value) run();
 });
-["#style", "#bpm", "#strict"].forEach(s => $(s).onchange = () => $("#url").value && run());
+["#style", "#bpm", "#strict"].forEach(s => $(s).addEventListener("change", () => { updateFilterSummary(); $("#url").value && run(); }));
+function updateFilterSummary() {
+  const ageLabel = document.querySelector("#age button.on")?.textContent || "";
+  const parts = [ageLabel, $("#style").value || "any sub-genre", `±${$("#bpm").value} BPM`];
+  if ($("#strict").checked) parts.push("harmonic");
+  $("#filters-sum").textContent = parts.join(" · ");
+}
+// Filters start folded on phones (summary line shows the current choices)
+if (matchMedia("(max-width: 640px)").matches) $("#filters-wrap").open = false;
+updateFilterSummary();
 
 fetch("/api/stats").then(r => r.json()).then(s => {
   $("#stats").textContent = `${s.tracks.toLocaleString()} tracks · ${s.last_12_months.toLocaleString()} from the last 12 months`;
@@ -579,8 +620,15 @@ function refreshAddButtons() {
 let toastTimer;
 function toast(text) {
   const el = $("#toast");
-  el.textContent = text; el.classList.add("show");
+  el.textContent = text; el.classList.add("show"); el.classList.remove("has-action");
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 1600);
+}
+function toastAction(text, label, fn) {
+  const el = $("#toast");
+  el.innerHTML = `${esc(text)} <button type="button">${esc(label)}</button>`;
+  el.classList.add("show", "has-action");
+  el.querySelector("button").onclick = () => { fn(); el.classList.remove("show"); };
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 5000);
 }
 
 /* ---- How well do two neighbouring tracks mix? 2 = good, 1 = ok, 0 = bad ---- */
@@ -616,19 +664,51 @@ function transition(a, b) {
 
 function energyFlow() {
   if (set.length < 2) return "";
-  const w = 400, h = 54, pad = 6;
-  const x = i => pad + i * (w - 2 * pad) / (set.length - 1);
-  const y = e => h - pad - (e - 1) * (h - 2 * pad) / 9;
+  const w = 400, h = 64, padX = 8, padY = 10;
+  const es = set.map(t => t.energy);
+  const lo = Math.max(1, Math.min(...es) - 1), hi = Math.min(10, Math.max(...es) + 1);
+  const x = i => padX + i * (w - 2 * padX) / (set.length - 1);
+  const y = e => h - padY - (e - lo) * (h - 2 * padY) / Math.max(1, hi - lo);
   const pts = set.map((t, i) => `${x(i).toFixed(1)},${y(t.energy).toFixed(1)}`).join(" ");
-  const dots = set.map((t, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(t.energy).toFixed(1)}" r="3.5" fill="${camelotColor(t.camelot)}"/>`).join("");
-  return `<div class="flow-label">Energy flow</div>
-    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Energy across the set">
-      <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" vector-effect="non-scaling-stroke"/>${dots}
+  const dots = set.map((t, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(t.energy).toFixed(1)}" r="4" fill="${camelotColor(t.camelot)}" stroke="#14141b" stroke-width="2"><title>${i + 1}. ${esc(t.title)}: energy ${t.energy}</title></circle>`).join("");
+  return `<div class="flow-label">Energy flow <span>${es[0]} → ${es[es.length - 1]}</span></div>
+    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy across the set, from ${es[0]} to ${es[es.length - 1]}">
+      <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${dots}
     </svg>`;
+}
+
+/* Smart order: try every starting track, then greedily take the next track that mixes best
+   (key + BPM + energy), preferring a gentle energy build. Keeps the best-scoring order. */
+function smartOrder(tracks) {
+  const pairScore = (a, b) => {
+    const tr = transition(a, b);
+    const de = b.energy - a.energy;
+    return tr.score * 10 - Math.abs(a.bpm - b.bpm) * 0.4 + (de >= 0 && de <= 2 ? 1.5 : 0) - Math.max(0, -de) * 0.8;
+  };
+  let best = tracks, bestTotal = -Infinity;
+  tracks.forEach((start, si) => {
+    const left = tracks.filter((_, i) => i !== si), order = [start];
+    while (left.length) {
+      const cur = order[order.length - 1];
+      let bi = 0;
+      left.forEach((t, i) => { if (pairScore(cur, t) > pairScore(cur, left[bi])) bi = i; });
+      order.push(left.splice(bi, 1)[0]);
+    }
+    // small bonus for starting low and finishing high: a set that builds
+    const total = order.slice(1).reduce((sum, t, i) => sum + pairScore(order[i], t), 0)
+                + (order[order.length - 1].energy - order[0].energy) * 0.5;
+    if (total > bestTotal) { bestTotal = total; best = order; }
+  });
+  return best;
 }
 
 function renderSet() {
   $("#set-count").textContent = set.length;
+  $("#fab-count").textContent = set.length;
+  $("#set-fab").hidden = !set.length;
+  const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
+  $("#fab-sub").textContent = set.length < 2 ? "" : clashes ? `${clashes} clash${clashes > 1 ? "es" : ""}` : "no clashes";
+  $("#fab-sub").className = "fab-sub" + (clashes ? " bad" : "");
   $("#set-empty").style.display = set.length ? "none" : "";
   $("#set-flow").innerHTML = energyFlow();
   const links = set.slice(1).map((t, i) => transition(set[i], t));
@@ -724,10 +804,20 @@ function openSet(open) {
   else setOpener?.focus?.();
 }
 $("#set-open").onclick = () => openSet(true);
+$("#set-fab").onclick = () => openSet(true);
 $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
 document.addEventListener("keydown", e => { if (e.key === "Escape") openSet(false); });
 
+let undoOrder = null;
+$("#set-smart").onclick = () => {
+  if (set.length < 3) return toast("Add at least 3 tracks to sort them");
+  const before = set.map(t => t.deezer_id).join();
+  const next = smartOrder(set);
+  if (next.map(t => t.deezer_id).join() === before) return toast("Already in the smoothest order");
+  undoOrder = set; set = next; saveSet(); renderSet();
+  toastAction("Reordered for smoother mixes", "Undo", () => { set = undoOrder; saveSet(); renderSet(); });
+};
 $("#set-clear").onclick = () => {
   if (!set.length) return;
   set = []; saveSet(); renderSet(); refreshAddButtons(); toast("Set cleared");
