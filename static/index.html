@@ -187,7 +187,10 @@
 
   /* ---------- Search-as-you-type ---------- */
   .search-wrap { position: relative; }
-  .suggest { position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; z-index: 10; box-shadow: 0 18px 50px rgba(0,0,0,.55); max-height: min(440px, 60vh); overflow-y: auto; }
+  .suggest { position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; z-index: 10; box-shadow: 0 18px 50px rgba(0,0,0,.55); max-height: min(380px, 48vh); overflow-y: auto; overscroll-behavior: contain; }
+  .sg-head-row { display: flex; justify-content: space-between; align-items: center; }
+  .sg-clear { background: none; border: 0; color: var(--muted); font: 600 11px Inter, sans-serif; letter-spacing: .04em; text-transform: uppercase; padding: 4px 6px; border-radius: 6px; }
+  .sg-clear:hover { color: var(--text); background: var(--panel-2); }
   .sg-head { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); padding: 8px 10px 4px; }
   .sg-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; cursor: pointer; }
   .sg-item.active, .sg-item:hover { background: var(--panel-2); }
@@ -472,6 +475,7 @@ let picked = { text: null, url: null };
 
 let pendingTrack = null;   // {title, artist, cover} of a track picked from a list, shown while loading
 async function run(exactUrl, fromHistory = false) {
+  closeSuggest();
   if (exactUrl && exactUrl !== picked.url) resultLimit = 30;
   if (exactUrl) picked = { text: $("#url").value, url: exactUrl };
   const url = $("#url").value === picked.text ? picked.url : $("#url").value;
@@ -812,18 +816,19 @@ input.addEventListener("input", () => {
   clearTimeout(sgTimer);
   sgTimer = setTimeout(fetchSuggest, input.value.trim().length <= 1 ? 0 : 150);
 });
-input.addEventListener("focus", () => {
-  if (input.value.trim()) { sgLastQ = null; fetchSuggest(); return; }
-  const recent = recentSearches();
-  if (!recent.length) return;
+input.addEventListener("focus", () => { if (input.value.trim()) { sgLastQ = null; fetchSuggest(); } });
+input.addEventListener("pointerdown", () => { if (!input.value.trim()) setTimeout(showRecent, 0); });
+function showRecent() {
+  const recent = recentSearches().slice(0, 5);
+  if (!recent.length || input.value.trim() || document.activeElement !== input) return;
   sgItems = recent.map(r => ({ type: "track", value: r.label, id: r.id }));
-  box.innerHTML = `<div class="sg-head">Recent searches</div>` + recent.map((r, i) => `
+  box.innerHTML = `<div class="sg-head sg-head-row"><span>Recent searches</span><button type="button" class="sg-clear" id="sg-clear">Clear</button></div>` + recent.map((r, i) => `
     <div class="sg-item" role="option" id="sg-${i}" data-i="${i}">
       ${r.cover ? `<img src="${esc(r.cover)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
       <div class="sg-main"><div class="sg-name">${esc(r.label)}</div></div></div>`).join("");
   box.hidden = false; sgActive = -1; sgLastQ = "";
   input.setAttribute("aria-expanded", "true");
-});
+}
 input.addEventListener("keydown", e => {
   if (box.hidden || !sgItems.length) return;
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
@@ -844,7 +849,13 @@ box.addEventListener("click", e => {
   const el = e.target.closest(".sg-item");
   if (el) choose(Number(el.dataset.i));
 });
-document.addEventListener("click", e => { if (!e.target.closest(".search-wrap")) closeSuggest(); });
+document.addEventListener("pointerdown", e => { if (!e.target.closest(".search-wrap")) closeSuggest(); }, true);
+input.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== input) closeSuggest(); }, 150));
+box.addEventListener("click", e => {
+  if (!e.target.closest("#sg-clear")) return;
+  try { localStorage.removeItem("ss_recent"); } catch {}
+  closeSuggest(); toast("Recent searches cleared");
+});
 
 /* ================= Prefetch: analyse a track before it's clicked ================= */
 const prefetched = new Set();
