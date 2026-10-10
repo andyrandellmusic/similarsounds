@@ -158,7 +158,7 @@
   .list { display: grid; gap: 8px; }
   .row { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 10px 10px; transition: border-color .15s; }
   /* Track cards in results: a lime hairline, the same green as the fresh-release hover */
-  .query .row, #list .row { border: 2px solid rgba(198,255,61,.5); transition: border-color .35s ease, box-shadow .35s ease; }
+  .query .row, #list .row { border: 2px solid rgba(198,255,61,.25); transition: border-color .35s ease, box-shadow .35s ease; }
   /* The card nearest the middle of the screen while scrolling fades up to full lime */
   .query .row.centered, #list .row.centered { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
