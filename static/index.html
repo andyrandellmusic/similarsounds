@@ -150,6 +150,10 @@
   .howto-grid > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   .howto-grid p { margin: 2px 0 0; flex-basis: 100%; }
   .howto-grid b { color: var(--text); display: block; }
+  .group-head { display: flex; align-items: center; gap: 8px; margin: 18px 2px 2px; font-weight: 800; font-size: 13px; letter-spacing: .02em; }
+  .group-head:first-child { margin-top: 4px; }
+  .group-head.good { color: var(--good); } .group-head.ok { color: var(--ok); } .group-head.bad { color: var(--bad); }
+  .group-n { color: var(--muted); font-weight: 600; font-family: "JetBrains Mono", monospace; font-size: 12px; }
   .why { display: flex; align-items: center; gap: 7px; margin-top: 7px; font-size: 12px; color: var(--muted); min-width: 0; }
   .why > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
@@ -670,7 +674,7 @@ function render({ source, query, results }) {
       <span class="head-tools">
       ${results.length ? `<button type="button" class="icon" id="copy-link" title="Copy a link to these results">Copy link</button>` : ""}
       ${results.length ? `<label class="sort"><span class="sort-l">Sort</span> <select id="sort" aria-label="Sort results">
-        <option value="best">Best match</option><option value="mix">Smoothest mix</option>
+        <option value="mix">Mixes well first</option><option value="match">Highest match %</option>
         <option value="new">Newest</option><option value="bpm">Closest BPM</option></select></label>` : ""}
       </span>
     </div>
@@ -694,7 +698,7 @@ function render({ source, query, results }) {
   renderList();
 }
 
-let lastQuery = null, lastResults = [], sortBy = "best", keepScroll = null;
+let lastQuery = null, lastResults = [], sortBy = "mix", keepScroll = null;
 const signed = (n, unit) => n === 0 ? `same ${unit}` : `${n > 0 ? "+" : "−"}${Math.abs(n)} ${unit}`;
 
 function whyLine(q, t) {
@@ -708,13 +712,23 @@ function renderList() {
   const list = $("#list");
   if (!list) return;
   const sorters = {
-    best: (a, b) => a.rank - b.rank,
-    mix: (a, b) => b.mix.score - a.mix.score || a.rank - b.rank,
+    // Mixes well -> Workable -> Will clash, and within each group highest match % first
+    mix: (a, b) => b.mix.score - a.mix.score || b.similarity - a.similarity || a.rank - b.rank,
+    match: (a, b) => b.similarity - a.similarity || b.mix.score - a.mix.score || a.rank - b.rank,
     new: (a, b) => a.age_days - b.age_days || a.rank - b.rank,
     bpm: (a, b) => Math.abs(a.bpm - lastQuery.bpm) - Math.abs(b.bpm - lastQuery.bpm) || a.rank - b.rank,
   };
-  const rows = [...lastResults].sort(sorters[sortBy] || sorters.best);
-  list.innerHTML = rows.map(t => `
+  const rows = [...lastResults].sort(sorters[sortBy] || sorters.mix);
+  // In "Mixes well first", start each colour group with a small heading and count
+  const counts = { good: 0, ok: 0, bad: 0 };
+  rows.forEach(t => counts[t.mix.cls]++);
+  let lastGroup = null;
+  const groupHead = t => {
+    if (sortBy !== "mix" || t.mix.cls === lastGroup) return "";
+    lastGroup = t.mix.cls;
+    return `<div class="group-head ${t.mix.cls}"><span class="dot ${t.mix.cls}" aria-hidden="true"></span>${t.mix.label}<span class="group-n">${counts[t.mix.cls]}</span></div>`;
+  };
+  list.innerHTML = rows.map(t => groupHead(t) + `
     <div class="row" data-id="${t.deezer_id}">
       <button type="button" class="cover play" data-id="${t.deezer_id}" aria-label="Preview ${esc(t.title)} by ${esc(t.artist)}">
         <img src="${esc(t.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
