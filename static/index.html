@@ -110,7 +110,10 @@
   .sc-attr { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; color: var(--muted); font-size: 13px; }
   .sc-attr a { color: var(--text); font-weight: 600; }
   .sc-logo { display: inline-flex; align-items: center; background: #121212; padding: 7px 10px; border-radius: 6px; }
-  .sc-logo img { display: block; width: 120px; height: 15px; }
+  .query .sc-logo img { display: block; width: 120px; height: 15px; border-radius: 0; object-fit: contain; background: none; }
+  /* YouTube: file includes YouTube's clear space; 48px tall image = ~24px logo, on a solid background */
+  .yt-logo { display: inline-flex; background: var(--bg); border-radius: 6px; }
+  .query .yt-logo img { display: block; width: 143px; height: 48px; border-radius: 0; object-fit: contain; background: none; }
   .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
   .problem-title { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
   .problem p { color: var(--muted); margin: 0 0 12px; }
@@ -638,6 +641,16 @@ function render({ source, query, results }) {
   sharedArrival = false;
   const safeUrl = u => /^https:\/\/(www\.|m\.|on\.)?soundcloud\.com\//i.test(u || "") ? u : "";
   const scLink = source.source === "soundcloud" ? safeUrl(source.url) : "";
+  const ytOk = u => /^https:\/\/(www\.|m\.|music\.)?(youtube\.com|youtu\.be)\//i.test(u || "") ? u : "";
+  const ytLink = source.source === "youtube" ? ytOk(source.url) : "";
+  // YouTube attribution, per developers.google.com/youtube/branding: official logo (unaltered, white
+  // text for dark backgrounds) next to the YouTube content, clickable to that video, on a solid
+  // background, and never the most prominent element on the page.
+  const ytAttribution = ytLink ? `<div class="sc-attr">
+      <span>Video from <a href="${esc(ytOk(source.author_url) || ytLink)}" target="_blank" rel="noopener">${esc(source.author)}</a> on</span>
+      <a class="yt-logo" href="${esc(ytLink)}" target="_blank" rel="noopener" aria-label="Watch on YouTube">
+        <img src="/static/brands/youtube/yt_logo_fullcolor_white_digital.png" width="143" height="48" alt="YouTube"></a>
+    </div>` : "";
   const attribution = scLink ? `<div class="sc-attr">
       <span>Uploaded by <a href="${esc(safeUrl(source.author_url) || scLink)}" target="_blank" rel="noopener">${esc(source.author)}</a> on</span>
       <a class="sc-logo" href="${esc(scLink)}" target="_blank" rel="noopener" aria-label="Listen on SoundCloud">
@@ -661,7 +674,7 @@ function render({ source, query, results }) {
           </div>
         </div>
         <div class="actions">${addButton(query)}</div>
-      </div>${attribution}${embed}
+      </div>${attribution}${ytAttribution}${embed}
     </section>`;
   trackCache = {};
   trackCache[query.deezer_id] = query;
