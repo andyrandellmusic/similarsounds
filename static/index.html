@@ -155,6 +155,8 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   .skel { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
   .skel i { display: block; border-radius: 6px; background: linear-gradient(90deg, var(--panel-2) 25%, #24242f 50%, var(--panel-2) 75%); background-size: 300% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+  .skel-chip { display: inline-block; width: 44px; height: 24px; border-radius: 6px; background: linear-gradient(90deg, var(--panel-2) 25%, #24242f 50%, var(--panel-2) 75%); background-size: 300% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+  .skel-chip.w { width: 90px; }
   .skel .c { width: 64px; height: 64px; border-radius: 8px; }
   .skel .l1 { height: 14px; width: 55%; } .skel .l2 { height: 11px; width: 35%; margin-top: 8px; } .skel .l3 { height: 22px; width: 75%; margin-top: 10px; }
   @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
@@ -415,6 +417,7 @@ document.addEventListener("click", e => {
   const b = e.target.closest("[data-try]");
   if (!b) return;
   $("#url").value = b.dataset.label; allowNonHouse = false;
+  pendingTrack = { title: b.querySelector(".tt")?.textContent, artist: b.dataset.label.split(" - ")[0], cover: b.querySelector("img")?.src };
   run(`https://www.deezer.com/track/${b.dataset.try}`);
 });
 
@@ -428,6 +431,7 @@ let resultLimit = 30;
 // as the box still shows that track (so filter changes re-run the same version)
 let picked = { text: null, url: null };
 
+let pendingTrack = null;   // {title, artist, cover} of a track picked from a list, shown while loading
 async function run(exactUrl, fromHistory = false) {
   if (exactUrl && exactUrl !== picked.url) resultLimit = 30;
   if (exactUrl) picked = { text: $("#url").value, url: exactUrl };
@@ -437,7 +441,11 @@ async function run(exactUrl, fromHistory = false) {
   if (age) params.set("max_age_days", age);
   if ($("#style").value) params.set("style", $("#style").value);
   $("#go").disabled = true;
-  $("#out").innerHTML = `<div class="loading-note"><span class="spinner" aria-hidden="true"></span>
+  const pt = pendingTrack; pendingTrack = null;
+  $("#out").innerHTML = (pt ? `<section class="query"><div class="row qrow">
+      <div class="cover"><img src="${esc(pt.cover || "")}" alt=""></div>
+      <div class="meta"><div class="eyebrow">Your track</div><div class="qt">${esc(pt.title)}</div><div class="a">${esc(pt.artist)}</div>
+      <div class="chips"><i class="skel-chip"></i><i class="skel-chip"></i><i class="skel-chip w"></i></div></div></div></section>` : "") + `<div class="loading-note"><span class="spinner" aria-hidden="true"></span>
       <span>Finding your track and checking its key, BPM and energy… <span class="fl">(new tracks can take ~10 seconds)</span></span></div>
     ${'<div class="skel" aria-hidden="true"><i class="c"></i><div><i class="l1"></i><i class="l2"></i><i class="l3"></i></div></div>'.repeat(4)}`;
   announce("Searching…");
@@ -691,6 +699,8 @@ function choose(i) {
   } else {
     // Search by the exact Deezer track, so the right version is analysed
     input.value = it.value; closeSuggest();
+    { const el = box.querySelector(`[data-i="${i}"]`); const [artist, ...rest] = it.value.split(" - ");
+      pendingTrack = { title: rest.join(" - "), artist, cover: el?.querySelector("img")?.src }; }
     allowNonHouse = false; run(`https://www.deezer.com/track/${it.id}`);
   }
 }
@@ -720,6 +730,7 @@ input.addEventListener("keydown", e => {
       el.classList.toggle("active", j === sgActive); el.setAttribute("aria-selected", j === sgActive);
     });
     input.setAttribute("aria-activedescendant", `sg-${sgActive}`);
+    if (sgItems[sgActive]?.type === "track") prefetch(sgItems[sgActive].id);
     box.querySelector(".sg-item.active")?.scrollIntoView({ block: "nearest" });
   } else if (e.key === "Enter" && sgActive >= 0) {
     e.preventDefault(); choose(sgActive);
@@ -731,6 +742,27 @@ box.addEventListener("click", e => {
   if (el) choose(Number(el.dataset.i));
 });
 document.addEventListener("click", e => { if (!e.target.closest(".search-wrap")) closeSuggest(); });
+
+/* ================= Prefetch: analyse a track before it's clicked ================= */
+const prefetched = new Set();
+function prefetch(id) {
+  if (!id || prefetched.has(id)) return;
+  prefetched.add(id);
+  fetch(`/api/prefetch/${id}`, { method: "POST" }).catch(() => {});
+}
+let hoverTimer;
+function prefetchTarget(el) {
+  const sg = el.closest?.(".sg-item"); if (sg) { const it = sgItems[Number(sg.dataset.i)]; return it?.type === "track" ? it.id : null; }
+  const tr = el.closest?.("[data-try]"); if (tr) return tr.dataset.try;
+  const nx = el.closest?.("[data-next]"); if (nx) return nx.dataset.next;
+  return null;
+}
+document.addEventListener("pointerover", e => {
+  const id = prefetchTarget(e.target);
+  clearTimeout(hoverTimer);
+  if (id) hoverTimer = setTimeout(() => prefetch(id), 150);
+});
+document.addEventListener("pointerdown", e => prefetch(prefetchTarget(e.target)), true);
 
 /* ================= Build your set ================= */
 let trackCache = {};
@@ -904,6 +936,7 @@ $("#set-list").addEventListener("click", e => {
   if (nx) {
     openSet(false);
     $("#url").value = nx.dataset.label; allowNonHouse = false; resultLimit = 30;
+    { const t = set.find(x => String(x.deezer_id) === nx.dataset.next); if (t) pendingTrack = { title: t.title, artist: t.artist, cover: t.cover }; }
     run(`https://www.deezer.com/track/${nx.dataset.next}`);
     scrollTo({ top: 0, behavior: "smooth" });
     return;

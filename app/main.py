@@ -78,12 +78,15 @@ def analyse_query(deezer_id: int) -> dict:
                 "house_check": {"is_house": True, "confidence": 1.0, "reason": None}}
     if deezer_id in _query_cache:
         return _query_cache[deezer_id]
-    t = sources.deezer_track(deezer_id)
-    if not t.get("preview"):
-        raise HTTPException(404, "No preview available for this track, so it can't be analysed.")
-    audio = sources.fetch_preview(t["preview"])
-    with _analysis_lock:   # one analysis at a time keeps peak memory inside the free 512 MB plan
-        feats = analyse(audio)
+    # One analysis at a time (keeps peak memory inside the free 512 MB plan). Re-check the cache
+    # once we hold the lock: a prefetch for the same track may have just finished it.
+    with _analysis_lock:
+        if deezer_id in _query_cache:
+            return _query_cache[deezer_id]
+        t = sources.deezer_track(deezer_id)
+        if not t.get("preview"):
+            raise HTTPException(404, "No preview available for this track, so it can't be analysed.")
+        feats = analyse(sources.fetch_preview(t["preview"]))
     energy = float(index.energy_scores(np.array([energy_vector(feats["energy_raw"])], dtype="float32"))[0])
     try:
         album = sources.deezer(f"/album/{t['album']['id']}")
@@ -133,6 +136,21 @@ async def match(
     if not q["house_check"]["is_house"] and not allow_non_house:
         results = []
     return {"source": src, "query": query, "results": results}
+
+
+@app.post("/api/prefetch/{deezer_id}")
+async def prefetch(deezer_id: int):
+    """Start analysing a track the visitor is about to pick, so the real search is instant."""
+    if deezer_id not in index.ids and deezer_id not in _query_cache:
+        threading.Thread(target=lambda: _safe(analyse_query, deezer_id), daemon=True).start()
+    return {"ok": True}
+
+
+def _safe(fn, *a):
+    try:
+        fn(*a)
+    except Exception:
+        pass
 
 
 @app.get("/api/tracks")

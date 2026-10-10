@@ -86,3 +86,14 @@ Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 9 · Set 9.5 · Mobile 
   and freshness - NEW badge, sub-genre and "1d ago" - so the site's selling point is visible
   before the first search.
 Scores: Visual 9 · Clarity 9 · Search 9 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9
+
+### Round 9: 9.1 → 9.2 (kept; one idea rejected)
+- Measured: analysis is 0.75 s/track locally, 78% of it key detection (≈12 s live on the free CPU).
+- REJECTED: analysing 15 s instead of 30 s (2x faster) changed the key on 6/24 tracks; faster key
+  methods agreed with the current one on only 34-36/40 tracks. Wrong keys would break the mix
+  ratings, so the analysis was left unchanged.
+- KEPT: prefetch - hovering, pressing or arrowing onto a suggested/example/recent/"find next" track
+  starts its analysis on the server (POST /api/prefetch), and a lock-safe cache means the real
+  search reuses it (locally 1.9 s → 0.65 s after a 1.5 s hover). The chosen track's cover, title
+  and artist now appear instantly with placeholder chips while matches load.
+Scores: Visual 9 · Clarity 9 · Search 9.5 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9.5
