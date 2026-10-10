@@ -244,7 +244,14 @@
   .flow-label span { letter-spacing: 0; font: 700 11px "JetBrains Mono", monospace; color: var(--text); }
   .icon.smart { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
   .toast.has-action { pointer-events: auto; display: flex; gap: 12px; align-items: center; }
-  .toast button { background: none; border: 0; color: var(--bg); font-weight: 800; text-decoration: underline; padding: 0; }
+  .toast button { background: none; border: 0; color: var(--bg); font-weight: 800; text-decoration: underline; padding: 0;
+                  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
+  .toast.has-action { overflow: hidden; padding-bottom: 13px; }
+  .count-pill { display: inline-grid; place-items: center; min-width: 20px; height: 20px; border-radius: 99px; background: var(--bg); color: var(--accent);
+                font: 800 11px "JetBrains Mono", monospace; text-decoration: none; }
+  .toast-bar { position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: #6f9418; transform-origin: left;
+               animation-name: toast-countdown; animation-timing-function: linear; animation-fill-mode: forwards; }
+  @keyframes toast-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
   .filters-sum { display: none; }
   .set-fab { display: none; }
@@ -1006,15 +1013,25 @@ function refreshAddButtons() {
 let toastTimer;
 function toast(text) {
   const el = $("#toast");
+  clearInterval(toastTick);
   el.textContent = text; el.classList.add("show"); el.classList.remove("has-action");
   clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 1600);
 }
-function toastAction(text, label, fn) {
+let toastTick;
+function toastAction(text, label, fn, seconds = 6) {
   const el = $("#toast");
-  el.innerHTML = `${esc(text)} <button type="button">${esc(label)}</button>`;
+  clearTimeout(toastTimer); clearInterval(toastTick);
+  el.innerHTML = `<span>${esc(text)}</span>
+    <button type="button">${esc(label)} <span class="count-pill" aria-hidden="true">${seconds}</span></button>
+    <i class="toast-bar" style="animation-duration:${seconds}s" aria-hidden="true"></i>`;
   el.classList.add("show", "has-action");
-  el.querySelector("button").onclick = () => { fn(); el.classList.remove("show"); };
-  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 5000);
+  const pill = el.querySelector(".count-pill");
+  let left = seconds;
+  const done = () => { clearInterval(toastTick); clearTimeout(toastTimer); el.classList.remove("show"); };
+  el.querySelector("button").onclick = () => { done(); fn(); };
+  // count the seconds down on the button, and hide when time is up
+  toastTick = setInterval(() => { left -= 1; if (left > 0) pill.textContent = left; }, 1000);
+  toastTimer = setTimeout(done, seconds * 1000);
 }
 
 /* ---- How well do two neighbouring tracks mix? 2 = good, 1 = ok, 0 = bad ---- */
