@@ -1,0 +1,30 @@
+# SimilarSounds UX/UI improvement rounds
+
+Each round: review the local site (desktop 800px + phone 375px), score with the fixed
+rubric below, make 1-2 highest-impact upgrades, re-score. Kept only if the overall score
+goes up (committed + pushed live); otherwise reverted with git.
+
+## Rubric (each 0-10, overall = average, rounded to 0.5)
+
+| Area | 10/10 means |
+|---|---|
+| Visual design | Consistent spacing/type scale, clear hierarchy, polished components, no rough edges |
+| UX clarity | A first-time visitor instantly knows what to do and what each control means |
+| Search flow | Typing, suggestions, loading and errors feel fast, guided and forgiving |
+| Results | Easy to scan and compare; key/BPM/energy/newness readable at a glance; preview is one tap |
+| Build your set | Discoverable, easy to add/reorder, transition feedback clear, useful export |
+| Mobile | Thumb-friendly, no overflow, filters and panel comfortable at 375px |
+| Accessibility | Contrast, focus states, keyboard use, labels, reduced motion |
+| Polish/perf | Empty/loading states, no layout jumps, no console errors, small touches (favicon, meta, share image) |
+
+## Log
+
+### Baseline: 6.5
+Visual 6.5 · Clarity 6 · Search 7.5 · Results 6 · Set 7 · Mobile 6.5 · Access 5.5 · Polish 6
+
+### Round 1: 6.5 → 7.0 (kept)
+- Compact result rows: cover art is the play button (one-tap preview), NEW badge, one chip line
+  incl. match %, only "+ Set" and "Beatport" on the row; SoundCloud/YouTube links appear with the preview.
+- Start screen: 4 fresh example releases to try (newest per sub-genre, cover required, explicit titles
+  skipped) and a 3-step "how it works". Filters grouped as label+control pairs; BPM shows ±3/±6/±10.
+Scores: Visual 7.5 · Clarity 7.5 · Search 7.5 · Results 7.5 · Set 7 · Mobile 7 · Access 6 · Polish 6.5

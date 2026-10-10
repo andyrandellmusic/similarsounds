@@ -4,6 +4,7 @@ Run:  uv run uvicorn app.main:app --reload --port 8000
 """
 import json
 import os
+import re
 import threading
 from datetime import date
 from pathlib import Path
@@ -147,7 +148,18 @@ def stats():
     rows = index.rows
     today = date.today()
     recent = sum(1 for r in rows if r["release_date"] and (today - date.fromisoformat(r["release_date"])).days <= 365)
-    return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES)}
+    # Example tracks for the start screen: the newest releases, one per artist and sub-genre
+    examples, seen = [], set()
+    explicit = re.compile(r"\b(pussy|fuck|shit|bitch|dick|cock|nigga|hoe|sex)\w*", re.I)
+    for r in sorted(rows, key=lambda r: r["release_date"] or "", reverse=True):
+        if not r["cover"] or explicit.search(r["title"]) or r["artist"] in seen or r["style"] in {e["style"] for e in examples}:
+            continue
+        seen.add(r["artist"])
+        examples.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
+                         "cover": r["cover"], "style": r["style"]})
+        if len(examples) == 4:
+            break
+    return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples}
 
 
 @app.post("/api/reload")
