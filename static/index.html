@@ -76,6 +76,21 @@
 
   footer { margin-top: 50px; color: var(--muted); font-size: 12px; }
 
+  /* ---------- Search-as-you-type ---------- */
+  .search-wrap { position: relative; }
+  .suggest { position: absolute; left: 0; right: 0; top: calc(100% + 6px); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; z-index: 10; box-shadow: 0 18px 50px rgba(0,0,0,.55); max-height: min(440px, 60vh); overflow-y: auto; }
+  .sg-head { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); padding: 8px 10px 4px; }
+  .sg-item { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 9px; cursor: pointer; }
+  .sg-item.active, .sg-item:hover { background: var(--panel-2); }
+  .sg-item img, .sg-item .ph { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; background: var(--panel-2); flex: none; }
+  .sg-item.artist img, .sg-item.artist .ph { border-radius: 50%; }
+  .sg-main { min-width: 0; flex: 1; }
+  .sg-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sg-name mark { background: none; color: var(--accent); font-weight: 700; }
+  .sg-sub { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sg-tag { font: 600 11px "JetBrains Mono", monospace; color: var(--accent-ink); background: var(--accent); border-radius: 5px; padding: 3px 6px; flex: none; }
+  .sg-empty { color: var(--muted); padding: 10px; font-size: 13px; }
+
   /* ---------- Build your set ---------- */
   :root { --good: #3ddc84; --ok: #ffb020; --bad: #ff5a5a; }
   .header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
@@ -143,10 +158,14 @@
   <h1>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h1>
   <p class="sub">Matched on sound, key (Camelot), BPM and energy - with the newest releases ranked first.</p>
 
-  <form class="search" id="form">
-    <input id="url" placeholder="YouTube, SoundCloud, Beatport link… or 'Artist - Title'" autocomplete="off" required>
-    <button class="go" id="go">Find</button>
-  </form>
+  <div class="search-wrap">
+    <form class="search" id="form">
+      <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required
+             role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+      <button class="go" id="go">Find</button>
+    </form>
+    <div class="suggest" id="suggest" role="listbox" hidden></div>
+  </div>
 
   <div class="filters">
     <span>Released</span>
@@ -224,10 +243,16 @@ fetch("/api/stats").then(r => r.json()).then(s => {
 // Set when the visitor chooses "show matches anyway" for a track that doesn't look like house;
 // a new search resets it, filter changes keep it.
 let allowNonHouse = false;
-$("#form").onsubmit = e => { e.preventDefault(); allowNonHouse = false; run(); };
+$("#form").onsubmit = e => { e.preventDefault(); closeSuggest(); allowNonHouse = false; run(); };
 
-async function run() {
-  const params = new URLSearchParams({ url: $("#url").value, bpm_range: $("#bpm").value,
+// When a track is picked from the suggestions, remember its exact Deezer link for as long
+// as the box still shows that track (so filter changes re-run the same version)
+let picked = { text: null, url: null };
+
+async function run(exactUrl) {
+  if (exactUrl) picked = { text: $("#url").value, url: exactUrl };
+  const url = $("#url").value === picked.text ? picked.url : $("#url").value;
+  const params = new URLSearchParams({ url, bpm_range: $("#bpm").value,
                                        strict_key: $("#strict").checked, allow_non_house: allowNonHouse });
   if (age) params.set("max_age_days", age);
   if ($("#style").value) params.set("style", $("#style").value);
@@ -298,6 +323,108 @@ function render({ source, query, results }) {
       src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe></div>`);
   });
 }
+
+/* ================= Search-as-you-type ================= */
+const input = $("#url"), box = $("#suggest");
+let sgItems = [], sgActive = -1, sgTimer, sgAbort, sgLastQ = null;
+const isLink = v => /^(https?:|www\.)/i.test(v.trim()) || v.includes("://");
+
+function highlight(text, q) {
+  // Bold the part of each word that matches what's been typed
+  const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if (!words.length) return esc(text);
+  return esc(text).replace(/[^\s()&,-]+/g, w => {
+    const hit = words.find(p => w.toLowerCase().startsWith(p));
+    return hit ? `<mark>${w.slice(0, hit.length)}</mark>${w.slice(hit.length)}` : w;
+  });
+}
+
+function closeSuggest() {
+  box.hidden = true; sgItems = []; sgActive = -1;
+  input.setAttribute("aria-expanded", "false");
+}
+
+async function fetchSuggest() {
+  const v = input.value;
+  if (!v.trim() || isLink(v)) { closeSuggest(); return; }
+  if (v === sgLastQ && !box.hidden) return;
+  sgAbort?.abort(); sgAbort = new AbortController();
+  try {
+    const r = await fetch(`/api/suggest?q=${encodeURIComponent(v)}`, { signal: sgAbort.signal });
+    const data = await r.json();
+    if (input.value !== v) return;          // typed more since: a newer request is on its way
+    sgLastQ = v; showSuggest(data, v);
+  } catch (e) { if (e.name !== "AbortError") closeSuggest(); }
+}
+
+function showSuggest({ artists = [], tracks = [], artist }, v) {
+  sgItems = []; let html = "";
+  const typed = artist !== undefined ? v.split(" - ").slice(1).join(" - ") : v;
+  if (artists.length) {
+    html += `<div class="sg-head">Artists</div>`;
+    artists.forEach(a => {
+      sgItems.push({ type: "artist", value: a.name });
+      html += `<div class="sg-item artist" role="option" data-i="${sgItems.length - 1}">
+        ${a.picture ? `<img src="${esc(a.picture)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
+        <div class="sg-main"><div class="sg-name">${highlight(a.name, v)}</div>
+        <div class="sg-sub">${a.in_catalogue ? `${a.in_catalogue} track${a.in_catalogue > 1 ? "s" : ""} in our house catalogue` : "Artist"}</div></div>
+      </div>`;
+    });
+  }
+  if (tracks.length) {
+    html += `<div class="sg-head">${artist ? `Tracks by ${esc(artist)}` : "Tracks"}</div>`;
+    tracks.forEach(t => {
+      sgItems.push({ type: "track", value: `${t.artist} - ${t.title}`, id: t.deezer_id });
+      html += `<div class="sg-item" role="option" data-i="${sgItems.length - 1}">
+        ${t.cover ? `<img src="${esc(t.cover)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
+        <div class="sg-main"><div class="sg-name">${highlight(t.title, typed)}</div>
+        <div class="sg-sub">${esc(t.artist)}${t.release_date ? " · " + esc(t.release_date.slice(0, 4)) : ""}</div></div>
+        ${t.in_catalogue ? `<span class="sg-tag">${esc(t.camelot)} · ${esc(t.bpm)}</span>` : ""}
+      </div>`;
+    });
+  }
+  if (!html) html = artist !== undefined
+    ? `<div class="sg-empty">No matching tracks by ${esc(artist)} - press Find to search anyway.</div>`
+    : `<div class="sg-empty">No matches yet - keep typing, or press Find.</div>`;
+  box.innerHTML = html; box.hidden = false; sgActive = -1;
+  input.setAttribute("aria-expanded", "true");
+}
+
+function choose(i) {
+  const it = sgItems[i];
+  if (!it) return;
+  if (it.type === "artist") {
+    // Show that artist's tracks next
+    input.value = `${it.value} - `; input.focus(); sgLastQ = null; fetchSuggest();
+  } else {
+    // Search by the exact Deezer track, so the right version is analysed
+    input.value = it.value; closeSuggest();
+    allowNonHouse = false; run(`https://www.deezer.com/track/${it.id}`);
+  }
+}
+
+input.addEventListener("input", () => {
+  clearTimeout(sgTimer);
+  sgTimer = setTimeout(fetchSuggest, input.value.trim().length <= 1 ? 0 : 150);
+});
+input.addEventListener("focus", () => { if (input.value.trim()) { sgLastQ = null; fetchSuggest(); } });
+input.addEventListener("keydown", e => {
+  if (box.hidden || !sgItems.length) return;
+  if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+    e.preventDefault();
+    sgActive = (sgActive + (e.key === "ArrowDown" ? 1 : -1) + sgItems.length) % sgItems.length;
+    box.querySelectorAll(".sg-item").forEach((el, j) => el.classList.toggle("active", j === sgActive));
+    box.querySelector(".sg-item.active")?.scrollIntoView({ block: "nearest" });
+  } else if (e.key === "Enter" && sgActive >= 0) {
+    e.preventDefault(); choose(sgActive);
+  } else if (e.key === "Escape") closeSuggest();
+});
+box.addEventListener("pointerdown", e => e.preventDefault());   // keep focus in the box
+box.addEventListener("click", e => {
+  const el = e.target.closest(".sg-item");
+  if (el) choose(Number(el.dataset.i));
+});
+document.addEventListener("click", e => { if (!e.target.closest(".search-wrap")) closeSuggest(); });
 
 /* ================= Build your set ================= */
 let trackCache = {};

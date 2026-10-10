@@ -18,12 +18,14 @@ from app import house, sources
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
 from app.ranking import rank
+from app.suggest import Suggester
 from scripts.seed import STYLES
 
 STATIC = Path(__file__).resolve().parent.parent / "static"
 
 app = FastAPI(title="SimilarSounds")
 index = Index()
+suggester = Suggester(index)
 _query_cache: dict[int, dict] = {}
 _analysis_lock = threading.Lock()
 
@@ -131,6 +133,15 @@ async def match(
     return {"source": src, "query": query, "results": results}
 
 
+@app.get("/api/suggest")
+def suggest(q: str = Query("", max_length=100)):
+    """Search-as-you-type: artists from the first letter, tracks from 3 letters, or an artist's
+    tracks once the box reads "Artist - "."""
+    if q.lower().startswith(("http", "www.")) or "://" in q:
+        return {"artists": [], "tracks": []}
+    return suggester.suggest(q)
+
+
 @app.get("/api/stats")
 def stats():
     rows = index.rows
@@ -142,6 +153,7 @@ def stats():
 @app.post("/api/reload")
 def reload():
     index.reload()
+    suggester.rebuild()
     return {"tracks": len(index.rows)}
 
 
