@@ -88,8 +88,21 @@
   .energy i { width: 4px; height: 10px; border-radius: 1px; background: var(--line); }
   .energy i.f { background: var(--accent); }
 
-  .results-head { display: flex; justify-content: space-between; align-items: baseline; margin: 34px 0 10px; }
+  .results-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 34px 0 8px; }
   .results-head h2 { margin: 0; font-size: 18px; }
+  .sort { color: var(--muted); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
+  .howto { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+  .howto summary { cursor: pointer; width: fit-content; }
+  .howto summary:hover { color: var(--text); }
+  .howto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
+  .howto-grid > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .howto-grid p { margin: 2px 0 0; flex-basis: 100%; }
+  .howto-grid b { color: var(--text); display: block; }
+  .why { display: flex; align-items: center; gap: 7px; margin-top: 7px; font-size: 12px; color: var(--muted); min-width: 0; }
+  .why > span:last-child { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; display: inline-block; }
+  .dot.good { background: var(--good); } .dot.ok { background: var(--ok); } .dot.bad { background: var(--bad); }
+  .why b.good { color: var(--good); } .why b.ok { color: var(--ok); } .why b.bad { color: var(--bad); }
   .list { display: grid; gap: 8px; }
   .row { display: grid; grid-template-columns: 64px 1fr auto; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 10px 10px; transition: border-color .15s; }
   .row:hover, .row.playing { border-color: #3a3a4a; }
@@ -425,9 +438,49 @@ function render({ source, query, results }) {
   }
   if (!check.is_house) html += `<div class="msg">Not a house track, so these are the closest house tracks we have.</div>`;
   announce(`${results.length} matches for ${query.artist} - ${query.title}`);
-  html += `<div class="results-head"><h2>${results.length} matches</h2><span class="stats">newest &amp; closest first</span></div>`;
+  lastQuery = query;
+  lastResults = results.map((t, i) => ({ ...t, rank: i, mix: transition(query, t) }));
+  html += `<div class="results-head">
+      <h2>${results.length} matches</h2>
+      ${results.length ? `<label class="sort">Sort <select id="sort">
+        <option value="best">Best match</option><option value="mix">Smoothest mix</option>
+        <option value="new">Newest</option><option value="bpm">Closest BPM</option></select></label>` : ""}
+    </div>
+    ${results.length ? `<details class="howto"><summary>How to read these results</summary>
+      <div class="howto-grid">
+        <div><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
+        <div><span class="chip cam" style="background:${camelotColor("8A")}">8A</span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
+        <div>${energyBar(6)}<p><b>Energy</b> 1 = deep and chilled, 10 = peak-time.</p></div>
+        <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
+      </div></details>` : ""}`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
-  html += `<div class="list">` + results.map(t => `
+  html += `<div class="list" id="list"></div>`;
+  $("#out").innerHTML = html;
+  if ($("#sort")) { $("#sort").value = sortBy; $("#sort").onchange = e => { sortBy = e.target.value; renderList(); }; }
+  renderList();
+}
+
+let lastQuery = null, lastResults = [], sortBy = "best";
+const signed = (n, unit) => n === 0 ? `same ${unit}` : `${n > 0 ? "+" : "−"}${Math.abs(n)} ${unit}`;
+
+function whyLine(q, t) {
+  const k = keyMix(q.camelot, t.camelot)[1];
+  const bpm = Math.round((t.bpm - q.bpm) * 10) / 10;
+  const parts = [k[0].toUpperCase() + k.slice(1), signed(bpm, "BPM"), signed(t.energy - q.energy, "energy").replace(/^([+−]\d+) energy$/, "energy $1")];
+  return parts.join(" · ");
+}
+
+function renderList() {
+  const list = $("#list");
+  if (!list) return;
+  const sorters = {
+    best: (a, b) => a.rank - b.rank,
+    mix: (a, b) => b.mix.score - a.mix.score || a.rank - b.rank,
+    new: (a, b) => a.age_days - b.age_days || a.rank - b.rank,
+    bpm: (a, b) => Math.abs(a.bpm - lastQuery.bpm) - Math.abs(b.bpm - lastQuery.bpm) || a.rank - b.rank,
+  };
+  const rows = [...lastResults].sort(sorters[sortBy] || sorters.best);
+  list.innerHTML = rows.map(t => `
     <div class="row" data-id="${t.deezer_id}">
       <button type="button" class="cover play" data-id="${t.deezer_id}" aria-label="Preview ${esc(t.title)} by ${esc(t.artist)}">
         <img src="${esc(t.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
@@ -442,13 +495,13 @@ function render({ source, query, results }) {
           <span class="chip" title="Released ${esc(t.release_date)}">${ago(t.age_days)}</span>
           <span class="chip match" title="How close it sounds to your track">${t.similarity}% match</span>
         </div>
+        <div class="why"><span class="dot ${t.mix.cls}" aria-hidden="true"></span><span><b class="${t.mix.cls}">${t.mix.label}</b> · ${esc(whyLine(lastQuery, t))}</span></div>
       </div>
       <div class="actions">
         ${addButton(t)}
         <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport ↗</a>
       </div>
-    </div>`).join("") + `</div>`;
-  $("#out").innerHTML = html;
+    </div>`).join("");
 }
 
 // One-tap preview from the cover art (delegated, so it works for every render)

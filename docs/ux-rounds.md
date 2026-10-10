@@ -45,3 +45,11 @@ Scores: Visual 7.5 · Clarity 7.5 · Search 8 · Results 7.5 · Set 7.5 · Mobil
 - Mobile: sticky "Your set" bar at the bottom (count + clash status, one tap to open), cramped top bar
   removed, filters fold into a one-line "Filters" summary showing the current choices.
 Scores: Visual 8 · Clarity 7.5 · Search 8 · Results 7.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 8
+
+### Round 4: 8.0 → 8.3 (kept)  [scores now reported to one decimal]
+- Results: every match shows "why" in the same green/amber/red language as Build your set
+  (e.g. "Mixes well · Same key · +2 BPM · energy +1"). Sort by Best match / Smoothest mix /
+  Newest / Closest BPM (client-side, instant).
+- Clarity: "How to read these results" legend explaining the mix dot, Camelot key, energy bars
+  and sound-match %.
+Scores: Visual 8 · Clarity 8.5 · Search 8 · Results 8.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 8
