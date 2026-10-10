@@ -97,3 +97,19 @@ Scores: Visual 9 · Clarity 9 · Search 9 · Results 9 · Set 9.5 · Mobile 9 ·
   search reuses it (locally 1.9 s → 0.65 s after a 1.5 s hover). The chosen track's cover, title
   and artist now appear instantly with placeholder chips while matches load.
 Scores: Visual 9 · Clarity 9 · Search 9.5 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9.5
+
+### Round 10: 9.2 → 9.4 (kept) - final round
+- Live end-to-end check first: page, share image, suggestions (~1 s), prefetch, matching, shared-set
+  lookups and health all OK on www.similarsounds.com.
+- Dead ends removed: "We couldn't find …" card with practical tips plus fresh releases to try
+  (instead of an orange error line with jargon); separate "Can't reach SimilarSounds" state with
+  Try again (recovers in place); unsupported links get their own explanation.
+- Press "/" anywhere to jump to the search box (shown as a hint on desktop).
+Scores: Visual 9 · Clarity 9.5 · Search 9.5 · Results 9 · Set 9.5 · Mobile 9 · Access 9.5 · Polish 9.5
+
+## Where it ended: 6.5 → 9.4 in 10 rounds
+What stands between 9.4 and 10 (not fixable in page code alone):
+- Speed of brand-new tracks (~12 s) is the free server's CPU; the $7/month Render plan cuts it to a
+  few seconds. Faster analysis methods were tested and rejected for accuracy (round 9).
+- Results/Visual/Mobile 9: result rows on phones are still 4 lines tall; key/BPM accuracy and a
+  bigger catalogue depend on the Beatport partnership.

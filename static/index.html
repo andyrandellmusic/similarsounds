@@ -78,6 +78,13 @@
 
   .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
   .msg.err { border-color: #5a2c22; color: var(--warn); }
+  .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
+  .problem-title { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
+  .problem p { color: var(--muted); margin: 0 0 12px; }
+  .tips { color: var(--muted); margin: 6px 0 4px; padding-left: 18px; display: grid; gap: 4px; }
+  .tips b { color: var(--text); }
+  .kbd { align-self: center; font: 600 12px "JetBrains Mono", monospace; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; margin-right: 2px; }
+  form.search:focus-within .kbd { display: none; }
   .notice { margin-top: 20px; padding: 18px; border-radius: 14px; background: var(--panel); border: 1px solid #5a4a22; }
   .notice-title { font-weight: 700; color: #ffcf5c; }
   .notice p { color: var(--muted); margin: 6px 0 14px; }
@@ -257,6 +264,7 @@
     .actions { grid-column: 2; }
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
+    .kbd { display: none; }
     .steps { grid-template-columns: 1fr; }
     .icon, select { height: 44px; }
     .icon { padding: 0 14px; font-size: 13px; }
@@ -290,8 +298,9 @@
 
   <div class="search-wrap">
     <form class="search" id="form">
-      <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required
+      <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required aria-keyshortcuts="/"
              role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
+      <kbd class="kbd" aria-hidden="true" title="Press / to search">/</kbd>
       <button class="go" id="go">Find</button>
     </form>
     <div class="suggest" id="suggest" role="listbox" hidden></div>
@@ -398,8 +407,13 @@ updateFilterSummary();
 fetch("/api/stats").then(r => r.json()).then(s => {
   $("#stats").textContent = `${s.tracks.toLocaleString()} tracks · ${s.last_12_months.toLocaleString()} from the last 12 months`;
   s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
+  examplesCache = s.examples || [];
   const tryBox = $("#try");
-  if (tryBox) tryBox.innerHTML = (s.examples || []).map(t => {
+  if (tryBox) tryBox.innerHTML = examplesHtml(examplesCache);
+});
+let examplesCache = [];
+function examplesHtml(list) {
+  return list.map(t => {
     const m = t.title.match(/^(.*?)\s*[(\[](.+)[)\]]\s*$/);   // "Title (X Remix)" -> "Title" + "X Remix"
     const title = m ? m[1] : t.title, version = m ? m[2] : "";
     return `
@@ -412,7 +426,7 @@ fetch("/api/stats").then(r => r.json()).then(s => {
       </span>
     </button>`;
   }).join("");
-});
+}
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-try]");
   if (!b) return;
@@ -450,9 +464,10 @@ async function run(exactUrl, fromHistory = false) {
     ${'<div class="skel" aria-hidden="true"><i class="c"></i><div><i class="l1"></i><i class="l2"></i><i class="l3"></i></div></div>'.repeat(4)}`;
   announce("Searching…");
   try {
-    const r = await fetch(`/api/match?${params}`);
-    const data = await r.json();
-    if (!r.ok) throw new Error(data.detail || "Something went wrong");
+    let r, data;
+    try { r = await fetch(`/api/match?${params}`); data = await r.json(); }
+    catch { const e = new Error("offline"); e.kind = "offline"; throw e; }
+    if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
@@ -461,8 +476,38 @@ async function run(exactUrl, fromHistory = false) {
       history[fromHistory ? "replaceState" : "pushState"]({ t, label }, "", `?t=${t}`);
     document.title = `${label} - similar house tracks | SimilarSounds`;
   } catch (err) {
-    $("#out").innerHTML = `<div class="msg err" role="alert">${esc(err.message)}</div>`;
+    showProblem(err, url);
   } finally { $("#go").disabled = false; }
+}
+
+/* Friendly dead-ends: never just an error line - always a way forward */
+function showProblem(err, attempted) {
+  const typed = isLink(attempted || "") ? "" : (attempted || "").trim();
+  const tryAgain = `<button type="button" class="icon" id="retry">Try again</button>`;
+  const examples = examplesCache.length ? `<div class="start-label" style="margin-top:18px">Or try a fresh release</div>
+    <div class="try">${examplesHtml(examplesCache)}</div>` : "";
+  let title, body, actions = "";
+  if (err.kind === "notfound") {
+    title = typed ? `We couldn't find "${esc(typed)}"` : "We couldn't find that track";
+    body = `<ul class="tips">
+        <li>Start typing the <b>artist's name</b> and pick the track from the list - that's the most reliable way.</li>
+        <li>Check the spelling, or use the format <b>Artist - Title</b>.</li>
+        <li>Brand-new or very underground tracks may not have a preview yet.</li></ul>`;
+  } else if (err.kind === "badlink") {
+    title = "That link isn't one we can read yet";
+    body = `<p>${esc(err.message)}</p>`;
+  } else if (err.kind === "offline") {
+    title = "Can't reach SimilarSounds right now";
+    body = `<p>Check your connection. If the site has been quiet for a while it may be waking up - give it a few seconds.</p>`;
+    actions = tryAgain;
+  } else {
+    title = "Something went wrong on our side";
+    body = `<p>${esc(err.message)}</p>`;
+    actions = tryAgain;
+  }
+  $("#out").innerHTML = `<section class="problem" role="alert"><div class="problem-title">${title}</div>${body}${actions}</section>${examples}`;
+  $("#retry")?.addEventListener("click", () => run(picked.text === $("#url").value ? picked.url : undefined));
+  announce(title.replace(/&quot;/g, '"'));
 }
 
 function render({ source, query, results }) {
@@ -1007,7 +1052,12 @@ $("#set-open").onclick = () => openSet(true);
 $("#set-fab").onclick = () => openSet(true);
 $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
-document.addEventListener("keydown", e => { if (e.key === "Escape") openSet(false); });
+document.addEventListener("keydown", e => {
+  if (e.key === "Escape") openSet(false);
+  if (e.key === "/" && !e.target.closest?.("input, textarea, select") && !$("#set-panel").classList.contains("open")) {
+    e.preventDefault(); input.focus(); input.select();
+  }
+});
 
 $("#set-share").onclick = async () => {
   if (!set.length) return toast("Your set is empty");
