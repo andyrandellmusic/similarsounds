@@ -38,6 +38,27 @@
   .logo { display: inline-block; font-weight: 800; letter-spacing: -0.03em; line-height: 1; white-space: nowrap;
           font-size: clamp(40px, 10vw, 84px); margin: 34px 0 0; }
   .logo span { color: var(--accent); }
+  a.logo { color: inherit; text-decoration: none; }
+  a.logo:focus-visible { outline-offset: 6px; border-radius: 6px; }
+  .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 34px; }
+  .brand-row .logo { margin: 0; }
+  /* The diamonds make one smooth turn, then rest - every 3 seconds */
+  .logo .mark { transform-box: fill-box; transform-origin: 50% 50%; animation: mark-spin 3s cubic-bezier(.65,0,.35,1) infinite; }
+  @keyframes mark-spin { 0% { transform: rotate(0deg); } 30% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
+  .logo:hover .mark { animation-play-state: paused; }
+
+  .menu-wrap { position: relative; flex: none; }
+  .menu-btn { width: 48px; height: 48px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); display: grid; place-content: center; gap: 5px; padding: 0; }
+  .menu-btn span { display: block; width: 20px; height: 2px; border-radius: 2px; background: var(--text); transition: transform .2s, opacity .2s; }
+  .menu-btn:hover { border-color: #4a4a5c; }
+  .menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
+  .menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+  .menu { position: absolute; right: 0; top: calc(100% + 8px); width: 260px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; z-index: 18; box-shadow: 0 18px 50px rgba(0,0,0,.55); }
+  .menu button { display: grid; gap: 1px; width: 100%; text-align: left; background: none; border: 0; color: var(--text); padding: 10px 12px; border-radius: 10px; }
+  .menu button:hover, .menu button:focus-visible { background: var(--panel-2); }
+  .menu b { font-size: 15px; }
+  .menu small { color: var(--muted); font-size: 12px; }
   .logo .mark { display: inline-block; height: 0.86em; width: 1.31em; margin-right: 0.07em; vertical-align: -0.065em; overflow: visible; }
   .stats { color: var(--muted); font-size: 13px; }
   h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 16px 0 26px; font-weight: 700; max-width: 760px; }
@@ -229,7 +250,9 @@
   .set-fab { display: none; }
   @media (max-width: 640px) {
     header { display: none; }
-    .logo { margin-top: 20px; }
+    .brand-row { margin-top: 18px; }
+    .brand-row .logo { font-size: min(42px, calc((100vw - 32px - 56px) / 8.45)); }
+    .menu-btn { width: 44px; height: 44px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
     .filters-sum { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; list-style: none; font-weight: 600; font-size: 14px; }
     .filters-sum::-webkit-details-marker { display: none; }
@@ -317,7 +340,20 @@
     </div>
   </header>
 
-  <div class="logo" role="img" aria-label="SimilarSounds"><svg class="mark" viewBox="16 39 64 42" aria-hidden="true"><path d="M37 39 L58 60 L37 81 L16 60 Z" fill="#f2f2f5"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#0b0b0f" stroke-width="12" stroke-linejoin="miter"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#c6ff3d" stroke-width="7" stroke-linejoin="miter"/></svg>Similar<span>Sounds</span></div>
+  <div class="brand-row">
+    <a class="logo" href="/" id="home-link" aria-label="SimilarSounds - home"><svg class="mark" viewBox="16 39 64 42" aria-hidden="true"><path d="M37 39 L58 60 L37 81 L16 60 Z" fill="#f2f2f5"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#0b0b0f" stroke-width="12" stroke-linejoin="miter"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#c6ff3d" stroke-width="7" stroke-linejoin="miter"/></svg>Similar<span>Sounds</span></a>
+    <div class="menu-wrap">
+      <button type="button" class="menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="menu" id="menu" hidden aria-label="Main menu">
+        <button type="button" data-menu="home"><b>Home</b><small>Back to the start screen</small></button>
+        <button type="button" data-menu="set"><b>Build your set</b><small id="menu-set-sub">Your saved tracks</small></button>
+        <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
+        <button type="button" data-menu="share"><b>Share SimilarSounds</b><small>Copy the site link</small></button>
+      </nav>
+    </div>
+  </div>
   <h1>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h1>
 
   <div class="search-wrap">
@@ -353,7 +389,7 @@
     <section class="start" id="start">
       <div class="start-label">Try a fresh release</div>
       <div class="try" id="try"></div>
-      <ol class="steps">
+      <ol class="steps" id="how">
         <li><b>1</b><span><strong>Pick a track</strong> Type an artist or paste a YouTube, SoundCloud or Beatport link.</span></li>
         <li><b>2</b><span><strong>Get matches</strong> New house that fits its key, BPM, energy and sound.</span></li>
         <li><b>3</b><span><strong>Build your set</strong> Line tracks up and see which ones mix smoothly.</span></li>
@@ -855,6 +891,32 @@ box.addEventListener("click", e => {
   if (!e.target.closest("#sg-clear")) return;
   try { localStorage.removeItem("ss_recent"); } catch {}
   closeSuggest(); toast("Recent searches cleared");
+});
+
+/* ================= Home link + ☰ menu ================= */
+const menu = $("#menu"), menuBtn = $("#menu-btn");
+function toggleMenu(open = menu.hidden) {
+  menu.hidden = !open; menuBtn.setAttribute("aria-expanded", open);
+  if (open) { $("#menu-set-sub").textContent = set.length ? `${set.length} track${set.length > 1 ? "s" : ""} saved` : "Your saved tracks"; menu.querySelector("button").focus(); }
+}
+menuBtn.addEventListener("click", () => toggleMenu());
+document.addEventListener("pointerdown", e => { if (!menu.hidden && !e.target.closest(".menu-wrap")) toggleMenu(false); }, true);
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !menu.hidden) { toggleMenu(false); menuBtn.focus(); } });
+function goHome() { newSearch(); scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }); }
+$("#home-link").addEventListener("click", e => {
+  if (e.metaKey || e.ctrlKey || e.shiftKey) return;   // let "open in new tab" work
+  e.preventDefault(); goHome();
+});
+menu.addEventListener("click", async e => {
+  const b = e.target.closest("[data-menu]"); if (!b) return;
+  const what = b.dataset.menu; toggleMenu(false);
+  if (what === "home") goHome();
+  if (what === "set") openSet(true);
+  if (what === "how") { if (!$("#how")) newSearch(); $("#how").scrollIntoView({ behavior: "smooth", block: "center" }); }
+  if (what === "share") {
+    try { await navigator.clipboard.writeText("https://www.similarsounds.com/"); toast("Site link copied - www.similarsounds.com"); }
+    catch { toast("Couldn't copy - your browser blocked it"); }
+  }
 });
 
 /* ================= Prefetch: analyse a track before it's clicked ================= */
