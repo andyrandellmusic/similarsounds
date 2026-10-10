@@ -14,7 +14,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from app import sources
+from app import house, sources
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
 from app.ranking import rank
@@ -70,7 +70,9 @@ def analyse_query(deezer_id: int) -> dict:
         return {"key": r["key"], "camelot": r["camelot"], "bpm": r["bpm"], "energy": float(r["energy"]),
                 "embedding": json.loads(r["embedding"]), "title": r["title"], "artist": r["artist"],
                 "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],
-                "deezer_id": deezer_id, "in_catalogue": True}
+                "deezer_id": deezer_id, "in_catalogue": True,
+                # Everything in the catalogue was collected as house
+                "house_check": {"is_house": True, "confidence": 1.0, "reason": None}}
     if deezer_id in _query_cache:
         return _query_cache[deezer_id]
     t = sources.deezer_track(deezer_id)
@@ -80,9 +82,15 @@ def analyse_query(deezer_id: int) -> dict:
     with _analysis_lock:   # one analysis at a time keeps peak memory inside the free 512 MB plan
         feats = analyse(audio)
     energy = float(index.energy_scores(np.array([energy_vector(feats["energy_raw"])], dtype="float32"))[0])
+    try:
+        album = sources.deezer(f"/album/{t['album']['id']}")
+    except Exception:
+        album = {}
+    genres = [g["id"] for g in album.get("genres", {}).get("data", [])]
     q = {**feats, "energy": energy, "title": t["title"], "artist": t["artist"]["name"],
-         "label": None, "cover": t["album"].get("cover_medium"), "release_date": t.get("release_date"),
-         "deezer_id": deezer_id, "in_catalogue": False}
+         "label": album.get("label"), "cover": t["album"].get("cover_medium"),
+         "release_date": t.get("release_date"), "deezer_id": deezer_id, "in_catalogue": False,
+         "house_check": house.check(house.house_features(feats, index, genres))}
     _query_cache[deezer_id] = q
     return q
 
@@ -94,6 +102,7 @@ async def match(
     strict_key: bool = False,
     bpm_range: float = 6.0,
     style: str | None = None,
+    allow_non_house: bool = False,
 ):
     if not index.rows:
         raise HTTPException(503, "The catalogue is empty - run the seed script first.")
@@ -113,9 +122,12 @@ async def match(
     q = await run_in_threadpool(analyse_query, deezer_id)
     results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
                                   strict_key=strict_key, bpm_range=bpm_range, style=style or None)
-    query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw")}
-    query["style"] = guessed_style
+    query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm")}
+    query["style"] = guessed_style if q["house_check"]["is_house"] else None
     query["energy"] = int(query["energy"])
+    # Not house: hold results back unless the visitor chooses to see them anyway
+    if not q["house_check"]["is_house"] and not allow_non_house:
+        results = []
     return {"source": src, "query": query, "results": results}
 
 

@@ -39,6 +39,9 @@
 
   .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
   .msg.err { border-color: #5a2c22; color: var(--warn); }
+  .notice { margin-top: 20px; padding: 18px; border-radius: 14px; background: var(--panel); border: 1px solid #5a4a22; }
+  .notice-title { font-weight: 700; color: #ffcf5c; }
+  .notice p { color: var(--muted); margin: 6px 0 14px; }
 
   .query { margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
   .query .top { display: flex; gap: 16px; align-items: center; }
@@ -72,11 +75,58 @@
   .match { font: 700 13px "JetBrains Mono", monospace; color: var(--accent); }
 
   footer { margin-top: 50px; color: var(--muted); font-size: 12px; }
+
+  /* ---------- Build your set ---------- */
+  :root { --good: #3ddc84; --ok: #ffb020; --bad: #ff5a5a; }
+  .header-right { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .set-toggle { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 8px 12px; font-weight: 600; font-size: 13px; display: inline-flex; gap: 8px; align-items: center; }
+  .set-toggle .count { background: var(--accent); color: var(--accent-ink); border-radius: 999px; min-width: 20px; height: 20px; padding: 0 6px; display: inline-grid; place-items: center; font-size: 12px; font-weight: 800; }
+  .icon.add.added { border-color: var(--accent); color: var(--accent); }
+
+  .set-panel { position: fixed; top: 0; right: 0; bottom: 0; width: min(440px, 100%); background: var(--panel); border-left: 1px solid var(--line); transform: translateX(100%); transition: transform .25s ease; z-index: 20; display: flex; flex-direction: column; }
+  .set-panel.open { transform: none; box-shadow: -20px 0 60px rgba(0,0,0,.5); }
+  .set-head { padding: 18px 18px 12px; border-bottom: 1px solid var(--line); }
+  .set-head .row1 { display: flex; justify-content: space-between; align-items: center; }
+  .set-head h2 { margin: 0; font-size: 18px; }
+  .close { background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; padding: 4px 8px; }
+  .set-summary { color: var(--muted); font-size: 13px; margin-top: 4px; }
+  .flow { margin-top: 12px; }
+  .flow svg { width: 100%; height: 54px; display: block; }
+  .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .set-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
+  .set-empty { color: var(--muted); text-align: center; padding: 40px 16px; }
+  .set-list { list-style: none; margin: 0; padding: 0; }
+  .set-item { user-select: none; }
+  .set-card { display: grid; grid-template-columns: 22px 40px 1fr auto; gap: 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
+  .set-card img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+  .set-card .t { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .set-card .a { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .set-card .chips { margin-top: 5px; }
+  .set-card .chip { font-size: 11px; padding: 4px 6px; }
+  .grip { cursor: grab; color: var(--muted); font-size: 18px; line-height: 1; text-align: center; touch-action: none; padding: 6px 0; }
+  .num { font: 700 11px "JetBrains Mono", monospace; color: var(--muted); }
+  .item-btns { display: flex; flex-direction: column; gap: 2px; }
+  .mini { background: none; border: 0; color: var(--muted); font-size: 13px; padding: 2px 6px; border-radius: 6px; }
+  .mini:hover { background: var(--line); color: var(--text); }
+  .set-item.dragging .set-card { border-color: var(--accent); box-shadow: 0 8px 30px rgba(0,0,0,.5); position: relative; z-index: 2; }
+  .set-list.is-dragging .link { visibility: hidden; }
+
+  .link { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px 14px; padding: 6px 0 6px 14px; border-left: 3px solid var(--c); font-size: 12px; color: var(--muted); }
+  .link .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .link b { color: var(--c); font-weight: 700; }
+  .link.good { --c: var(--good); } .link.ok { --c: var(--ok); } .link.bad { --c: var(--bad); }
+  .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 19; opacity: 0; pointer-events: none; transition: opacity .25s; }
+  .scrim.open { opacity: 1; pointer-events: auto; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; opacity: 0; transition: all .2s; z-index: 30; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateX(-50%); }
+
   @media (max-width: 640px) {
     .row { grid-template-columns: 48px 1fr; }
     .row img { width: 48px; height: 48px; }
-    .actions { grid-column: 1 / -1; }
+    .actions { grid-column: 1 / -1; flex-wrap: wrap; }
     .go { padding: 0 14px; }
+    .set-panel { width: 100%; }
   }
 </style>
 </head>
@@ -84,7 +134,10 @@
 <div class="wrap">
   <header>
     <div class="logo">Similar<span>Sounds</span></div>
-    <div class="stats" id="stats"></div>
+    <div class="header-right">
+      <div class="stats" id="stats"></div>
+      <button type="button" class="set-toggle" id="set-open">Build your set <span class="count" id="set-count">0</span></button>
+    </div>
   </header>
 
   <h1>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h1>
@@ -111,6 +164,24 @@
   </div>
 
   <div id="out"></div>
+
+  <div class="scrim" id="scrim"></div>
+  <aside class="set-panel" id="set-panel" aria-label="Your set">
+    <div class="set-head">
+      <div class="row1"><h2>Your set</h2><button type="button" class="close" id="set-close" aria-label="Close">×</button></div>
+      <div class="set-summary" id="set-summary"></div>
+      <div class="flow" id="set-flow"></div>
+      <div class="set-tools">
+        <button type="button" class="icon" id="set-copy">Copy tracklist</button>
+        <button type="button" class="icon" id="set-clear">Clear set</button>
+      </div>
+    </div>
+    <div class="set-body">
+      <ol class="set-list" id="set-list"></ol>
+      <div class="set-empty" id="set-empty">Add tracks with <b>+ Set</b>, then drag them into order.<br>Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</div>
+    </div>
+  </aside>
+  <div class="toast" id="toast"></div>
 
   <footer>Prototype. Previews &amp; players from Deezer; YouTube and SoundCloud are used for track lookup and players only - their audio is never downloaded. Analysis: key, BPM, energy and a timbre fingerprint computed from 30-second previews.</footer>
 </div>
@@ -150,10 +221,14 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
 });
 
-$("#form").onsubmit = e => { e.preventDefault(); run(); };
+// Set when the visitor chooses "show matches anyway" for a track that doesn't look like house;
+// a new search resets it, filter changes keep it.
+let allowNonHouse = false;
+$("#form").onsubmit = e => { e.preventDefault(); allowNonHouse = false; run(); };
 
 async function run() {
-  const params = new URLSearchParams({ url: $("#url").value, bpm_range: $("#bpm").value, strict_key: $("#strict").checked });
+  const params = new URLSearchParams({ url: $("#url").value, bpm_range: $("#bpm").value,
+                                       strict_key: $("#strict").checked, allow_non_house: allowNonHouse });
   if (age) params.set("max_age_days", age);
   if ($("#style").value) params.set("style", $("#style").value);
   $("#go").disabled = true;
@@ -177,10 +252,26 @@ function render({ source, query, results }) {
           <div class="eyebrow">Your track · via ${esc(source.source)}</div>
           <div class="qt">${esc(query.artist)} – ${esc(query.title)}</div>
           ${chips(query)}
+          <div class="actions" style="margin-top:10px">${addButton(query)}</div>
         </div>
       </div>${embed}
-    </section>
-    <div class="results-head"><h2>${results.length} matches</h2><span class="stats">newest &amp; closest first</span></div>`;
+    </section>`;
+  trackCache = {};
+  trackCache[query.deezer_id] = query;
+  results.forEach(t => trackCache[t.deezer_id] = t);
+  const check = query.house_check || { is_house: true };
+  if (!check.is_house && !allowNonHouse) {
+    html += `<div class="notice">
+        <div class="notice-title">This doesn't look like a house track</div>
+        <p>${check.reason ? esc(check.reason[0].toUpperCase() + check.reason.slice(1)) + ". " : ""}SimilarSounds only covers house music for now, so matches may not fit well.</p>
+        <button type="button" class="icon" id="anyway">Show house matches anyway</button>
+      </div>`;
+    $("#out").innerHTML = html;
+    $("#anyway").onclick = () => { allowNonHouse = true; run(); };
+    return;
+  }
+  if (!check.is_house) html += `<div class="msg">Not a house track, so these are the closest house tracks we have.</div>`;
+  html += `<div class="results-head"><h2>${results.length} matches</h2><span class="stats">newest &amp; closest first</span></div>`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
   html += `<div class="list">` + results.map((t, i) => `
     <div class="row">
@@ -192,6 +283,7 @@ function render({ source, query, results }) {
       </div>
       <div class="actions">
         <button class="icon play" data-id="${t.deezer_id}" data-i="${i}">▶ Preview</button>
+        ${addButton(t)}
         <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
         <a class="icon" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SC</a>
         <a class="icon" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YT</a>
@@ -206,6 +298,207 @@ function render({ source, query, results }) {
       src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe></div>`);
   });
 }
+
+/* ================= Build your set ================= */
+let trackCache = {};
+let set = loadSet();
+
+function loadSet() {
+  try { return JSON.parse(localStorage.getItem("ss_set") || "[]"); } catch { return []; }
+}
+function saveSet() {
+  try { localStorage.setItem("ss_set", JSON.stringify(set)); } catch {}
+}
+const inSet = id => set.some(t => t.deezer_id === id);
+
+function addButton(t) {
+  const added = inSet(t.deezer_id);
+  return `<button type="button" class="icon add${added ? " added" : ""}" data-add="${t.deezer_id}">${added ? "✓ In set" : "+ Set"}</button>`;
+}
+
+// Delegated, so buttons in freshly rendered results work too
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-add]");
+  if (!b) return;
+  const id = Number(b.dataset.add);
+  if (inSet(id)) {
+    set = set.filter(t => t.deezer_id !== id);
+    toast("Removed from your set");
+  } else {
+    const t = trackCache[id];
+    if (!t) return;
+    set.push({ deezer_id: t.deezer_id, title: t.title, artist: t.artist, cover: t.cover,
+               key: t.key, camelot: t.camelot, bpm: t.bpm, energy: t.energy });
+    toast(`Added to your set (${set.length})`);
+  }
+  saveSet(); renderSet(); refreshAddButtons();
+});
+
+function refreshAddButtons() {
+  document.querySelectorAll("[data-add]").forEach(b => {
+    const added = inSet(Number(b.dataset.add));
+    b.classList.toggle("added", added);
+    b.textContent = added ? "✓ In set" : "+ Set";
+  });
+}
+
+let toastTimer;
+function toast(text) {
+  const el = $("#toast");
+  el.textContent = text; el.classList.add("show");
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 1600);
+}
+
+/* ---- How well do two neighbouring tracks mix? 2 = good, 1 = ok, 0 = bad ---- */
+function keyMix(a, b) {
+  const na = parseInt(a), la = a.slice(-1), nb = parseInt(b), lb = b.slice(-1);
+  const up = (nb - na + 12) % 12, step = Math.min(up, 12 - up);
+  if (la === lb && step === 0) return [2, "same key"];
+  if (la === lb && step === 1) return [2, "adjacent key"];
+  if (la !== lb && step === 0) return [2, "relative major/minor"];
+  if (la === lb && step === 2) return [1, up === 2 ? "energy-boost key change (+2)" : "key change (−2)"];
+  if (la !== lb && step === 1) return [1, "diagonal key change"];
+  return [0, "key clash"];
+}
+function bpmMix(a, b) {
+  const d = Math.abs(a - b);
+  if (d <= 3) return [2, `${a}→${b} BPM`];
+  if (d <= 6) return [1, `${Math.round(d)} BPM apart`];
+  return [0, `${Math.round(d)} BPM apart`];
+}
+function energyMix(a, b) {
+  const d = b - a, s = d > 0 ? `+${d}` : `${d}`;
+  if (d === 0) return [2, "same energy"];
+  if (Math.abs(d) <= 2) return [2, `energy ${s}`];
+  if (Math.abs(d) === 3) return [1, `energy jump ${s}`];
+  return [0, `energy jump ${s}`];
+}
+function transition(a, b) {
+  const parts = [keyMix(a.camelot, b.camelot), bpmMix(a.bpm, b.bpm), energyMix(a.energy, b.energy)];
+  const score = Math.min(...parts.map(p => p[0]));
+  return { score, cls: ["bad", "ok", "good"][score], label: ["Will clash", "Workable", "Mixes well"][score],
+           detail: `${a.camelot}→${b.camelot} ${parts[0][1]} · ${parts[1][1]} · ${parts[2][1]}` };
+}
+
+function energyFlow() {
+  if (set.length < 2) return "";
+  const w = 400, h = 54, pad = 6;
+  const x = i => pad + i * (w - 2 * pad) / (set.length - 1);
+  const y = e => h - pad - (e - 1) * (h - 2 * pad) / 9;
+  const pts = set.map((t, i) => `${x(i).toFixed(1)},${y(t.energy).toFixed(1)}`).join(" ");
+  const dots = set.map((t, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(t.energy).toFixed(1)}" r="3.5" fill="${camelotColor(t.camelot)}"/>`).join("");
+  return `<div class="flow-label">Energy flow</div>
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" role="img" aria-label="Energy across the set">
+      <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" vector-effect="non-scaling-stroke"/>${dots}
+    </svg>`;
+}
+
+function renderSet() {
+  $("#set-count").textContent = set.length;
+  $("#set-empty").style.display = set.length ? "none" : "";
+  $("#set-flow").innerHTML = energyFlow();
+  const links = set.slice(1).map((t, i) => transition(set[i], t));
+  const rough = links.filter(l => l.score === 0).length, workable = links.filter(l => l.score === 1).length;
+  $("#set-summary").textContent = set.length
+    ? `${set.length} track${set.length > 1 ? "s" : ""}` + (links.length
+      ? ` · ${links.length - rough - workable} smooth, ${workable} workable, ${rough} clashing` : "")
+    : "Nothing here yet.";
+  $("#set-list").innerHTML = set.map((t, i) => `
+    <li class="set-item" data-id="${t.deezer_id}">
+      ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span></div>` : ""}
+      <div class="set-card">
+        <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
+        <img src="${esc(t.cover)}" alt="">
+        <div style="min-width:0">
+          <div class="t">${esc(t.title)}</div>
+          <div class="a">${esc(t.artist)}</div>
+          <div class="chips">
+            <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
+            <span class="chip">${esc(t.bpm)} BPM</span>${energyBar(t.energy)}
+          </div>
+        </div>
+        <div class="item-btns">
+          <button type="button" class="mini" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="mini" data-remove aria-label="Remove">✕</button>
+          <button type="button" class="mini" data-move="1" aria-label="Move down" ${i === set.length - 1 ? "disabled" : ""}>▼</button>
+        </div>
+      </div>
+    </li>`).join("");
+}
+
+$("#set-list").addEventListener("click", e => {
+  const item = e.target.closest(".set-item");
+  if (!item) return;
+  const i = set.findIndex(t => t.deezer_id === Number(item.dataset.id));
+  if (e.target.closest("[data-remove]")) set.splice(i, 1);
+  const mv = e.target.closest("[data-move]");
+  if (mv) {
+    const j = i + Number(mv.dataset.move);
+    if (j < 0 || j >= set.length) return;
+    [set[i], set[j]] = [set[j], set[i]];
+  }
+  if (e.target.closest("[data-remove], [data-move]")) { saveSet(); renderSet(); refreshAddButtons(); }
+});
+
+/* Drag to reorder (pointer events: works with mouse and touch) */
+let drag = null;
+$("#set-list").addEventListener("pointerdown", e => {
+  const grip = e.target.closest(".grip");
+  if (!grip) return;
+  e.preventDefault();
+  const item = grip.closest(".set-item");
+  drag = { item, startY: e.clientY };
+  item.classList.add("dragging");
+  $("#set-list").classList.add("is-dragging");
+  grip.setPointerCapture(e.pointerId);
+});
+$("#set-list").addEventListener("pointermove", e => {
+  if (!drag) return;
+  const list = $("#set-list");
+  const others = [...list.querySelectorAll(".set-item:not(.dragging)")];
+  const after = others.find(el => {
+    const r = el.querySelector(".set-card").getBoundingClientRect();
+    return e.clientY < r.top + r.height / 2;
+  });
+  if (after) { if (after !== drag.item.nextElementSibling) list.insertBefore(drag.item, after); }
+  else if (list.lastElementChild !== drag.item) list.appendChild(drag.item);
+  // Auto-scroll the panel near its edges
+  const body = document.querySelector(".set-body").getBoundingClientRect();
+  if (e.clientY < body.top + 40) document.querySelector(".set-body").scrollTop -= 12;
+  if (e.clientY > body.bottom - 40) document.querySelector(".set-body").scrollTop += 12;
+});
+function endDrag() {
+  if (!drag) return;
+  const order = [...$("#set-list").querySelectorAll(".set-item")].map(el => Number(el.dataset.id));
+  set = order.map(id => set.find(t => t.deezer_id === id));
+  drag = null;
+  $("#set-list").classList.remove("is-dragging");
+  saveSet(); renderSet();
+}
+$("#set-list").addEventListener("pointerup", endDrag);
+$("#set-list").addEventListener("pointercancel", endDrag);
+
+function openSet(open) {
+  $("#set-panel").classList.toggle("open", open);
+  $("#scrim").classList.toggle("open", open);
+}
+$("#set-open").onclick = () => openSet(true);
+$("#set-close").onclick = () => openSet(false);
+$("#scrim").onclick = () => openSet(false);
+document.addEventListener("keydown", e => { if (e.key === "Escape") openSet(false); });
+
+$("#set-clear").onclick = () => {
+  if (!set.length) return;
+  set = []; saveSet(); renderSet(); refreshAddButtons(); toast("Set cleared");
+};
+$("#set-copy").onclick = async () => {
+  if (!set.length) return toast("Your set is empty");
+  const text = set.map((t, i) => `${i + 1}. ${t.artist} - ${t.title} (${t.camelot}, ${t.bpm} BPM, energy ${t.energy})`).join("\n");
+  try { await navigator.clipboard.writeText(text); toast("Tracklist copied"); }
+  catch { toast("Couldn't copy - your browser blocked it"); }
+};
+
+renderSet();
 </script>
 </body>
 </html>

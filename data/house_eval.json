@@ -1,0 +1,3664 @@
+[
+ {
+  "id": 4122018711,
+  "label": 1,
+  "kind": "house",
+  "name": "ANOTR - Silver Lines (feat. Emily Warren)",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.24206469829861568,
+  "kick_bar": 0.348721549882898,
+  "kick_offbeat": 0.05581869118375792,
+  "pulse": 0.5187809650133561,
+  "tempo_free": 126.0,
+  "low_share": 0.8385327458381653,
+  "nn_sim": 0.586926281452179,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4144811412,
+  "label": 1,
+  "kind": "house",
+  "name": "Kolter - Hey Everybody",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.4623724226839843,
+  "kick_bar": 0.3233342904766854,
+  "kick_offbeat": 0.04208859313406391,
+  "pulse": 0.44377190293744234,
+  "tempo_free": 132.5,
+  "low_share": 0.7653802037239075,
+  "nn_sim": 0.645557701587677,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4192199712,
+  "label": 1,
+  "kind": "house",
+  "name": "Tommy Phillips - Sun is Shining (Lovelee Dae)",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.19459263822780198,
+  "kick_bar": 0.40126743568823997,
+  "kick_offbeat": 0.17359644289200116,
+  "pulse": 0.5720224562817465,
+  "tempo_free": 129.5,
+  "low_share": 0.9296144843101501,
+  "nn_sim": 0.5479408502578735,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4141710881,
+  "label": 1,
+  "kind": "house",
+  "name": "Bob Sinclar - Tequila & Ibiza",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.07691069217912087,
+  "kick_bar": 0.4721493083895659,
+  "kick_offbeat": 0.04719725463037035,
+  "pulse": 0.5233021918610911,
+  "tempo_free": 126.0,
+  "low_share": 0.8780128955841064,
+  "nn_sim": 0.381045401096344,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4138862031,
+  "label": 1,
+  "kind": "house",
+  "name": "Loods - Feels Like Heaven",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.20598616402342246,
+  "kick_bar": 0.19322434118525542,
+  "kick_offbeat": 0.04567169956598346,
+  "pulse": 0.42430934496223954,
+  "tempo_free": 132.5,
+  "low_share": 0.8787993788719177,
+  "nn_sim": 0.6051431894302368,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4275618372,
+  "label": 1,
+  "kind": "house",
+  "name": "Jonas Blue - Girl 2.0",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.40356622403487563,
+  "kick_bar": 0.4303736053407192,
+  "kick_offbeat": -0.03256483201403171,
+  "pulse": 0.7563364561647177,
+  "tempo_free": 126.0,
+  "low_share": 0.7877846956253052,
+  "nn_sim": 0.5847010016441345,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4164977112,
+  "label": 1,
+  "kind": "house",
+  "name": "Chandler McFadden - Music Move Ya",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.35047596509707724,
+  "kick_bar": 0.6290307876866629,
+  "kick_offbeat": 0.23735184919668406,
+  "pulse": 0.6354640278613238,
+  "tempo_free": 126.0,
+  "low_share": 0.5199659466743469,
+  "nn_sim": 0.8432866930961609,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4156286512,
+  "label": 1,
+  "kind": "house",
+  "name": "Beave - 1997 (Radio Edit)",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.2775069855322894,
+  "kick_bar": 0.3759457369080996,
+  "kick_offbeat": 0.009251319721277634,
+  "pulse": 0.6271319809708408,
+  "tempo_free": 132.5,
+  "low_share": 0.8893993496894836,
+  "nn_sim": 0.5297130346298218,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4080386671,
+  "label": 1,
+  "kind": "house",
+  "name": "Duke Dumont - Ain't No Game",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.3850226239917579,
+  "kick_bar": 0.31800385019468,
+  "kick_offbeat": -0.13992559546536276,
+  "pulse": 0.3063098973567211,
+  "tempo_free": 68.0,
+  "low_share": 0.8786462545394897,
+  "nn_sim": 0.7610566020011902,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3410703621,
+  "label": 1,
+  "kind": "house",
+  "name": "Jonas Blue - Edge of Desire",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.6939918384773702,
+  "kick_bar": 0.7983316602866826,
+  "kick_offbeat": 0.16231722228808285,
+  "pulse": 0.6631593378260733,
+  "tempo_free": 123.0,
+  "low_share": 0.7831753492355347,
+  "nn_sim": 0.7420616149902344,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3784724892,
+  "label": 1,
+  "kind": "house",
+  "name": "ANOTR - Talk To You (ft. 54 Ultra)",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.3312533155972647,
+  "kick_bar": 0.425019072114744,
+  "kick_offbeat": 0.12144204745047976,
+  "pulse": 0.4851471510165458,
+  "tempo_free": 132.5,
+  "low_share": 0.7700700759887695,
+  "nn_sim": 0.5728498101234436,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3923734071,
+  "label": 1,
+  "kind": "house",
+  "name": "Woodcamp - Eatin' Good",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.35990926646627486,
+  "kick_bar": 0.7241396903991699,
+  "kick_offbeat": -0.07959510164801031,
+  "pulse": 0.48866779869422317,
+  "tempo_free": 83.5,
+  "low_share": 0.8787440061569214,
+  "nn_sim": 0.5598722100257874,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4246767981,
+  "label": 1,
+  "kind": "house",
+  "name": "Denis Sulta - Push The Tempo",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.347757156159787,
+  "kick_bar": 0.3216332911979407,
+  "kick_offbeat": 0.1091057737612573,
+  "pulse": 0.6000592065101955,
+  "tempo_free": 129.0,
+  "low_share": 0.7638887763023376,
+  "nn_sim": 0.7309648394584656,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4155973492,
+  "label": 1,
+  "kind": "house",
+  "name": "Stryv - Patigo",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.6800160559359938,
+  "kick_bar": 0.5999139342457056,
+  "kick_offbeat": 0.20073247255641036,
+  "pulse": 0.6923853852786124,
+  "tempo_free": 120.0,
+  "low_share": 0.9053831696510315,
+  "nn_sim": 0.6803752183914185,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4263923532,
+  "label": 1,
+  "kind": "house",
+  "name": "Oden & Fatzo - Take Our Time",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.4779143293853849,
+  "kick_bar": 0.5054930471815169,
+  "kick_offbeat": 0.09147337064496242,
+  "pulse": 0.5340173910371959,
+  "tempo_free": 120.0,
+  "low_share": 0.7765613198280334,
+  "nn_sim": 0.7806306481361389,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4175097732,
+  "label": 1,
+  "kind": "house",
+  "name": "Mel\u00e9 - Body Move",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.122250499621838,
+  "kick_bar": 0.7180191396989601,
+  "kick_offbeat": -0.10173997570316051,
+  "pulse": 0.5207408837847076,
+  "tempo_free": 132.5,
+  "low_share": 0.8985408544540405,
+  "nn_sim": 0.7294697761535645,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4210006302,
+  "label": 1,
+  "kind": "house",
+  "name": "Leyo - Stamina",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.3524177193248761,
+  "kick_bar": 0.6567847947590053,
+  "kick_offbeat": 0.0772881194279762,
+  "pulse": 0.571965933413594,
+  "tempo_free": 129.0,
+  "low_share": 0.8832665085792542,
+  "nn_sim": 0.5934411287307739,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4174938702,
+  "label": 1,
+  "kind": "house",
+  "name": "The Shapeshifters - On The Way Up",
+  "genres": [
+   113,
+   168
+  ],
+  "kick_pulse": 0.5133627821065363,
+  "kick_bar": 0.4925731390897856,
+  "kick_offbeat": 0.1131987215017854,
+  "pulse": 0.4756809548306904,
+  "tempo_free": 123.0,
+  "low_share": 0.2720905542373657,
+  "nn_sim": 0.7035025358200073,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4267069892,
+  "label": 1,
+  "kind": "house",
+  "name": "Wh0 - Burnin' Deep",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.6339684184931684,
+  "kick_bar": 0.6582943160901777,
+  "kick_offbeat": 0.18545162552436523,
+  "pulse": 0.47174194452236407,
+  "tempo_free": 85.0,
+  "low_share": 0.8599247932434082,
+  "nn_sim": 0.6098384857177734,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4264451892,
+  "label": 1,
+  "kind": "house",
+  "name": "DJ PP - Miami Vice",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": -0.021918715501669794,
+  "kick_bar": 0.5780208148062229,
+  "kick_offbeat": 0.07277270234772004,
+  "pulse": 0.4234139225445688,
+  "tempo_free": 63.0,
+  "low_share": 0.7743484973907471,
+  "nn_sim": 0.5307258367538452,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4258216771,
+  "label": 1,
+  "kind": "house",
+  "name": "Butch - Come Get Up",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.49245989229530096,
+  "kick_bar": 0.745750930160284,
+  "kick_offbeat": 0.021409275327641808,
+  "pulse": 0.6262429361231625,
+  "tempo_free": 126.0,
+  "low_share": 0.9097764492034912,
+  "nn_sim": 0.6497759222984314,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4238474342,
+  "label": 1,
+  "kind": "house",
+  "name": "WEISS - Feel My Needs (Rue Jay x Cash Only Remix)",
+  "genres": [
+   85,
+   87,
+   113
+  ],
+  "kick_pulse": 0.350458487868309,
+  "kick_bar": 0.3015546165406704,
+  "kick_offbeat": -0.055255243089050055,
+  "pulse": 0.37739843130111694,
+  "tempo_free": 136.0,
+  "low_share": 0.8201594948768616,
+  "nn_sim": 0.7135719060897827,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4282339042,
+  "label": 1,
+  "kind": "house",
+  "name": "Tony Cortez - Mirame",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": -0.015061942976899445,
+  "kick_bar": 0.6434033550322056,
+  "kick_offbeat": 0.02323284878730192,
+  "pulse": 0.8066406855359674,
+  "tempo_free": 126.0,
+  "low_share": 0.8978985548019409,
+  "nn_sim": 0.8339381217956543,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4282339262,
+  "label": 1,
+  "kind": "house",
+  "name": "MOSKA - Diva",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.012751911010127515,
+  "kick_bar": 0.566009359434247,
+  "kick_offbeat": 0.05020158679690212,
+  "pulse": 0.7753262240439653,
+  "tempo_free": 126.0,
+  "low_share": 0.7511517405509949,
+  "nn_sim": 0.6190614104270935,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4233144192,
+  "label": 1,
+  "kind": "house",
+  "name": "KC Lights - Work",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": 0.21210739411803525,
+  "kick_bar": 0.6996718359201453,
+  "kick_offbeat": 0.2748562641344358,
+  "pulse": 0.720174927004548,
+  "tempo_free": 129.0,
+  "low_share": 0.9376600980758667,
+  "nn_sim": 0.7109886407852173,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4267057892,
+  "label": 1,
+  "kind": "house",
+  "name": "Alex Preston - What's Up Man",
+  "genres": [
+   106,
+   111,
+   113
+  ],
+  "kick_pulse": -0.11497691716067493,
+  "kick_bar": 0.32806800305843353,
+  "kick_offbeat": -0.005587456704233773,
+  "pulse": 0.509240266866982,
+  "tempo_free": 126.0,
+  "low_share": 0.8895363211631775,
+  "nn_sim": 0.7631057500839233,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4266867182,
+  "label": 1,
+  "kind": "house",
+  "name": "Mak\u00e8z - Reverse Things",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.3010364703547497,
+  "kick_bar": 0.5151420188351337,
+  "kick_offbeat": 0.23187752337589002,
+  "pulse": 0.5897648882550687,
+  "tempo_free": 129.5,
+  "low_share": 0.47488653659820557,
+  "nn_sim": 0.6063463687896729,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197659687,
+  "label": 1,
+  "kind": "house",
+  "name": "M A N I K - Body High",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.2285015672678128,
+  "kick_bar": 0.14391398150473833,
+  "kick_offbeat": 0.08413273344922345,
+  "pulse": 0.5939984419383109,
+  "tempo_free": 120.0,
+  "low_share": 0.8771308064460754,
+  "nn_sim": 0.7055737972259521,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197659677,
+  "label": 1,
+  "kind": "house",
+  "name": "Infinity Ink - Games",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.8582823553779084,
+  "kick_bar": 0.8049161377378171,
+  "kick_offbeat": -0.0668628493058648,
+  "pulse": 0.824992867492017,
+  "tempo_free": 123.0,
+  "low_share": 0.6571136713027954,
+  "nn_sim": 0.7281648516654968,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2202519157,
+  "label": 1,
+  "kind": "house",
+  "name": "Infinity Ink - Till The Light",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.4543530319351703,
+  "kick_bar": 0.606470350176096,
+  "kick_offbeat": 0.3303082599886693,
+  "pulse": 0.4947695938171819,
+  "tempo_free": 120.0,
+  "low_share": 0.9826674461364746,
+  "nn_sim": 0.7706635594367981,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197737897,
+  "label": 1,
+  "kind": "house",
+  "name": "Lee Foss - Happen For a Reason",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.331696862851071,
+  "kick_bar": 0.39658231813399547,
+  "kick_offbeat": 0.151202903638716,
+  "pulse": 0.477850329711056,
+  "tempo_free": 123.0,
+  "low_share": 0.9054650664329529,
+  "nn_sim": 0.6851218938827515,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197728007,
+  "label": 1,
+  "kind": "house",
+  "name": "Lee Foss - Keep My Cool",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5136017412310694,
+  "kick_bar": 0.3467944363450132,
+  "kick_offbeat": 0.030953419313158433,
+  "pulse": 0.7640430296703083,
+  "tempo_free": 123.0,
+  "low_share": 0.9928194284439087,
+  "nn_sim": 0.7062193155288696,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2200105747,
+  "label": 1,
+  "kind": "house",
+  "name": "Anabel Englund - Ghost In The System",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.21538009808864444,
+  "kick_bar": 0.22582904202863574,
+  "kick_offbeat": 0.021235725501355773,
+  "pulse": 0.14436904981266707,
+  "tempo_free": 117.5,
+  "low_share": 0.0916028767824173,
+  "nn_sim": 0.7013736963272095,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197737907,
+  "label": 1,
+  "kind": "house",
+  "name": "Lee Foss - Chic Sheik",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.7899973299354315,
+  "kick_bar": 0.8090765699744225,
+  "kick_offbeat": 0.36321455892175436,
+  "pulse": 0.5587734319269657,
+  "tempo_free": 126.0,
+  "low_share": 0.9567358493804932,
+  "nn_sim": 0.5596469640731812,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197737877,
+  "label": 1,
+  "kind": "house",
+  "name": "Lee Foss - U Got Me",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.6807363440921483,
+  "kick_bar": 0.6370747984071403,
+  "kick_offbeat": 0.15952455439250762,
+  "pulse": 0.8018703916656575,
+  "tempo_free": 120.5,
+  "low_share": 0.9887129068374634,
+  "nn_sim": 0.648290753364563,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2197760147,
+  "label": 1,
+  "kind": "house",
+  "name": "Lee Foss - Electricity",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.19084630544175915,
+  "kick_bar": 0.2640048015214822,
+  "kick_offbeat": 0.36982020934152865,
+  "pulse": 0.21917101831944735,
+  "tempo_free": 115.0,
+  "low_share": 0.9191001653671265,
+  "nn_sim": 0.706091046333313,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3931736101,
+  "label": 1,
+  "kind": "house",
+  "name": "Adam Port - Be The One",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.47063066142543064,
+  "kick_bar": 0.45268450768255614,
+  "kick_offbeat": 0.11617776361668893,
+  "pulse": 0.6293407872818956,
+  "tempo_free": 123.0,
+  "low_share": 0.8259528875350952,
+  "nn_sim": 0.5789331793785095,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3567779721,
+  "label": 1,
+  "kind": "house",
+  "name": "Hydawai - My Darling (Suma Suma) ft. Dawda",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.4414749562104301,
+  "kick_bar": 0.47233923242949866,
+  "kick_offbeat": 0.0839185635445685,
+  "pulse": 0.5013895541111507,
+  "tempo_free": 123.0,
+  "low_share": 0.8316271305084229,
+  "nn_sim": 0.826819896697998,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4054045201,
+  "label": 1,
+  "kind": "house",
+  "name": "Francis Mercier - Champagne",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.34493787540122867,
+  "kick_bar": 0.39697636011987925,
+  "kick_offbeat": 0.22445287316804752,
+  "pulse": 0.7501959051005542,
+  "tempo_free": 120.0,
+  "low_share": 0.8795350193977356,
+  "nn_sim": 0.8138992190361023,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3387508571,
+  "label": 1,
+  "kind": "house",
+  "name": "Shimza - Fire Fire",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.04893822269514203,
+  "kick_bar": 0.3354676477611065,
+  "kick_offbeat": 0.08758305851370096,
+  "pulse": 0.3847101964056492,
+  "tempo_free": 126.0,
+  "low_share": 0.8119152784347534,
+  "nn_sim": 0.8239353895187378,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3476066671,
+  "label": 1,
+  "kind": "house",
+  "name": "&ME - See You Again",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.3317214853595942,
+  "kick_bar": 0.3529096054844558,
+  "kick_offbeat": 0.2354275450343266,
+  "pulse": 0.7237503153737634,
+  "tempo_free": 120.0,
+  "low_share": 0.9144752025604248,
+  "nn_sim": 0.7406460642814636,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3890657371,
+  "label": 1,
+  "kind": "house",
+  "name": "Merzzy - Faya",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.038167701168276835,
+  "kick_bar": 0.7059653392061591,
+  "kick_offbeat": 0.08948512654751539,
+  "pulse": 0.2568376610870473,
+  "tempo_free": 120.0,
+  "low_share": 0.3971375823020935,
+  "nn_sim": 0.7947352528572083,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3367072751,
+  "label": 1,
+  "kind": "house",
+  "name": "Rampa - Crazy For It",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.3943608021363616,
+  "kick_bar": 0.45939616300165653,
+  "kick_offbeat": 0.21244150833808817,
+  "pulse": 0.6489448822103441,
+  "tempo_free": 120.0,
+  "low_share": 0.8340428471565247,
+  "nn_sim": 0.6086961627006531,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4117446651,
+  "label": 1,
+  "kind": "house",
+  "name": "Marcel Scott - Lost",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.41247412991687293,
+  "kick_bar": 0.5485235397226927,
+  "kick_offbeat": -0.08101745575053118,
+  "pulse": 0.8106218126670617,
+  "tempo_free": 123.0,
+  "low_share": 0.9131810069084167,
+  "nn_sim": 0.6475861072540283,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4075301241,
+  "label": 1,
+  "kind": "house",
+  "name": "Idris - Chasing Fire",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.10211745637650717,
+  "kick_bar": 0.6983658455130533,
+  "kick_offbeat": 0.06932708344183772,
+  "pulse": 0.7391925006196267,
+  "tempo_free": 123.0,
+  "low_share": 0.9507355690002441,
+  "nn_sim": 0.6875646114349365,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1369388872,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Bodrum",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5107444510795176,
+  "kick_bar": 0.7059157881885767,
+  "kick_offbeat": 0.12106355216383236,
+  "pulse": 0.8736568732419983,
+  "tempo_free": 112.5,
+  "low_share": 0.9741019606590271,
+  "nn_sim": 0.6050179600715637,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2886232062,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Oriaka",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5440186411645768,
+  "kick_bar": 0.6014403114850462,
+  "kick_offbeat": 0.47704599389957414,
+  "pulse": 0.7341823216930434,
+  "tempo_free": 110.0,
+  "low_share": 0.9435592293739319,
+  "nn_sim": 0.6787567734718323,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2886232052,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Crossroads",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.006516682490529799,
+  "kick_bar": 0.46250542778006987,
+  "kick_offbeat": -0.08942648440334436,
+  "pulse": 0.22487609265690445,
+  "tempo_free": 101.5,
+  "low_share": 0.9243847131729126,
+  "nn_sim": 0.40016788244247437,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3564168401,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Aman (Original Mix)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.4162694901643582,
+  "kick_bar": 0.702646439664127,
+  "kick_offbeat": 0.358445803176858,
+  "pulse": 0.8270720102447121,
+  "tempo_free": 120.5,
+  "low_share": 0.9454709887504578,
+  "nn_sim": 0.5766080021858215,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1975578947,
+  "label": 1,
+  "kind": "house",
+  "name": "Milo H\u00e4fliger - Hiraeth",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.768022349104285,
+  "kick_bar": 0.7422789354687143,
+  "kick_offbeat": 0.130845581414178,
+  "pulse": 0.8479886258263946,
+  "tempo_free": 115.0,
+  "low_share": 0.9661725163459778,
+  "nn_sim": 0.4888330101966858,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 721934062,
+  "label": 1,
+  "kind": "house",
+  "name": "Tebra - Vreme",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.4304274181706895,
+  "kick_bar": 0.6073846383469889,
+  "kick_offbeat": 0.18119225863584093,
+  "pulse": 0.7108968189146755,
+  "tempo_free": 115.0,
+  "low_share": 0.8863178491592407,
+  "nn_sim": 0.4661789536476135,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3564168351,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Motherland",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.532398903509602,
+  "kick_bar": 0.7515720771625638,
+  "kick_offbeat": 0.15550247544888407,
+  "pulse": 0.7910214939620346,
+  "tempo_free": 120.0,
+  "low_share": 0.9377748370170593,
+  "nn_sim": 0.5204540491104126,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 721934002,
+  "label": 1,
+  "kind": "house",
+  "name": "Sahal\u00e9 - Maangalye",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5550701644440945,
+  "kick_bar": 0.7737250710752894,
+  "kick_offbeat": 0.2659120465925133,
+  "pulse": 0.8183286825872288,
+  "tempo_free": 110.0,
+  "low_share": 0.8979588150978088,
+  "nn_sim": 0.5582586526870728,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2886232122,
+  "label": 1,
+  "kind": "house",
+  "name": "Buddha Bar - Do This",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.48524015734437853,
+  "kick_bar": 0.7848178949207067,
+  "kick_offbeat": 0.2263714888249524,
+  "pulse": 0.9037065925076604,
+  "tempo_free": 120.0,
+  "low_share": 0.9931490421295166,
+  "nn_sim": 0.6284574270248413,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4158561702,
+  "label": 1,
+  "kind": "house",
+  "name": "Adriatique - Closer (Adriatique x GENESI)",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.49372914258856326,
+  "kick_bar": 0.5310161578236148,
+  "kick_offbeat": 0.33474751114772516,
+  "pulse": 0.5619062486221083,
+  "tempo_free": 129.0,
+  "low_share": 0.7625306248664856,
+  "nn_sim": 0.6610251665115356,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4139574561,
+  "label": 1,
+  "kind": "house",
+  "name": "bradeazy - Louboutin",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.5253487549595198,
+  "kick_bar": 0.4484744475815782,
+  "kick_offbeat": 0.42160624210638076,
+  "pulse": 0.7584774006496781,
+  "tempo_free": 132.5,
+  "low_share": 0.8110837936401367,
+  "nn_sim": 0.49089956283569336,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4106033791,
+  "label": 1,
+  "kind": "house",
+  "name": "Jay Pryor - Girlfriend",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.20899202666160752,
+  "kick_bar": 0.5152547122402622,
+  "kick_offbeat": 0.1364265514685857,
+  "pulse": 0.47351493256759264,
+  "tempo_free": 87.5,
+  "low_share": 0.9350011944770813,
+  "nn_sim": 0.5982557535171509,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4242834562,
+  "label": 1,
+  "kind": "house",
+  "name": "Michael Bibi - Feel This Grip (feat. Baby Tate)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.29451905760484254,
+  "kick_bar": 0.1084299083226003,
+  "kick_offbeat": 0.009896168224468774,
+  "pulse": 0.6494061673919739,
+  "tempo_free": 129.5,
+  "low_share": 0.8573479056358337,
+  "nn_sim": 0.5373716354370117,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4180461252,
+  "label": 1,
+  "kind": "house",
+  "name": "OMNOM - Pressure (feat. Tommy Genesis)",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.4711513545435781,
+  "kick_bar": 0.5990724096504549,
+  "kick_offbeat": 0.15149311225216544,
+  "pulse": 0.7239032677876259,
+  "tempo_free": 129.5,
+  "low_share": 0.6502172350883484,
+  "nn_sim": 0.6476240158081055,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4278603892,
+  "label": 1,
+  "kind": "house",
+  "name": "Green Velvet - Work With Me",
+  "genres": [
+   106,
+   111
+  ],
+  "kick_pulse": 0.5071212573406786,
+  "kick_bar": 0.5383336129956539,
+  "kick_offbeat": 0.3431698659685654,
+  "pulse": 0.6629897118904267,
+  "tempo_free": 129.5,
+  "low_share": 0.5271700620651245,
+  "nn_sim": 0.8510730862617493,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4159097462,
+  "label": 1,
+  "kind": "house",
+  "name": "Max Styler - Feel The XTC",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.3751227772937944,
+  "kick_bar": 0.4214046202026885,
+  "kick_offbeat": 0.015745504238181586,
+  "pulse": 0.6803572849872016,
+  "tempo_free": 129.5,
+  "low_share": 0.9454706907272339,
+  "nn_sim": 0.6716641187667847,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4205752442,
+  "label": 1,
+  "kind": "house",
+  "name": "Ruback - ELEVATION",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.2152000105404478,
+  "kick_bar": 0.10783455515001691,
+  "kick_offbeat": 0.08713660282669518,
+  "pulse": 0.7454945869509159,
+  "tempo_free": 126.0,
+  "low_share": 0.9062370657920837,
+  "nn_sim": 0.6172488331794739,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4322046532,
+  "label": 1,
+  "kind": "house",
+  "name": "GENESI - Red Button",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5667402325418052,
+  "kick_bar": 0.452532032695342,
+  "kick_offbeat": 0.47552531306800533,
+  "pulse": 0.6843617117164407,
+  "tempo_free": 126.0,
+  "low_share": 0.828964352607727,
+  "nn_sim": 0.676953911781311,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4235758832,
+  "label": 1,
+  "kind": "house",
+  "name": "Anyma - Prophecy",
+  "genres": [],
+  "kick_pulse": 0.0734814976861414,
+  "kick_bar": 0.11013287510006509,
+  "kick_offbeat": 0.07701821382551521,
+  "pulse": 0.25273141193275256,
+  "tempo_free": 129.5,
+  "low_share": 0.49410301446914673,
+  "nn_sim": 0.6397262811660767,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4236635222,
+  "label": 1,
+  "kind": "house",
+  "name": "Cascada - ALIVE",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.3602093220900067,
+  "kick_bar": 0.35896926779638616,
+  "kick_offbeat": 0.02945610771513946,
+  "pulse": 0.5117710930168293,
+  "tempo_free": 132.5,
+  "low_share": 0.8266775012016296,
+  "nn_sim": 0.6277556419372559,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4173612762,
+  "label": 1,
+  "kind": "house",
+  "name": "ARTBAT - Somebody That I Used To Know (ARTBAT x David Guetta Mix)",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.3679304585066132,
+  "kick_bar": 0.34610098538788253,
+  "kick_offbeat": 0.40135008682621515,
+  "pulse": 0.24423650010510922,
+  "tempo_free": 126.0,
+  "low_share": 0.47871312499046326,
+  "nn_sim": 0.6475998163223267,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3984147451,
+  "label": 1,
+  "kind": "house",
+  "name": "Kaskade - Meet Again",
+  "genres": [
+   113,
+   132
+  ],
+  "kick_pulse": 0.07349517616041172,
+  "kick_bar": 0.09523305538195102,
+  "kick_offbeat": 0.17970864926676516,
+  "pulse": 0.3211444302208046,
+  "tempo_free": 132.5,
+  "low_share": 0.6783296465873718,
+  "nn_sim": 0.7017004489898682,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4008378221,
+  "label": 1,
+  "kind": "house",
+  "name": "MEDUZA - Silence",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.4617674416647507,
+  "kick_bar": 0.3915010796716586,
+  "kick_offbeat": -0.03304491565974717,
+  "pulse": 0.5133065165450365,
+  "tempo_free": 129.5,
+  "low_share": 0.7973085045814514,
+  "nn_sim": 0.6494683027267456,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4323874092,
+  "label": 1,
+  "kind": "house",
+  "name": "R3HAB - Dramma",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.12539614917659492,
+  "kick_bar": 0.2915695492993109,
+  "kick_offbeat": 0.09796971605010185,
+  "pulse": 0.2036649357578426,
+  "tempo_free": 126.0,
+  "low_share": 0.6492457985877991,
+  "nn_sim": 0.7907706499099731,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4297510702,
+  "label": 1,
+  "kind": "house",
+  "name": "Andrew Rayel - On Fire",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": 0.7859518777971206,
+  "kick_bar": 0.6429531103686282,
+  "kick_offbeat": 0.26836890560623844,
+  "pulse": 0.8148650984818999,
+  "tempo_free": 132.5,
+  "low_share": 0.9357107877731323,
+  "nn_sim": 0.45258426666259766,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4221169982,
+  "label": 1,
+  "kind": "house",
+  "name": "Robbie Williams - Beauty In Us",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.3893990721553564,
+  "kick_bar": 0.22418749704957008,
+  "kick_offbeat": 0.007883018344728043,
+  "pulse": 0.3256179615855217,
+  "tempo_free": 126.0,
+  "low_share": 0.6742113828659058,
+  "nn_sim": 0.6079536080360413,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4289395142,
+  "label": 1,
+  "kind": "house",
+  "name": "Hel:Sl\u00f8wed - Give It To Me",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": 0.560864914516647,
+  "kick_bar": 0.5489535485137632,
+  "kick_offbeat": 0.1630867611704849,
+  "pulse": 0.4315204092587424,
+  "tempo_free": 126.0,
+  "low_share": 0.9085835218429565,
+  "nn_sim": 0.8828438520431519,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4250696681,
+  "label": 0,
+  "kind": "pop",
+  "name": "AD\u00c9LA - Nicole Kidman",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.29661809955723584,
+  "kick_bar": -0.012569243568577804,
+  "kick_offbeat": 0.08695184960379265,
+  "pulse": 0.5275395021308213,
+  "tempo_free": 140.0,
+  "low_share": 0.7510086894035339,
+  "nn_sim": 0.7419215440750122,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3895241341,
+  "label": 0,
+  "kind": "pop",
+  "name": "STELLA LEFTY - Boston",
+  "genres": [
+   84,
+   132
+  ],
+  "kick_pulse": 0.23639639164321125,
+  "kick_bar": 0.38767812587320805,
+  "kick_offbeat": 0.14983718167059124,
+  "pulse": 0.4212998179718852,
+  "tempo_free": 126.0,
+  "low_share": 0.55411696434021,
+  "nn_sim": 0.7188961505889893,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3602074142,
+  "label": 0,
+  "kind": "pop",
+  "name": "Ella Langley - Choosin' Texas",
+  "genres": [
+   84,
+   132
+  ],
+  "kick_pulse": 0.1328659768187208,
+  "kick_bar": 0.4108752813190222,
+  "kick_offbeat": 0.26870558742666617,
+  "pulse": 0.2601570430852007,
+  "tempo_free": 112.5,
+  "low_share": 0.7227946519851685,
+  "nn_sim": 0.6122687458992004,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4304169612,
+  "label": 0,
+  "kind": "pop",
+  "name": "Taylor Swift - Patient Zero",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.2873017991776864,
+  "kick_bar": 0.0847561219228945,
+  "kick_offbeat": -0.04325562688490161,
+  "pulse": 0.22199489255515478,
+  "tempo_free": 184.5,
+  "low_share": 0.755515456199646,
+  "nn_sim": 0.65662682056427,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4078104881,
+  "label": 0,
+  "kind": "pop",
+  "name": "Olivia Rodrigo - stupid song",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.23424428933867603,
+  "kick_bar": 0.15029793680878356,
+  "kick_offbeat": 0.10757200326042948,
+  "pulse": 0.27490439899702324,
+  "tempo_free": 129.0,
+  "low_share": 0.3526843786239624,
+  "nn_sim": 0.6511884927749634,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3834003271,
+  "label": 0,
+  "kind": "pop",
+  "name": "Ella Langley - Be Her",
+  "genres": [
+   84,
+   132
+  ],
+  "kick_pulse": 0.43170435409489516,
+  "kick_bar": 0.5583145302292467,
+  "kick_offbeat": 0.15092666522675272,
+  "pulse": 0.44421581551432615,
+  "tempo_free": 112.0,
+  "low_share": 0.7110639810562134,
+  "nn_sim": 0.6289075613021851,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4045817471,
+  "label": 0,
+  "kind": "pop",
+  "name": "Ariana Grande - hate that i made you love me",
+  "genres": [
+   132
+  ],
+  "kick_pulse": -0.10592133409045346,
+  "kick_bar": 0.4311242004914675,
+  "kick_offbeat": -0.09948232184706285,
+  "pulse": -0.11813049112424778,
+  "tempo_free": 96.0,
+  "low_share": 0.7135123610496521,
+  "nn_sim": 0.4639376997947693,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3503857201,
+  "label": 0,
+  "kind": "pop",
+  "name": "Olivia Dean - Man I Need",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.28300454012830467,
+  "kick_bar": 0.49628944826476734,
+  "kick_offbeat": -0.11634180767406874,
+  "pulse": 0.37824910057379924,
+  "tempo_free": 117.5,
+  "low_share": 0.7453593611717224,
+  "nn_sim": 0.6867121458053589,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4015341011,
+  "label": 0,
+  "kind": "rap",
+  "name": "Shakira - Dai Dai",
+  "genres": [
+   113,
+   116,
+   132
+  ],
+  "kick_pulse": 0.43110371485416743,
+  "kick_bar": 0.5366542258075088,
+  "kick_offbeat": 0.09940693729079392,
+  "pulse": 0.2753000809120592,
+  "tempo_free": 115.0,
+  "low_share": 0.8295562267303467,
+  "nn_sim": 0.7969326972961426,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3262675101,
+  "label": 0,
+  "kind": "rap",
+  "name": "Doechii - Anxiety",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.23074456460254136,
+  "kick_bar": 0.5303067726104758,
+  "kick_offbeat": 0.36472105466609084,
+  "pulse": 0.45020179433185,
+  "tempo_free": 129.0,
+  "low_share": 0.6951941847801208,
+  "nn_sim": 0.5066912174224854,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4022917771,
+  "label": 0,
+  "kind": "rap",
+  "name": "Drake - Janice STFU",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.021015095087932423,
+  "kick_bar": -0.011728042096365243,
+  "kick_offbeat": 0.027588808356085792,
+  "pulse": 0.47625572653487325,
+  "tempo_free": 126.0,
+  "low_share": 0.8707067966461182,
+  "nn_sim": 0.6027084589004517,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 131391760,
+  "label": 0,
+  "kind": "rap",
+  "name": "Mac Miller - Cinderella (feat. Ty Dolla $ign)",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.07006736393668689,
+  "kick_bar": 0.04535208980087191,
+  "kick_offbeat": 0.12950864393496886,
+  "pulse": 0.3206989539321512,
+  "tempo_free": 139.5,
+  "low_share": 0.7336238026618958,
+  "nn_sim": 0.6448842287063599,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3616144112,
+  "label": 0,
+  "kind": "rap",
+  "name": "Dave - Raindance",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.19860929679821862,
+  "kick_bar": 0.46841631290093755,
+  "kick_offbeat": 0.14859401669340191,
+  "pulse": 0.31621145522308963,
+  "tempo_free": 143.5,
+  "low_share": 0.7372674942016602,
+  "nn_sim": 0.6108508110046387,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1109731,
+  "label": 0,
+  "kind": "rap",
+  "name": "Eminem - Lose Yourself",
+  "genres": [
+   116
+  ],
+  "kick_pulse": -0.083514210768044,
+  "kick_bar": 0.571494023168558,
+  "kick_offbeat": -0.14887867332436144,
+  "pulse": -0.07653608400448177,
+  "tempo_free": 172.0,
+  "low_share": 0.8072268962860107,
+  "nn_sim": 0.6487454175949097,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3812245442,
+  "label": 0,
+  "kind": "rap",
+  "name": "Don Toliver - E85",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.02685103601834272,
+  "kick_bar": 0.11941656645980084,
+  "kick_offbeat": 0.18734584389974104,
+  "pulse": 0.3780355513392187,
+  "tempo_free": 132.5,
+  "low_share": 0.8070740103721619,
+  "nn_sim": 0.5388720035552979,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 747399352,
+  "label": 0,
+  "kind": "rap",
+  "name": "Post Malone - Circles",
+  "genres": [
+   116
+  ],
+  "kick_pulse": 0.5377125062514096,
+  "kick_bar": 0.30399913620203733,
+  "kick_offbeat": 0.1051178842317313,
+  "pulse": 0.6469883495010436,
+  "tempo_free": 120.0,
+  "low_share": 0.7877098321914673,
+  "nn_sim": 0.5421910285949707,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 538660022,
+  "label": 0,
+  "kind": "rock",
+  "name": "Bon Jovi - Livin' On A Prayer",
+  "genres": [
+   152
+  ],
+  "kick_pulse": 0.29117388516284626,
+  "kick_bar": 0.41239894348760464,
+  "kick_offbeat": 0.27848849756915833,
+  "pulse": 0.4988764954553182,
+  "tempo_free": 120.5,
+  "low_share": 0.6349211931228638,
+  "nn_sim": 0.7131074666976929,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 985745702,
+  "label": 0,
+  "kind": "rock",
+  "name": "Oasis - Wonderwall",
+  "genres": [
+   85,
+   87,
+   152
+  ],
+  "kick_pulse": 0.10026787470381415,
+  "kick_bar": 0.044601344503462655,
+  "kick_offbeat": -0.09462001894672331,
+  "pulse": 0.31915079150348896,
+  "tempo_free": 117.5,
+  "low_share": 0.6250969767570496,
+  "nn_sim": 0.7562516927719116,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 518458172,
+  "label": 0,
+  "kind": "rock",
+  "name": "Guns N' Roses - Sweet Child O' Mine",
+  "genres": [
+   152
+  ],
+  "kick_pulse": 0.19964192389312574,
+  "kick_bar": 0.49652865253330153,
+  "kick_offbeat": 0.29369590719281796,
+  "pulse": 0.28667651317779,
+  "tempo_free": 126.0,
+  "low_share": 0.5274730324745178,
+  "nn_sim": 0.600119948387146,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 15586246,
+  "label": 0,
+  "kind": "rock",
+  "name": "Bruce Springsteen - Dancing In the Dark",
+  "genres": [
+   132,
+   134,
+   152
+  ],
+  "kick_pulse": -0.09802299973500128,
+  "kick_bar": 0.16643562639022583,
+  "kick_offbeat": -0.06772689568221245,
+  "pulse": -0.12849106267094612,
+  "tempo_free": 74.5,
+  "low_share": 0.6950703859329224,
+  "nn_sim": 0.7275659441947937,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1899060227,
+  "label": 0,
+  "kind": "rock",
+  "name": "Djo - End of Beginning",
+  "genres": [
+   85,
+   152
+  ],
+  "kick_pulse": -0.06195039125964498,
+  "kick_bar": 0.26860287590561627,
+  "kick_offbeat": -0.07381894009157354,
+  "pulse": -0.09424806020231308,
+  "tempo_free": 80.5,
+  "low_share": 0.8001675605773926,
+  "nn_sim": 0.644577145576477,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 985722002,
+  "label": 0,
+  "kind": "rock",
+  "name": "Oasis - Don't Look Back In Anger",
+  "genres": [
+   85,
+   87,
+   152
+  ],
+  "kick_pulse": -0.032812874343898006,
+  "kick_bar": 0.09329611501642897,
+  "kick_offbeat": -0.03158395650416756,
+  "pulse": 0.10440478800841856,
+  "tempo_free": 82.0,
+  "low_share": 0.4906412661075592,
+  "nn_sim": 0.6761086583137512,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4603408,
+  "label": 0,
+  "kind": "rock",
+  "name": "Michael Jackson - Billie Jean",
+  "genres": [
+   132,
+   134,
+   152
+  ],
+  "kick_pulse": 0.5039226466503279,
+  "kick_bar": 0.5477933654418363,
+  "kick_offbeat": 0.3643620595909081,
+  "pulse": 0.68134794713786,
+  "tempo_free": 117.5,
+  "low_share": 0.8110126256942749,
+  "nn_sim": 0.4986935555934906,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 92720102,
+  "label": 0,
+  "kind": "rock",
+  "name": "AC/DC - Thunderstruck",
+  "genres": [
+   152
+  ],
+  "kick_pulse": 0.5693452775741059,
+  "kick_bar": 0.5423725589170835,
+  "kick_offbeat": 0.5665673240586077,
+  "pulse": 0.4778064798650351,
+  "tempo_free": 132.5,
+  "low_share": 0.7905721664428711,
+  "nn_sim": 0.6783286333084106,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3410232121,
+  "label": 0,
+  "kind": "rnb",
+  "name": "Kehlani - Folded",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.18659389442558777,
+  "kick_bar": 0.1791738469208423,
+  "kick_offbeat": 0.11090729045185176,
+  "pulse": 0.23080090960309654,
+  "tempo_free": 68.0,
+  "low_share": 0.8152049779891968,
+  "nn_sim": 0.6631141901016235,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2755315691,
+  "label": 0,
+  "kind": "rnb",
+  "name": "Ravyn Lenae - Love Me Not",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.2942076229343289,
+  "kick_bar": 0.5833729899635441,
+  "kick_offbeat": 0.17679457100549417,
+  "pulse": 0.5491365971729943,
+  "tempo_free": 114.5,
+  "low_share": 0.7120404243469238,
+  "nn_sim": 0.5613211393356323,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2929833161,
+  "label": 0,
+  "kind": "rnb",
+  "name": "Leon Thomas - MUTT",
+  "genres": [
+   165
+  ],
+  "kick_pulse": -0.06250387622276321,
+  "kick_bar": 0.13374935183674097,
+  "kick_offbeat": -0.042257208879163954,
+  "pulse": -0.10247223707847297,
+  "tempo_free": 178.0,
+  "low_share": 0.8867542147636414,
+  "nn_sim": 0.5365872979164124,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1075781,
+  "label": 0,
+  "kind": "rnb",
+  "name": "TLC - No Scrubs",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.1673130092977156,
+  "kick_bar": 0.12973358351436837,
+  "kick_offbeat": -0.10519970001769254,
+  "pulse": 0.2590283450009602,
+  "tempo_free": 92.5,
+  "low_share": 0.8301630020141602,
+  "nn_sim": 0.5847235918045044,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 908604612,
+  "label": 0,
+  "kind": "rnb",
+  "name": "The Weeknd - Blinding Lights",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.05405356468767616,
+  "kick_bar": 0.28463127816978256,
+  "kick_offbeat": -0.06711184365160175,
+  "pulse": 0.17772779064743144,
+  "tempo_free": 86.0,
+  "low_share": 0.8090147972106934,
+  "nn_sim": 0.6007611155509949,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3765666312,
+  "label": 0,
+  "kind": "rnb",
+  "name": "Brent Faiyaz - butterflies.",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.07946543482480095,
+  "kick_bar": -0.06337580287896374,
+  "kick_offbeat": 0.050775448814124206,
+  "pulse": 0.17410377594810647,
+  "tempo_free": 123.0,
+  "low_share": 0.9868301749229431,
+  "nn_sim": 0.52876216173172,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4038764841,
+  "label": 0,
+  "kind": "rnb",
+  "name": "F3miii - NOBLE",
+  "genres": [
+   165
+  ],
+  "kick_pulse": -0.11371822107673413,
+  "kick_bar": 0.6089879777883336,
+  "kick_offbeat": -0.05942519166837295,
+  "pulse": -0.057497681448078375,
+  "tempo_free": 93.5,
+  "low_share": 0.7947396636009216,
+  "nn_sim": 0.5728943347930908,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4278790462,
+  "label": 0,
+  "kind": "rnb",
+  "name": "Jhen\u00e9 Aiko - So Good",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.17688428117510152,
+  "kick_bar": 0.054078165633494456,
+  "kick_offbeat": -0.07562556482084534,
+  "pulse": 0.17075481172651052,
+  "tempo_free": 89.0,
+  "low_share": 0.838725745677948,
+  "nn_sim": 0.7496029138565063,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3414318771,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Xavier Gordon - On the Money",
+  "genres": [
+   129
+  ],
+  "kick_pulse": -0.03177942329784855,
+  "kick_bar": 0.48103858157992363,
+  "kick_offbeat": 0.1215167704212945,
+  "pulse": 0.5227332282811403,
+  "tempo_free": 107.5,
+  "low_share": 0.8670425415039062,
+  "nn_sim": 0.6863042116165161,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3465927701,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Jeff Bradshaw - Sunday Morning",
+  "genres": [
+   129
+  ],
+  "kick_pulse": 0.18563262652299414,
+  "kick_bar": 0.31378682170333005,
+  "kick_offbeat": -0.14311447391848656,
+  "pulse": 0.06324484486781572,
+  "tempo_free": 178.5,
+  "low_share": 0.6030377149581909,
+  "nn_sim": 0.6978522539138794,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2842787442,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Nex Lev'l Band - So Sweet",
+  "genres": [
+   129
+  ],
+  "kick_pulse": -0.08821301709000275,
+  "kick_bar": 0.178582096914366,
+  "kick_offbeat": -0.017065495212236947,
+  "pulse": -0.1618579336228954,
+  "tempo_free": 74.0,
+  "low_share": 0.6821011304855347,
+  "nn_sim": 0.6592666506767273,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2238153377,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Laufey - From The Start",
+  "genres": [
+   129
+  ],
+  "kick_pulse": 0.12310405273360268,
+  "kick_bar": 0.21732370705025963,
+  "kick_offbeat": -0.10181237672871424,
+  "pulse": 0.32436997388563676,
+  "tempo_free": 110.0,
+  "low_share": 0.6527555584907532,
+  "nn_sim": 0.6256457567214966,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2973943031,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Sherry Reeves - No Tickets (feat. Cashmere Williams)",
+  "genres": [
+   129
+  ],
+  "kick_pulse": 0.156932422224517,
+  "kick_bar": 0.08714442526582951,
+  "kick_offbeat": -0.0839972747569184,
+  "pulse": 0.389562170465731,
+  "tempo_free": 99.5,
+  "low_share": 0.8183397650718689,
+  "nn_sim": 0.5563419461250305,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 709830092,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Nina Simone - Feeling Good",
+  "genres": [
+   129
+  ],
+  "kick_pulse": -0.0490325282949816,
+  "kick_bar": -0.06599225693003523,
+  "kick_offbeat": 0.0013035616974005756,
+  "pulse": 0.06236250226867269,
+  "tempo_free": 112.5,
+  "low_share": 0.3583625257015228,
+  "nn_sim": 0.6865860819816589,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 549279042,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Roy Ayers - Everybody Loves The Sunshine",
+  "genres": [
+   129
+  ],
+  "kick_pulse": -0.07395479863043875,
+  "kick_bar": 0.10200989665463567,
+  "kick_offbeat": -0.07438833668129519,
+  "pulse": 0.1488212705589831,
+  "tempo_free": 161.5,
+  "low_share": 0.4465169608592987,
+  "nn_sim": 0.6212126016616821,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4004421301,
+  "label": 0,
+  "kind": "jazz",
+  "name": "Mike Williams on Sax - Wine Night (feat. Yorman Williams)",
+  "genres": [
+   129
+  ],
+  "kick_pulse": 0.15558716706672984,
+  "kick_bar": 0.24195811316357071,
+  "kick_offbeat": -0.09961060805099459,
+  "pulse": 0.18476845485666732,
+  "tempo_free": 79.5,
+  "low_share": 0.7672033905982971,
+  "nn_sim": 0.6475909948348999,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 72059729,
+  "label": 0,
+  "kind": "classical",
+  "name": "Ludovico Einaudi - Einaudi: Experience",
+  "genres": [
+   98
+  ],
+  "kick_pulse": 0.04266704195798676,
+  "kick_bar": 0.0018748388807110115,
+  "kick_offbeat": 0.01654527340560302,
+  "pulse": 0.004247240314021619,
+  "tempo_free": 92.5,
+  "low_share": 0.5194926261901855,
+  "nn_sim": 0.6720137000083923,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 128951018,
+  "label": 0,
+  "kind": "classical",
+  "name": "Pitbull - Greenlight (feat. Flo Rida & LunchMoney Lewis)",
+  "genres": [
+   98,
+   106,
+   110,
+   111,
+   113,
+   116,
+   132,
+   165,
+   173,
+   174
+  ],
+  "kick_pulse": 0.49894947105127824,
+  "kick_bar": 0.41035892571444077,
+  "kick_offbeat": 0.051762789012054375,
+  "pulse": 0.3546865192120489,
+  "tempo_free": 115.0,
+  "low_share": 0.8279358744621277,
+  "nn_sim": 0.6518247723579407,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3785935112,
+  "label": 0,
+  "kind": "classical",
+  "name": "Jim Croce - Time in a Bottle",
+  "genres": [
+   152
+  ],
+  "kick_pulse": 0.09138166251133628,
+  "kick_bar": 0.08270092017309207,
+  "kick_offbeat": 0.06469692534344873,
+  "pulse": 0.22012224526895177,
+  "tempo_free": 132.5,
+  "low_share": 0.6408841609954834,
+  "nn_sim": 0.6683713793754578,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2617772682,
+  "label": 0,
+  "kind": "classical",
+  "name": "Stephan Moccio - The Wanderer",
+  "genres": [
+   98
+  ],
+  "kick_pulse": 0.014068705996078122,
+  "kick_bar": 0.04571680286754007,
+  "kick_offbeat": -0.010171189767833324,
+  "pulse": -0.009863626118671667,
+  "tempo_free": 68.0,
+  "low_share": 0.7859318256378174,
+  "nn_sim": 0.5828955173492432,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3571516451,
+  "label": 0,
+  "kind": "classical",
+  "name": "Peter Sandberg - Temporary Coexistence",
+  "genres": [
+   98
+  ],
+  "kick_pulse": -0.035809627400445854,
+  "kick_bar": 0.01710615113518352,
+  "kick_offbeat": 0.0453694669223867,
+  "pulse": -0.02733451080086186,
+  "tempo_free": 101.5,
+  "low_share": 0.7279951572418213,
+  "nn_sim": 0.602899432182312,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 497150662,
+  "label": 0,
+  "kind": "classical",
+  "name": "Max Richter - Richter: On the Nature of Daylight",
+  "genres": [
+   98
+  ],
+  "kick_pulse": -0.04627754349820258,
+  "kick_bar": -0.016411385557609202,
+  "kick_offbeat": -0.008966962004556104,
+  "pulse": 0.012224758235820539,
+  "tempo_free": 182.5,
+  "low_share": 0.7011573910713196,
+  "nn_sim": 0.6061272025108337,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 69261827,
+  "label": 0,
+  "kind": "classical",
+  "name": "Ludovico Einaudi - I Giorni",
+  "genres": [
+   98
+  ],
+  "kick_pulse": 0.07479900897600533,
+  "kick_bar": 0.010966373514312483,
+  "kick_offbeat": 0.11289730919039366,
+  "pulse": 0.35286429709971984,
+  "tempo_free": 129.5,
+  "low_share": 0.42764922976493835,
+  "nn_sim": 0.5481824278831482,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1467838532,
+  "label": 0,
+  "kind": "classical",
+  "name": "Stephan Moccio - Le Jardin de Monsieur Monet",
+  "genres": [
+   98
+  ],
+  "kick_pulse": 0.041302213243463365,
+  "kick_bar": -0.0010279084134112064,
+  "kick_offbeat": -0.008179466994033322,
+  "pulse": 0.48629657416972966,
+  "tempo_free": 136.0,
+  "low_share": 0.3918033838272095,
+  "nn_sim": 0.6031683683395386,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4208859922,
+  "label": 0,
+  "kind": "latin",
+  "name": "KAROL G - BbY WOW",
+  "genres": [
+   197
+  ],
+  "kick_pulse": 0.10110506950877607,
+  "kick_bar": 0.45732847694307566,
+  "kick_offbeat": 0.14486195947392844,
+  "pulse": 0.1734049490187317,
+  "tempo_free": 60.0,
+  "low_share": 0.7760260105133057,
+  "nn_sim": 0.6457842588424683,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3171003121,
+  "label": 0,
+  "kind": "latin",
+  "name": "Bad Bunny - EoO",
+  "genres": [
+   197
+  ],
+  "kick_pulse": -0.01735155182156155,
+  "kick_bar": 0.529478956315227,
+  "kick_offbeat": -0.14934507565511226,
+  "pulse": 0.05845325909510437,
+  "tempo_free": 101.5,
+  "low_share": 0.7866945862770081,
+  "nn_sim": 0.4955408573150635,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3171003131,
+  "label": 0,
+  "kind": "latin",
+  "name": "Bad Bunny - DtMF",
+  "genres": [
+   197
+  ],
+  "kick_pulse": 0.7014445967609643,
+  "kick_bar": 0.6827933599068022,
+  "kick_offbeat": -0.037846911602768915,
+  "pulse": 0.32185829739885785,
+  "tempo_free": 112.5,
+  "low_share": 0.8798916935920715,
+  "nn_sim": 0.6684364080429077,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4208859872,
+  "label": 0,
+  "kind": "latin",
+  "name": "KAROL G - Still",
+  "genres": [
+   197
+  ],
+  "kick_pulse": 0.0668826779583469,
+  "kick_bar": -0.027608509873971343,
+  "kick_offbeat": -0.03212535518105142,
+  "pulse": 0.24425090570002794,
+  "tempo_free": 156.5,
+  "low_share": 0.6966218948364258,
+  "nn_sim": 0.6296982765197754,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 15211178,
+  "label": 0,
+  "kind": "latin",
+  "name": "Shakira - Whenever, Wherever",
+  "genres": [
+   197
+  ],
+  "kick_pulse": 0.18479546778281405,
+  "kick_bar": 0.45492396901835913,
+  "kick_offbeat": 0.24018030197162277,
+  "pulse": 0.5500919107593539,
+  "tempo_free": 107.5,
+  "low_share": 0.699070930480957,
+  "nn_sim": 0.7680293321609497,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 13704591,
+  "label": 0,
+  "kind": "latin",
+  "name": "Ricky Martin - Livin' la Vida Loca",
+  "genres": [
+   152,
+   197
+  ],
+  "kick_pulse": 0.31485550636973453,
+  "kick_bar": 0.18162374976365037,
+  "kick_offbeat": -0.17735162534860566,
+  "pulse": 0.36626126562409544,
+  "tempo_free": 89.0,
+  "low_share": 0.6356931328773499,
+  "nn_sim": 0.7628000378608704,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3171002981,
+  "label": 0,
+  "kind": "latin",
+  "name": "Bad Bunny - NUEVAYoL",
+  "genres": [
+   197
+  ],
+  "kick_pulse": -0.0848512544959657,
+  "kick_bar": 0.05277872717765671,
+  "kick_offbeat": 0.016966017126648355,
+  "pulse": 0.4804550604579056,
+  "tempo_free": 117.5,
+  "low_share": 0.7547833323478699,
+  "nn_sim": 0.7213796377182007,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 623698142,
+  "label": 0,
+  "kind": "latin",
+  "name": "Luis Fonsi - Despacito",
+  "genres": [
+   132,
+   197
+  ],
+  "kick_pulse": 0.09266626825282238,
+  "kick_bar": 0.2974043804056509,
+  "kick_offbeat": -0.08203007373274031,
+  "pulse": 0.2848903117701411,
+  "tempo_free": 89.0,
+  "low_share": 0.7435421943664551,
+  "nn_sim": 0.711844265460968,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 92720048,
+  "label": 0,
+  "kind": "metal",
+  "name": "AC/DC - You Shook Me All Night Long",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": 0.275258413729109,
+  "kick_bar": 0.4552143245503345,
+  "kick_offbeat": 0.17447690948914027,
+  "pulse": 0.3339613351670202,
+  "tempo_free": 126.5,
+  "low_share": 0.4855414628982544,
+  "nn_sim": 0.631879985332489,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 92719900,
+  "label": 0,
+  "kind": "metal",
+  "name": "AC/DC - Highway to Hell",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": 0.415809503812664,
+  "kick_bar": 0.380981396755268,
+  "kick_offbeat": 0.08268906869162838,
+  "pulse": 0.33745883320104975,
+  "tempo_free": 115.0,
+  "low_share": 0.45779719948768616,
+  "nn_sim": 0.60546875,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 92720046,
+  "label": 0,
+  "kind": "metal",
+  "name": "AC/DC - Back In Black",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": -0.009457600331263126,
+  "kick_bar": 0.2411019936448235,
+  "kick_offbeat": -0.07018858030988055,
+  "pulse": 0.04517887850849296,
+  "tempo_free": 92.5,
+  "low_share": 0.5089761018753052,
+  "nn_sim": 0.6544085144996643,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3819908,
+  "label": 0,
+  "kind": "metal",
+  "name": "Slipknot - Duality",
+  "genres": [
+   464
+  ],
+  "kick_pulse": 0.04330958630205568,
+  "kick_bar": 0.0006483364127189925,
+  "kick_offbeat": -0.044314647857015776,
+  "pulse": 0.16151038544809385,
+  "tempo_free": 143.5,
+  "low_share": 0.6779330968856812,
+  "nn_sim": 0.762438178062439,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 15523793,
+  "label": 0,
+  "kind": "metal",
+  "name": "System of A Down - Toxicity",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": 0.26448970241472125,
+  "kick_bar": 0.19967961306438634,
+  "kick_offbeat": 0.21067790976897077,
+  "pulse": 0.21278278713457682,
+  "tempo_free": 76.0,
+  "low_share": 0.709568440914154,
+  "nn_sim": 0.5513271689414978,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 62082829,
+  "label": 0,
+  "kind": "metal",
+  "name": "Rage Against the Machine - Killing In The Name",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": 0.1778278650049496,
+  "kick_bar": 0.09634002464729441,
+  "kick_offbeat": -0.08585363180684182,
+  "pulse": -0.03815647266931201,
+  "tempo_free": 161.5,
+  "low_share": 0.7703110575675964,
+  "nn_sim": 0.7773789763450623,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4283830192,
+  "label": 0,
+  "kind": "metal",
+  "name": "Falling in Reverse - Joseph",
+  "genres": [
+   152,
+   464
+  ],
+  "kick_pulse": 0.09700263039065662,
+  "kick_bar": 0.13366524817851863,
+  "kick_offbeat": 0.04175001308948803,
+  "pulse": 0.337286030802016,
+  "tempo_free": 117.5,
+  "low_share": 0.33767008781433105,
+  "nn_sim": 0.556820273399353,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 134523750,
+  "label": 0,
+  "kind": "metal",
+  "name": "Korn - Freak On a Leash",
+  "genres": [
+   152,
+   155,
+   464
+  ],
+  "kick_pulse": 0.1329200071114291,
+  "kick_bar": 0.03970220005758281,
+  "kick_offbeat": -0.039825909749975894,
+  "pulse": 0.0642120160061068,
+  "tempo_free": 103.0,
+  "low_share": 0.8403246402740479,
+  "nn_sim": 0.6161150932312012,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4167204822,
+  "label": 0,
+  "kind": "country",
+  "name": "Morgan Wallen - Been By Now",
+  "genres": [
+   84
+  ],
+  "kick_pulse": 0.3537152959997284,
+  "kick_bar": 0.4022991044832202,
+  "kick_offbeat": 0.33330260538736933,
+  "pulse": 0.5477033562572866,
+  "tempo_free": 115.0,
+  "low_share": 0.6563032865524292,
+  "nn_sim": 0.5674353837966919,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4058916481,
+  "label": 0,
+  "kind": "country",
+  "name": "Taylor Swift - I Knew It, I Knew You (From \"Toy Story 5\")",
+  "genres": [
+   84
+  ],
+  "kick_pulse": -0.14092104556038976,
+  "kick_bar": 0.2611018344759941,
+  "kick_offbeat": -0.11110696569085121,
+  "pulse": -0.02494215441402048,
+  "tempo_free": 94.0,
+  "low_share": 0.6836835145950317,
+  "nn_sim": 0.5756704211235046,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3991431871,
+  "label": 0,
+  "kind": "country",
+  "name": "Kacey Musgraves - Mexico Honey",
+  "genres": [
+   84
+  ],
+  "kick_pulse": 0.10184790277554559,
+  "kick_bar": 0.5352123400213522,
+  "kick_offbeat": 0.13449801092672614,
+  "pulse": 0.44851275957232223,
+  "tempo_free": 110.0,
+  "low_share": 0.835214376449585,
+  "nn_sim": 0.6068536043167114,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3838327301,
+  "label": 0,
+  "kind": "country",
+  "name": "Luke Combs - Be By You",
+  "genres": [
+   84,
+   132
+  ],
+  "kick_pulse": -0.12737189885228872,
+  "kick_bar": 0.2813427299261093,
+  "kick_offbeat": -0.08261927706189454,
+  "pulse": 0.030373350891750306,
+  "tempo_free": 94.0,
+  "low_share": 0.6814175844192505,
+  "nn_sim": 0.5861504673957825,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2729273551,
+  "label": 0,
+  "kind": "country",
+  "name": "Shaboozey - A Bar Song (Tipsy)",
+  "genres": [
+   84
+  ],
+  "kick_pulse": -0.001091459474793055,
+  "kick_bar": 0.049782913411036134,
+  "kick_offbeat": -0.034030679569696076,
+  "pulse": 0.11612872924888507,
+  "tempo_free": 161.5,
+  "low_share": 0.7647006511688232,
+  "nn_sim": 0.6454931497573853,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3056032231,
+  "label": 0,
+  "kind": "country",
+  "name": "Shaboozey - Good News",
+  "genres": [
+   84
+  ],
+  "kick_pulse": 0.011112722801044583,
+  "kick_bar": 0.06798519100993872,
+  "kick_offbeat": 0.0027019147146347677,
+  "pulse": 0.029448792643961497,
+  "tempo_free": 81.0,
+  "low_share": 0.6346613764762878,
+  "nn_sim": 0.5706143975257874,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4203392972,
+  "label": 0,
+  "kind": "country",
+  "name": "Koe Wetzel - Jaded",
+  "genres": [
+   84
+  ],
+  "kick_pulse": 0.44452956784516573,
+  "kick_bar": 0.1751621006987989,
+  "kick_offbeat": 0.2914854921400547,
+  "pulse": 0.44308236334472895,
+  "tempo_free": 103.5,
+  "low_share": 0.6568973064422607,
+  "nn_sim": 0.6724995970726013,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2780753191,
+  "label": 0,
+  "kind": "country",
+  "name": "Post Malone - I Had Some Help",
+  "genres": [
+   84
+  ],
+  "kick_pulse": 0.23164841844481998,
+  "kick_bar": 0.39467051535029896,
+  "kick_offbeat": 0.3116269382117025,
+  "pulse": 0.4029028584845946,
+  "tempo_free": 129.0,
+  "low_share": 0.6585958003997803,
+  "nn_sim": 0.6780441999435425,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 136341512,
+  "label": 0,
+  "kind": "reggae",
+  "name": "Sean Paul - No Lie",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.09593815797159219,
+  "kick_bar": 0.46151648234466247,
+  "kick_offbeat": -0.1173722732158186,
+  "pulse": 0.28633656277430825,
+  "tempo_free": 101.5,
+  "low_share": 0.7118629813194275,
+  "nn_sim": 0.6005763411521912,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2542703,
+  "label": 0,
+  "kind": "reggae",
+  "name": "Bob Marley & The Wailers - Could You Be Loved",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.427939560264349,
+  "kick_bar": 0.0730757312849164,
+  "kick_offbeat": 0.35812153620645404,
+  "pulse": 0.5521409437060356,
+  "tempo_free": 103.5,
+  "low_share": 0.6330163478851318,
+  "nn_sim": 0.5410091280937195,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1021870252,
+  "label": 0,
+  "kind": "reggae",
+  "name": "Cleo Sol - Shine",
+  "genres": [
+   132,
+   134,
+   144
+  ],
+  "kick_pulse": 0.09775025250248447,
+  "kick_bar": 0.06779120815917859,
+  "kick_offbeat": 0.09384665044490247,
+  "pulse": 0.47536403878146544,
+  "tempo_free": 139.5,
+  "low_share": 0.8584403991699219,
+  "nn_sim": 0.5250284671783447,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 71512092,
+  "label": 0,
+  "kind": "reggae",
+  "name": "MAGIC! - Rude",
+  "genres": [
+   85,
+   132,
+   134,
+   144,
+   152
+  ],
+  "kick_pulse": -0.10041006221233503,
+  "kick_bar": 0.23444524107743872,
+  "kick_offbeat": -0.05929377545987294,
+  "pulse": -0.10141258643251724,
+  "tempo_free": 143.5,
+  "low_share": 0.782524824142456,
+  "nn_sim": 0.4380715489387512,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3129568,
+  "label": 0,
+  "kind": "reggae",
+  "name": "UB40 - Red Red Wine",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.14565613554954973,
+  "kick_bar": 0.305453592363526,
+  "kick_offbeat": -0.16440537407556002,
+  "pulse": -0.011781645022839411,
+  "tempo_free": 178.0,
+  "low_share": 0.7798318266868591,
+  "nn_sim": 0.5221239328384399,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 102671422,
+  "label": 0,
+  "kind": "reggae",
+  "name": "R. City - Locked Away (feat. Adam Levine)",
+  "genres": [
+   113,
+   132,
+   134,
+   144,
+   152,
+   165
+  ],
+  "kick_pulse": 0.20016604702336252,
+  "kick_bar": 0.013338799035760135,
+  "kick_offbeat": -0.0744080134605742,
+  "pulse": 0.39139701926474846,
+  "tempo_free": 126.0,
+  "low_share": 0.6099844574928284,
+  "nn_sim": 0.5675190687179565,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2293791,
+  "label": 0,
+  "kind": "reggae",
+  "name": "Bob Marley & The Wailers - Is This Love",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.5666275179437148,
+  "kick_bar": 0.4164278483368953,
+  "kick_offbeat": -0.12079359425521002,
+  "pulse": 0.5160601017108613,
+  "tempo_free": 123.0,
+  "low_share": 0.4736775755882263,
+  "nn_sim": 0.5840936899185181,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 6592573,
+  "label": 0,
+  "kind": "reggae",
+  "name": "Gyptian - Hold You (Hold Yuh)",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.2340289192078145,
+  "kick_bar": 0.10390091863901989,
+  "kick_offbeat": -0.057995529725878056,
+  "pulse": 0.2536465923644995,
+  "tempo_free": 132.5,
+  "low_share": 0.5421435832977295,
+  "nn_sim": 0.5355400443077087,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 15586296,
+  "label": 0,
+  "kind": "soul",
+  "name": "Michael Jackson - Don't Stop 'Til You Get Enough",
+  "genres": [
+   132,
+   168,
+   169
+  ],
+  "kick_pulse": 0.2912028805517098,
+  "kick_bar": 0.6169495446717038,
+  "kick_offbeat": 0.07705342651153092,
+  "pulse": 0.478986895917093,
+  "tempo_free": 120.0,
+  "low_share": 0.5886245369911194,
+  "nn_sim": 0.5637169480323792,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 66609426,
+  "label": 0,
+  "kind": "soul",
+  "name": "Daft Punk - Get Lucky (Radio Edit - feat. Pharrell Williams and Nile Rodgers)",
+  "genres": [
+   106,
+   110,
+   111,
+   113,
+   132,
+   134,
+   152,
+   165,
+   168,
+   169
+  ],
+  "kick_pulse": 0.5193162844034618,
+  "kick_bar": 0.5850481280800087,
+  "kick_offbeat": -0.02810743443466169,
+  "pulse": 0.4450932980900438,
+  "tempo_free": 115.0,
+  "low_share": 0.8740329742431641,
+  "nn_sim": 0.6115311980247498,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1133408902,
+  "label": 0,
+  "kind": "soul",
+  "name": "Marvin Gaye - Mercy Mercy Me (The Ecology)",
+  "genres": [
+   165
+  ],
+  "kick_pulse": 0.021131001063622534,
+  "kick_bar": 0.22894638776779175,
+  "kick_offbeat": -0.16069739079102874,
+  "pulse": -0.044999355799518526,
+  "tempo_free": 94.0,
+  "low_share": 0.5975868105888367,
+  "nn_sim": 0.7304335236549377,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 646327092,
+  "label": 0,
+  "kind": "soul",
+  "name": "Marvin Gaye - Ain't No Mountain High Enough",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.28245563191982614,
+  "kick_bar": 0.216500805070003,
+  "kick_offbeat": 0.2510876777814701,
+  "pulse": 0.29253803240135323,
+  "tempo_free": 129.0,
+  "low_share": 0.49420031905174255,
+  "nn_sim": 0.6177124977111816,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4078982021,
+  "label": 0,
+  "kind": "soul",
+  "name": "anaiis - Sunshine",
+  "genres": [
+   85,
+   165,
+   169
+  ],
+  "kick_pulse": 0.21123772824648768,
+  "kick_bar": 0.1393932665232569,
+  "kick_offbeat": 0.1500307034002617,
+  "pulse": 0.3349402523599565,
+  "tempo_free": 143.5,
+  "low_share": 0.69133460521698,
+  "nn_sim": 0.6189479827880859,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3958539161,
+  "label": 0,
+  "kind": "soul",
+  "name": "Durand Bernarr - HELLO!",
+  "genres": [
+   165,
+   169
+  ],
+  "kick_pulse": 0.07033150651841424,
+  "kick_bar": 0.21713051199913025,
+  "kick_offbeat": -0.06530664724414237,
+  "pulse": 0.4503965835319832,
+  "tempo_free": 120.0,
+  "low_share": 0.7987292408943176,
+  "nn_sim": 0.7253736257553101,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3958539311,
+  "label": 0,
+  "kind": "soul",
+  "name": "Durand Bernarr - 10,000 Lifetimes (feat. Sevyn Streeter)",
+  "genres": [
+   165,
+   169
+  ],
+  "kick_pulse": 0.12475020431678828,
+  "kick_bar": 0.09687724391012707,
+  "kick_offbeat": -0.11152407852843944,
+  "pulse": 0.21740443223930953,
+  "tempo_free": 97.5,
+  "low_share": 0.8594399690628052,
+  "nn_sim": 0.7303812503814697,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 15586286,
+  "label": 0,
+  "kind": "soul",
+  "name": "Michael Jackson - Rock with You (Single Version)",
+  "genres": [
+   132,
+   168,
+   169
+  ],
+  "kick_pulse": 0.3859596646281048,
+  "kick_bar": 0.5044051762426267,
+  "kick_offbeat": 0.0039407978748826926,
+  "pulse": 0.5270708410077479,
+  "tempo_free": 115.0,
+  "low_share": 0.5697983503341675,
+  "nn_sim": 0.7034397125244141,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2387406055,
+  "label": 0,
+  "kind": "techno",
+  "name": "BENNETT - Vois sur ton chemin (Techno Mix)",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.20964294451329374,
+  "kick_bar": 0.16913836830012158,
+  "kick_offbeat": 0.027493887335446703,
+  "pulse": 0.6211151394021253,
+  "tempo_free": 139.5,
+  "low_share": 0.7229086756706238,
+  "nn_sim": 0.7367886900901794,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 51517221,
+  "label": 0,
+  "kind": "techno",
+  "name": "Boris Brejcha - Lost Memory",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.364989360794425,
+  "kick_bar": 0.34734848886728287,
+  "kick_offbeat": -0.11145570734515786,
+  "pulse": 0.744484968483448,
+  "tempo_free": 126.0,
+  "low_share": 0.9896978735923767,
+  "nn_sim": 0.6968702673912048,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1902369227,
+  "label": 0,
+  "kind": "techno",
+  "name": "Age Of Love - The Age Of Love (Charlotte de Witte & Enrico Sangiuliano Remix - Edit)",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.38976657315372265,
+  "kick_bar": 0.30467838435792,
+  "kick_offbeat": 0.1719860395398707,
+  "pulse": 0.6667458313302349,
+  "tempo_free": 129.5,
+  "low_share": 0.7618613839149475,
+  "nn_sim": 0.6508797407150269,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2607302922,
+  "label": 0,
+  "kind": "techno",
+  "name": "Eli Brown - When I Push (Edit)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.5542292248791277,
+  "kick_bar": 0.4579022329912265,
+  "kick_offbeat": 0.010377952087452968,
+  "pulse": 0.602030884933227,
+  "tempo_free": 132.5,
+  "low_share": 0.8583717346191406,
+  "nn_sim": 0.5969957113265991,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 978183732,
+  "label": 0,
+  "kind": "techno",
+  "name": "Ben Klock - Subzero (Original Mix)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.21547439647838473,
+  "kick_bar": 0.29155195131897926,
+  "kick_offbeat": 0.012069288219208829,
+  "pulse": 0.5122080165892839,
+  "tempo_free": 126.0,
+  "low_share": 0.9700720906257629,
+  "nn_sim": 0.6490721106529236,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 12744084,
+  "label": 0,
+  "kind": "techno",
+  "name": "Gesaffelstein - Opr",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.04060980194005397,
+  "kick_bar": 0.21034190838085443,
+  "kick_offbeat": -0.05529702238909442,
+  "pulse": 0.24367970088565996,
+  "tempo_free": 101.0,
+  "low_share": 0.9048865437507629,
+  "nn_sim": 0.53763747215271,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4215099272,
+  "label": 0,
+  "kind": "dnb",
+  "name": "Chase & Status - Gone Too Far (feat. Debbie)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.15213839808711782,
+  "kick_bar": 0.3361287354491651,
+  "kick_offbeat": 0.29773547052172944,
+  "pulse": 0.3118592389510013,
+  "tempo_free": 120.0,
+  "low_share": 0.6112188100814819,
+  "nn_sim": 0.7992348074913025,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2427437035,
+  "label": 0,
+  "kind": "dnb",
+  "name": "Kenya Grace - Strangers",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.21336404167824485,
+  "kick_bar": -0.0023737736940033305,
+  "kick_offbeat": -0.03802443326572452,
+  "pulse": 0.40663589114339754,
+  "tempo_free": 85.0,
+  "low_share": 0.7287068963050842,
+  "nn_sim": 0.5413388609886169,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3422346671,
+  "label": 0,
+  "kind": "dnb",
+  "name": "PinkPantheress - Illegal + Nia Archives",
+  "genres": [
+   132
+  ],
+  "kick_pulse": -0.04401861944357716,
+  "kick_bar": 0.2001009025201898,
+  "kick_offbeat": -0.06452964853427905,
+  "pulse": 0.47598398061660685,
+  "tempo_free": 107.5,
+  "low_share": 0.86043781042099,
+  "nn_sim": 0.6926890015602112,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4138399071,
+  "label": 0,
+  "kind": "dnb",
+  "name": "Rudimental - Send Shots",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.06526204932237326,
+  "kick_bar": -0.021148706839598998,
+  "kick_offbeat": 0.020180697859332686,
+  "pulse": 0.3089077590110885,
+  "tempo_free": 86.0,
+  "low_share": 0.7863638997077942,
+  "nn_sim": 0.8217881321907043,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4170984332,
+  "label": 0,
+  "kind": "dnb",
+  "name": "goddard. - Stamina",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.049098171311645525,
+  "kick_bar": 0.1416090964697874,
+  "kick_offbeat": -0.028973170755097435,
+  "pulse": 0.10178078238207562,
+  "tempo_free": 172.5,
+  "low_share": 0.5703545212745667,
+  "nn_sim": 0.521518349647522,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4194439862,
+  "label": 0,
+  "kind": "dnb",
+  "name": "Dimension - Ghost Town",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.10838736901421035,
+  "kick_bar": 0.13353552047869774,
+  "kick_offbeat": -0.06754801082344533,
+  "pulse": 0.31765372180861645,
+  "tempo_free": 172.5,
+  "low_share": 0.4433763921260834,
+  "nn_sim": 0.6994931101799011,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3147614951,
+  "label": 0,
+  "kind": "trance",
+  "name": "Kuko - Voicemail",
+  "genres": [
+   106
+  ],
+  "kick_pulse": -0.05116261366492836,
+  "kick_bar": 0.12260910985060036,
+  "kick_offbeat": 0.033731144772900734,
+  "pulse": 0.3621940884622745,
+  "tempo_free": 75.0,
+  "low_share": 0.8765896558761597,
+  "nn_sim": 0.5793954133987427,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4181733012,
+  "label": 0,
+  "kind": "trance",
+  "name": "Key4050 - Empty Space",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": 0.35057379402544186,
+  "kick_bar": 0.4619492229236205,
+  "kick_offbeat": 0.1894183944576703,
+  "pulse": 0.42707437920667557,
+  "tempo_free": 139.5,
+  "low_share": 0.7991696000099182,
+  "nn_sim": 0.8590550422668457,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4235367052,
+  "label": 0,
+  "kind": "trance",
+  "name": "York - On The Beach",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": 0.14288148016928212,
+  "kick_bar": 0.03635691059470019,
+  "kick_offbeat": 0.0893162456807749,
+  "pulse": 0.4716053707531806,
+  "tempo_free": 139.5,
+  "low_share": 0.2561466693878174,
+  "nn_sim": 0.7441350221633911,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4037889531,
+  "label": 0,
+  "kind": "trance",
+  "name": "Oxia - Domino (Space 92 Remix)",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": -0.03999899550050851,
+  "kick_bar": 0.3331725395146861,
+  "kick_offbeat": -0.11244190665958842,
+  "pulse": 0.3203905117534048,
+  "tempo_free": 143.5,
+  "low_share": 0.7974667549133301,
+  "nn_sim": 0.5332077741622925,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4077615801,
+  "label": 0,
+  "kind": "trance",
+  "name": "Steve Hill - Children",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": 0.1713355833443875,
+  "kick_bar": 0.22823000255820214,
+  "kick_offbeat": 0.21677230632715264,
+  "pulse": 0.517907966062982,
+  "tempo_free": 139.5,
+  "low_share": 0.6621816158294678,
+  "nn_sim": 0.6711894273757935,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 6495617,
+  "label": 0,
+  "kind": "trance",
+  "name": "Binary Finary - 1998",
+  "genres": [
+   113,
+   115
+  ],
+  "kick_pulse": -0.17400031699799,
+  "kick_bar": 0.5383375976234674,
+  "kick_offbeat": -0.0912564641184872,
+  "pulse": 0.18126565185957588,
+  "tempo_free": 152.0,
+  "low_share": 0.9588103294372559,
+  "nn_sim": 0.7229166030883789,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4431623,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Prince Jammy - Rude Boy",
+  "genres": [],
+  "kick_pulse": -0.05728685981183144,
+  "kick_bar": 0.12726914499174147,
+  "kick_offbeat": -0.007098156292854294,
+  "pulse": -0.12151323399944777,
+  "tempo_free": 148.0,
+  "low_share": 0.899056077003479,
+  "nn_sim": 0.512952983379364,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2166355,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Collie Buddz - Sensimillia (feat. Roache)",
+  "genres": [
+   132,
+   144,
+   146
+  ],
+  "kick_pulse": -0.14109131222357973,
+  "kick_bar": 0.05044100293889642,
+  "kick_offbeat": -0.06789960973401321,
+  "pulse": -0.0947920834296383,
+  "tempo_free": 90.5,
+  "low_share": 0.8244805932044983,
+  "nn_sim": 0.4580698609352112,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1312323,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Famara - The Talisman",
+  "genres": [
+   144
+  ],
+  "kick_pulse": 0.17372338194400072,
+  "kick_bar": 0.17138879746198654,
+  "kick_offbeat": -0.11211192363407463,
+  "pulse": 0.43645711056888103,
+  "tempo_free": 156.5,
+  "low_share": 0.7066798806190491,
+  "nn_sim": 0.6153405904769897,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1679908987,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Joseph Cotton - Internet Babies",
+  "genres": [
+   144,
+   145
+  ],
+  "kick_pulse": -0.07691646723150877,
+  "kick_bar": 0.4569969836259835,
+  "kick_offbeat": -0.16475131298390644,
+  "pulse": 0.0033319342011030573,
+  "tempo_free": 172.0,
+  "low_share": 0.7151532173156738,
+  "nn_sim": 0.5135936141014099,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 3705705,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Don Carlos - Johnny Big Mouth - Original",
+  "genres": [],
+  "kick_pulse": 0.15462023252621293,
+  "kick_bar": 0.3040382005274296,
+  "kick_offbeat": 0.07012388881412335,
+  "pulse": 0.5559892519377172,
+  "tempo_free": 139.5,
+  "low_share": 0.721148669719696,
+  "nn_sim": 0.5059119462966919,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 82812712,
+  "label": 0,
+  "kind": "dubstep",
+  "name": "Doris Days - To Ulrike M. (Tosca Baader Meinhof Remix)",
+  "genres": [
+   85,
+   106,
+   107
+  ],
+  "kick_pulse": 0.47942341853309145,
+  "kick_bar": 0.6588697698215306,
+  "kick_offbeat": -0.0931572765096924,
+  "pulse": 0.1659591401258514,
+  "tempo_free": 70.0,
+  "low_share": 0.9530426263809204,
+  "nn_sim": 0.49699991941452026,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4121187181,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "Dimitri Vegas - Turn The Tide (ft. Sylver)",
+  "genres": [
+   106
+  ],
+  "kick_pulse": 0.06810642858486501,
+  "kick_bar": 0.2500874429730881,
+  "kick_offbeat": 0.03944362070216163,
+  "pulse": -0.1526625426148154,
+  "tempo_free": 156.5,
+  "low_share": 0.9197891354560852,
+  "nn_sim": 0.6458132863044739,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4038207331,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "Restricted - Kick Drum Talk",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.008592679991278586,
+  "kick_bar": 0.20971845609831052,
+  "kick_offbeat": -0.04399072027250355,
+  "pulse": 0.12328447449401443,
+  "tempo_free": 161.5,
+  "low_share": 0.8583876490592957,
+  "nn_sim": 0.7011106610298157,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4064086171,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "Bassjackers - Jump Around",
+  "genres": [
+   106
+  ],
+  "kick_pulse": -0.04602894642659144,
+  "kick_bar": 0.22122390950282575,
+  "kick_offbeat": 0.004850968796697356,
+  "pulse": -0.08408463921391798,
+  "tempo_free": 152.0,
+  "low_share": 0.8871073722839355,
+  "nn_sim": 0.5744034051895142,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4062339981,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "KLOFAMA - REMEMBER THIS FACE",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.06501040417819055,
+  "kick_bar": 0.10297029237197301,
+  "kick_offbeat": 0.022554421578501186,
+  "pulse": 0.30711932454100793,
+  "tempo_free": 161.5,
+  "low_share": 0.7231758832931519,
+  "nn_sim": 0.5462862849235535,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4090034771,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "Da Tweekaz - Dancefloor Therapy",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.16471262206651366,
+  "kick_bar": 0.13472260049426169,
+  "kick_offbeat": 0.0795233481281607,
+  "pulse": 0.46519228886865405,
+  "tempo_free": 161.5,
+  "low_share": 0.8218274712562561,
+  "nn_sim": 0.5855382680892944,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 3982779911,
+  "label": 0,
+  "kind": "hardstyle",
+  "name": "DYEN - GABBER",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": -0.03503439148484038,
+  "kick_bar": 0.17911282940262852,
+  "kick_offbeat": -0.01927146378244306,
+  "pulse": -0.016908381140583312,
+  "tempo_free": 156.5,
+  "low_share": 0.9093109965324402,
+  "nn_sim": 0.4823984205722809,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1966683957,
+  "label": 0,
+  "kind": "ambient",
+  "name": "\u00d8neheart - apathy",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.07552048298847781,
+  "kick_bar": 0.014767487628639279,
+  "kick_offbeat": 0.07873027347324585,
+  "pulse": -0.01985799537082627,
+  "tempo_free": 83.5,
+  "low_share": 0.6709890961647034,
+  "nn_sim": 0.5996662378311157,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 2077792987,
+  "label": 0,
+  "kind": "ambient",
+  "name": "Richome - Mesmerised",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.07056620973162353,
+  "kick_bar": 0.03184271510690451,
+  "kick_offbeat": 0.03436085596331395,
+  "pulse": 0.18662773119285703,
+  "tempo_free": 103.0,
+  "low_share": 0.9373857378959656,
+  "nn_sim": 0.5537437796592712,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2203676557,
+  "label": 0,
+  "kind": "ambient",
+  "name": "ambi pino - bacio gelato",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.10321418188458449,
+  "kick_bar": -0.017301981577896048,
+  "kick_offbeat": 0.01868081625109856,
+  "pulse": 0.11647354291890527,
+  "tempo_free": 123.0,
+  "low_share": 0.8879311680793762,
+  "nn_sim": 0.5233116745948792,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2512110811,
+  "label": 0,
+  "kind": "ambient",
+  "name": "Sorth - another foggy day",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.18164605437777923,
+  "kick_bar": 0.19065351421607904,
+  "kick_offbeat": -0.04900721275864393,
+  "pulse": 0.24267795779048768,
+  "tempo_free": 129.5,
+  "low_share": 0.5191411375999451,
+  "nn_sim": 0.6691670417785645,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 1730547097,
+  "label": 0,
+  "kind": "ambient",
+  "name": "zZzforthepeople - jill snores",
+  "genres": [
+   132
+  ],
+  "kick_pulse": 0.0879839894358371,
+  "kick_bar": -0.021203530572272623,
+  "kick_offbeat": -0.016988476764655557,
+  "pulse": 0.07503247584442298,
+  "tempo_free": 147.5,
+  "low_share": 0.6148416996002197,
+  "nn_sim": 0.6682595014572144,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 2693481832,
+  "label": 0,
+  "kind": "ambient",
+  "name": "Alerius - Lullaby For Stars",
+  "genres": [
+   129
+  ],
+  "kick_pulse": -0.055295486158095535,
+  "kick_bar": 0.491755907451185,
+  "kick_offbeat": -0.03793048734651699,
+  "pulse": -0.051101873128038065,
+  "tempo_free": 101.5,
+  "low_share": 0.549517810344696,
+  "nn_sim": 0.6434005498886108,
+  "dance_genre": 0.0
+ },
+ {
+  "id": 4135283821,
+  "label": 0,
+  "kind": "edm",
+  "name": "Hardwell - Bangkok",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.31417273730039597,
+  "kick_bar": 0.14465316385030746,
+  "kick_offbeat": 0.0013087154366075993,
+  "pulse": 0.5377360694110394,
+  "tempo_free": 136.0,
+  "low_share": 0.8553371429443359,
+  "nn_sim": 0.612154483795166,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4155392052,
+  "label": 0,
+  "kind": "edm",
+  "name": "DJ Kuba - I Like The Bass",
+  "genres": [
+   113
+  ],
+  "kick_pulse": -0.011192509413376683,
+  "kick_bar": 0.27868232992477715,
+  "kick_offbeat": -0.04012737533048494,
+  "pulse": -0.043076906353235245,
+  "tempo_free": 152.0,
+  "low_share": 0.9061063528060913,
+  "nn_sim": 0.602057933807373,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4247046901,
+  "label": 0,
+  "kind": "edm",
+  "name": "Magnus Riedel - Good Times",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.02224700102356151,
+  "kick_bar": -0.010610701293586301,
+  "kick_offbeat": 0.08326636291527695,
+  "pulse": 0.26050483256817686,
+  "tempo_free": 143.5,
+  "low_share": 0.7421565651893616,
+  "nn_sim": 0.7732113599777222,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4153490752,
+  "label": 0,
+  "kind": "edm",
+  "name": "Dirty Signal - Freak In The Building",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.5100987175560869,
+  "kick_bar": 0.34966482976204893,
+  "kick_offbeat": 0.460190552667466,
+  "pulse": 0.5614430845722447,
+  "tempo_free": 139.5,
+  "low_share": 0.572087824344635,
+  "nn_sim": 0.7602147459983826,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 1818071587,
+  "label": 0,
+  "kind": "edm",
+  "name": "Hardwell - Call Me A Spaceman",
+  "genres": [
+   106,
+   113
+  ],
+  "kick_pulse": 0.3839501418803926,
+  "kick_bar": 0.6371144914655071,
+  "kick_offbeat": 0.43588616823059345,
+  "pulse": 0.24094360702536813,
+  "tempo_free": 126.5,
+  "low_share": 0.7196179032325745,
+  "nn_sim": 0.47358137369155884,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4143728002,
+  "label": 0,
+  "kind": "edm",
+  "name": "JUNIVERZ - Take Control",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.27473524771630764,
+  "kick_bar": 0.11248308070935309,
+  "kick_offbeat": -0.01934177422663197,
+  "pulse": 0.43639267538674176,
+  "tempo_free": 143.5,
+  "low_share": 0.8830480575561523,
+  "nn_sim": 0.7205720543861389,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4078563511,
+  "label": 0,
+  "kind": "ukg",
+  "name": "AlunaGeorge - Best Be Believing",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.16328749846347337,
+  "kick_bar": 0.20160456292275636,
+  "kick_offbeat": 0.13896105596934685,
+  "pulse": 0.3601374402294741,
+  "tempo_free": 132.5,
+  "low_share": 0.7568817138671875,
+  "nn_sim": 0.6847398281097412,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4303443302,
+  "label": 0,
+  "kind": "ukg",
+  "name": "Interplanetary Criminal - Memories",
+  "genres": [
+   85,
+   87,
+   106
+  ],
+  "kick_pulse": 0.29093596467625,
+  "kick_bar": 0.48615902938934613,
+  "kick_offbeat": 0.135473290208371,
+  "pulse": 0.29929790177094895,
+  "tempo_free": 68.0,
+  "low_share": 0.04252791404724121,
+  "nn_sim": 0.7207098007202148,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4198895852,
+  "label": 0,
+  "kind": "ukg",
+  "name": "Silva Bumpa - Fantasy (Baby if u know me) (feat. Kosmo Kint)",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.06593918048619181,
+  "kick_bar": 0.013362359387375514,
+  "kick_offbeat": -0.050539677135341625,
+  "pulse": 0.6121100201682346,
+  "tempo_free": 136.0,
+  "low_share": 0.867370069026947,
+  "nn_sim": 0.5270975828170776,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4267044912,
+  "label": 0,
+  "kind": "ukg",
+  "name": "MPH - Warlord",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.42142424266785383,
+  "kick_bar": 0.42470940947532654,
+  "kick_offbeat": -0.07811785663943738,
+  "pulse": 0.24994720751419663,
+  "tempo_free": 67.5,
+  "low_share": 0.9014075398445129,
+  "nn_sim": 0.6749569773674011,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4275920182,
+  "label": 0,
+  "kind": "ukg",
+  "name": "IN PARALLEL - Lock Off",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.23111923497430417,
+  "kick_bar": 0.25486427120973887,
+  "kick_offbeat": -0.07192326428091347,
+  "pulse": 0.19315015068894015,
+  "tempo_free": 68.0,
+  "low_share": 0.8910130262374878,
+  "nn_sim": 0.5631740689277649,
+  "dance_genre": 1.0
+ },
+ {
+  "id": 4008734111,
+  "label": 0,
+  "kind": "ukg",
+  "name": "James Hype - Seratonin",
+  "genres": [
+   113
+  ],
+  "kick_pulse": 0.7040714373731095,
+  "kick_bar": 0.6090785807565494,
+  "kick_offbeat": -0.038178064403599936,
+  "pulse": 0.6080003095304837,
+  "tempo_free": 139.5,
+  "low_share": 0.8176658749580383,
+  "nn_sim": 0.6172102093696594,
+  "dance_genre": 1.0
+ }
+]

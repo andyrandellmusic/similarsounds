@@ -77,10 +77,56 @@ def detect_bpm(y: np.ndarray, lo: float = 105, hi: float = 140) -> float:
     return float(round(bpm)) if abs(bpm - round(bpm)) < 0.3 else round(bpm, 1)
 
 
+def _ac_at(ac: np.ndarray, lag: float) -> float:
+    return float(np.interp(lag, np.arange(len(ac)), ac))
+
+
+def rhythm_features(y: np.ndarray, bpm: float) -> dict:
+    """Signals for "is this house?": a steady four-on-the-floor kick at the detected tempo."""
+    hop = 256
+    fps = SR / hop
+    lag = 60 * fps / bpm
+
+    # One power spectrogram, reused for every measurement below (keeps peak memory low)
+    power = np.abs(librosa.stft(y, n_fft=2048, hop_length=hop)) ** 2
+
+    # Kick band only (< 150 Hz), so hi-hats and vocals don't count
+    S = librosa.feature.melspectrogram(S=power, sr=SR, n_mels=12, fmax=150)
+    kick = librosa.onset.onset_strength(S=librosa.power_to_db(S, ref=np.max), sr=SR, hop_length=hop)
+    k = kick - kick.mean()
+    kac = librosa.autocorrelate(k)
+    kac = kac / (kac[0] + 1e-9)
+
+    mel = librosa.feature.melspectrogram(S=power, sr=SR, n_mels=64)
+    del power
+    onset = librosa.onset.onset_strength(S=librosa.power_to_db(mel, ref=np.max), sr=SR, hop_length=hop)
+    o = onset - onset.mean()
+    oac = librosa.autocorrelate(o)
+    oac = oac / (oac[0] + 1e-9)
+    # Unrestricted tempo (60-200 BPM), weighted towards ~120 like librosa's estimator.
+    # (librosa.feature.tempo pulls in scipy.stats, which costs ~110 MB on a 512 MB server.)
+    cand = np.arange(60.0, 200.0, 0.5)
+    prior = np.exp(-0.5 * np.log2(cand / 120) ** 2)
+    strength = np.interp(60 * fps / cand, np.arange(len(oac)), oac)
+    tempo_free = float(cand[int(np.argmax(np.clip(strength, 0, None) * prior))])
+
+    # Share of energy in the kick band (house is bass-heavy and kick-driven)
+    low_share = float(mel[:6].sum() / (mel.sum() + 1e-9))
+    return {
+        "kick_pulse": _ac_at(kac, lag),             # kick repeats on every beat
+        "kick_bar": _ac_at(kac, lag * 4),           # ...and keeps going bar after bar
+        "kick_offbeat": _ac_at(kac, lag * 0.5),     # low for 4x4, high for breakbeats/DnB
+        "pulse": _ac_at(oac, lag),
+        "tempo_free": round(tempo_free, 1),
+        "low_share": low_share,
+    }
+
+
 def analyse(data: bytes) -> dict:
     y = load_audio(data)
     key_name, camelot = detect_key(y)
     bpm = detect_bpm(y)
+    rhythm = rhythm_features(y, bpm)
 
     rms = librosa.feature.rms(y=y)[0]
     onset = librosa.onset.onset_strength(y=y, sr=SR)
@@ -109,4 +155,5 @@ def analyse(data: bytes) -> dict:
         "bpm": bpm,
         "energy_raw": energy_raw,
         "embedding": embedding.tolist(),
+        "rhythm": rhythm,
     }
