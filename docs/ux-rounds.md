@@ -28,3 +28,12 @@ Visual 6.5 · Clarity 6 · Search 7.5 · Results 6 · Set 7 · Mobile 6.5 · Acc
 - Start screen: 4 fresh example releases to try (newest per sub-genre, cover required, explicit titles
   skipped) and a 3-step "how it works". Filters grouped as label+control pairs; BPM shows ±3/±6/±10.
 Scores: Visual 7.5 · Clarity 7.5 · Search 7.5 · Results 7.5 · Set 7 · Mobile 7 · Access 6 · Polish 6.5
+
+### Round 2: 7.0 → 7.5 (kept)
+- Accessibility: visible green focus ring everywhere (search box glows when focused), reduced-motion
+  support, screen-reader announcements for searching/results, errors as alerts, suggestion list
+  wired to the input (aria-activedescendant), set panel is a proper dialog: unreachable while
+  closed (inert), focus moves in on open and back to the button on close.
+- Loading: spinner + skeleton result rows + honest "new tracks can take ~10 seconds" hint.
+- Polish: meta description, social share title/description, theme colour, friendlier footer.
+Scores: Visual 7.5 · Clarity 7.5 · Search 8 · Results 7.5 · Set 7.5 · Mobile 7 · Access 8 · Polish 7.5

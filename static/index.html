@@ -3,6 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Paste any track and find brand-new house music that mixes with it - matched on key, BPM, energy and sound, with this month's releases first.">
+<meta name="theme-color" content="#0b0b0f">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="SimilarSounds">
+<meta property="og:title" content="SimilarSounds - find new house music that mixes with any track">
+<meta property="og:description" content="Paste a track. Get this month's house that matches its key, BPM, energy and sound - then build a set that flows.">
+<meta property="og:url" content="https://www.similarsounds.com/">
+<meta name="twitter:card" content="summary">
 <title>SimilarSounds</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%230b0b0f'/%3E%3Cpath d='M49 39 L70 60 L49 81 L28 60 Z' fill='%23f2f2f5'/%3E%3Cpath d='M71 43.95 L87.05 60 L71 76.05 L54.95 60 Z' fill='none' stroke='%230b0b0f' stroke-width='12' stroke-linejoin='miter'/%3E%3Cpath d='M71 43.95 L87.05 60 L71 76.05 L54.95 60 Z' fill='none' stroke='%23c6ff3d' stroke-width='7' stroke-linejoin='miter'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -107,7 +115,21 @@
   .more a:hover { color: var(--accent); }
   .match { font: 700 13px "JetBrains Mono", monospace; color: var(--accent); }
 
-  footer { margin-top: 50px; color: var(--muted); font-size: 12px; }
+  footer { margin-top: 50px; color: var(--muted); font-size: 12px; max-width: 640px; }
+  :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  form.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,255,61,.12); }
+  form.search input:focus-visible { outline: none; }
+  .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
+
+  .loading-note { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 14px; margin: 28px 0 12px; }
+  .spinner { width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--line); border-top-color: var(--accent); animation: spin .8s linear infinite; flex: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .skel { display: grid; grid-template-columns: 64px 1fr; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; margin-bottom: 8px; }
+  .skel i { display: block; border-radius: 6px; background: linear-gradient(90deg, var(--panel-2) 25%, #24242f 50%, var(--panel-2) 75%); background-size: 300% 100%; animation: shimmer 1.4s ease-in-out infinite; }
+  .skel .c { width: 64px; height: 64px; border-radius: 8px; }
+  .skel .l1 { height: 14px; width: 55%; } .skel .l2 { height: 11px; width: 35%; margin-top: 8px; } .skel .l3 { height: 22px; width: 75%; margin-top: 10px; }
+  @keyframes shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
 
   /* ---------- Search-as-you-type ---------- */
   .search-wrap { position: relative; }
@@ -187,7 +209,7 @@
   <header>
     <div class="header-right">
       <div class="stats" id="stats"></div>
-      <button type="button" class="set-toggle" id="set-open">Build your set <span class="count" id="set-count">0</span></button>
+      <button type="button" class="set-toggle" id="set-open" aria-expanded="false" aria-controls="set-panel">Build your set <span class="count" id="set-count">0</span></button>
     </div>
   </header>
 
@@ -232,7 +254,7 @@
   </div>
 
   <div class="scrim" id="scrim"></div>
-  <aside class="set-panel" id="set-panel" aria-label="Your set">
+  <aside class="set-panel" id="set-panel" aria-label="Your set" role="dialog" aria-modal="true" inert>
     <div class="set-head">
       <div class="row1"><h2>Your set</h2><button type="button" class="close" id="set-close" aria-label="Close">×</button></div>
       <div class="set-summary" id="set-summary"></div>
@@ -247,13 +269,15 @@
       <div class="set-empty" id="set-empty">Add tracks with <b>+ Set</b>, then drag them into order.<br>Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</div>
     </div>
   </aside>
-  <div class="toast" id="toast"></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="sr-only" id="live" aria-live="polite"></div>
 
-  <footer>Prototype. Previews &amp; players from Deezer; YouTube and SoundCloud are used for track lookup and players only - their audio is never downloaded. Analysis: key, BPM, energy and a timbre fingerprint computed from 30-second previews.</footer>
+  <footer>SimilarSounds is in early preview. 30-second previews and players by Deezer; YouTube and SoundCloud links are used to look tracks up and play them, never to download audio. Key, BPM and energy are estimated from previews, so always trust your ears.</footer>
 </div>
 
 <script>
 const $ = s => document.querySelector(s);
+const announce = text => { const el = document.getElementById("live"); if (el) el.textContent = text; };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
 const camelotColor = code => {
@@ -317,14 +341,17 @@ async function run(exactUrl) {
   if (age) params.set("max_age_days", age);
   if ($("#style").value) params.set("style", $("#style").value);
   $("#go").disabled = true;
-  $("#out").innerHTML = `<div class="msg">Identifying the track and analysing it…</div>`;
+  $("#out").innerHTML = `<div class="loading-note"><span class="spinner" aria-hidden="true"></span>
+      <span>Finding your track and checking its key, BPM and energy… <span class="fl">(new tracks can take ~10 seconds)</span></span></div>
+    ${'<div class="skel" aria-hidden="true"><i class="c"></i><div><i class="l1"></i><i class="l2"></i><i class="l3"></i></div></div>'.repeat(4)}`;
+  announce("Searching…");
   try {
     const r = await fetch(`/api/match?${params}`);
     const data = await r.json();
     if (!r.ok) throw new Error(data.detail || "Something went wrong");
     render(data);
   } catch (err) {
-    $("#out").innerHTML = `<div class="msg err">${esc(err.message)}</div>`;
+    $("#out").innerHTML = `<div class="msg err" role="alert">${esc(err.message)}</div>`;
   } finally { $("#go").disabled = false; }
 }
 
@@ -356,6 +383,7 @@ function render({ source, query, results }) {
     return;
   }
   if (!check.is_house) html += `<div class="msg">Not a house track, so these are the closest house tracks we have.</div>`;
+  announce(`${results.length} matches for ${query.artist} - ${query.title}`);
   html += `<div class="results-head"><h2>${results.length} matches</h2><span class="stats">newest &amp; closest first</span></div>`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
   html += `<div class="list">` + results.map(t => `
@@ -417,7 +445,7 @@ function highlight(text, q) {
 
 function closeSuggest() {
   box.hidden = true; sgItems = []; sgActive = -1;
-  input.setAttribute("aria-expanded", "false");
+  input.setAttribute("aria-expanded", "false"); input.removeAttribute("aria-activedescendant");
 }
 
 async function fetchSuggest() {
@@ -440,7 +468,7 @@ function showSuggest({ artists = [], tracks = [], artist }, v) {
     html += `<div class="sg-head">Artists</div>`;
     artists.forEach(a => {
       sgItems.push({ type: "artist", value: a.name });
-      html += `<div class="sg-item artist" role="option" data-i="${sgItems.length - 1}">
+      html += `<div class="sg-item artist" role="option" id="sg-${sgItems.length - 1}" data-i="${sgItems.length - 1}">
         ${a.picture ? `<img src="${esc(a.picture)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
         <div class="sg-main"><div class="sg-name">${highlight(a.name, v)}</div>
         <div class="sg-sub">${a.in_catalogue ? `${a.in_catalogue} track${a.in_catalogue > 1 ? "s" : ""} in our house catalogue` : "Artist"}</div></div>
@@ -451,7 +479,7 @@ function showSuggest({ artists = [], tracks = [], artist }, v) {
     html += `<div class="sg-head">${artist ? `Tracks by ${esc(artist)}` : "Tracks"}</div>`;
     tracks.forEach(t => {
       sgItems.push({ type: "track", value: `${t.artist} - ${t.title}`, id: t.deezer_id });
-      html += `<div class="sg-item" role="option" data-i="${sgItems.length - 1}">
+      html += `<div class="sg-item" role="option" id="sg-${sgItems.length - 1}" data-i="${sgItems.length - 1}">
         ${t.cover ? `<img src="${esc(t.cover)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
         <div class="sg-main"><div class="sg-name">${highlight(t.title, typed)}</div>
         <div class="sg-sub">${esc(t.artist)}${t.release_date ? " · " + esc(t.release_date.slice(0, 4)) : ""}</div></div>
@@ -489,7 +517,10 @@ input.addEventListener("keydown", e => {
   if (e.key === "ArrowDown" || e.key === "ArrowUp") {
     e.preventDefault();
     sgActive = (sgActive + (e.key === "ArrowDown" ? 1 : -1) + sgItems.length) % sgItems.length;
-    box.querySelectorAll(".sg-item").forEach((el, j) => el.classList.toggle("active", j === sgActive));
+    box.querySelectorAll(".sg-item").forEach((el, j) => {
+      el.classList.toggle("active", j === sgActive); el.setAttribute("aria-selected", j === sgActive);
+    });
+    input.setAttribute("aria-activedescendant", `sg-${sgActive}`);
     box.querySelector(".sg-item.active")?.scrollIntoView({ block: "nearest" });
   } else if (e.key === "Enter" && sgActive >= 0) {
     e.preventDefault(); choose(sgActive);
@@ -681,9 +712,16 @@ function endDrag() {
 $("#set-list").addEventListener("pointerup", endDrag);
 $("#set-list").addEventListener("pointercancel", endDrag);
 
+let setOpener = null;
 function openSet(open) {
-  $("#set-panel").classList.toggle("open", open);
+  const panel = $("#set-panel");
+  if (open === panel.classList.contains("open")) return;
+  panel.classList.toggle("open", open);
   $("#scrim").classList.toggle("open", open);
+  panel.inert = !open;
+  $("#set-open").setAttribute("aria-expanded", open);
+  if (open) { setOpener = document.activeElement; $("#set-close").focus(); }
+  else setOpener?.focus?.();
 }
 $("#set-open").onclick = () => openSet(true);
 $("#set-close").onclick = () => openSet(false);
