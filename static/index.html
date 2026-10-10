@@ -108,6 +108,8 @@
   .energy { display: inline-flex; gap: 2px; align-items: center; }
   .energy i { width: 4px; height: 10px; border-radius: 1px; background: var(--line); }
   .energy i.f { background: var(--accent); }
+  .energy .e-lbl { font: 600 10px/1 Inter, sans-serif; letter-spacing: .02em; color: var(--muted); margin-right: 5px; text-transform: uppercase; }
+  .energy .e-num { margin-left: 5px; font-weight: 700; }
 
   .results-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 34px 0 8px; }
   .results-head h2 { margin: 0; font-size: 18px; }
@@ -384,7 +386,7 @@ const camelotColor = code => {
   const n = parseInt(code), minor = code.endsWith("A");
   return `hsl(${(n - 1) * 30} 90% ${minor ? 74 : 82}%)`;
 };
-const energyBar = e => `<span class="chip energy" title="Energy ${e}/10">${Array.from({length: 10}, (_, i) => `<i class="${i < e ? "f" : ""}"></i>`).join("")}&nbsp;${e}</span>`;
+const energyBar = e => `<span class="chip energy" title="Track energy ${e} out of 10 (1 = deep and chilled, 10 = peak-time)"><span class="e-lbl">Track energy</span>${Array.from({length: 10}, (_, i) => `<i class="${i < e ? "f" : ""}"></i>`).join("")}<b class="e-num">${e}</b></span>`;
 const ago = d => d < 1 ? "today" : d < 31 ? `${d}d ago` : d < 365 ? `${Math.round(d / 30)}mo ago` : `${(d / 365).toFixed(1)}y ago`;
 const searchQ = r => encodeURIComponent(`${r.artist} ${r.title}`);
 
@@ -575,7 +577,7 @@ function render({ source, query, results }) {
       <div class="howto-grid">
         <div><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
         <div><span class="chip cam" style="background:${camelotColor("8A")}">8A</span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
-        <div>${energyBar(6)}<p><b>Energy</b> 1 = deep and chilled, 10 = peak-time.</p></div>
+        <div>${energyBar(6)}<p><b>Track energy</b> How hard the track hits, from 1 (deep and chilled) to 10 (peak-time).</p></div>
         <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
       </div></details>` : ""}`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
