@@ -62,3 +62,12 @@ Scores: Visual 8 · Clarity 8.5 · Search 8 · Results 8.5 · Set 8.5 · Mobile 
   share card, home-screen icons (180 + 512 px) - all drawn from the diamond logo by
   brand/make_share_images.py.
 Scores: Visual 8 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 9
+
+### Round 6: 8.5 → 8.8 (kept)
+- Accessibility (measured): contrast audit of 406 text elements now passes WCAG AA everywhere;
+  Camelot key colours lightened so dark text is ≥6:1 on all 24 keys (worst was 3.4:1).
+  Tap targets on phones raised to ~44px (71 controls were under 40px, now 1 at 39px).
+- Visual: "Your track" card restyled in the same language as result rows (bigger cover with
+  one-tap preview, title/artist/label/sub-genre/year, same chips) and a clear "Your track" /
+  "From YouTube" label instead of "via text". Match count no longer wraps on phones.
+Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobile 9 · Access 9 · Polish 9

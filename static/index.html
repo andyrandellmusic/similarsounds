@@ -78,7 +78,11 @@
   .notice-title { font-weight: 700; color: #ffcf5c; }
   .notice p { color: var(--muted); margin: 6px 0 14px; }
 
-  .query { margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .query { margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .qrow { background: linear-gradient(180deg, #181822, var(--panel)); border-color: #34344a; padding: 14px; grid-template-columns: 88px 1fr auto; }
+  .qrow .cover { width: 88px; height: 88px; border-radius: 10px; }
+  .qrow .qt { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .qrow .eyebrow { color: var(--accent); }
   .query .top { display: flex; gap: 16px; align-items: center; }
   .query img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--panel-2); flex: none; }
   .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
@@ -245,6 +249,20 @@
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
     .steps { grid-template-columns: 1fr; }
+    .icon, select { height: 44px; }
+    .icon { padding: 0 14px; font-size: 13px; }
+    .seg button { padding: 12px 11px; }
+    input[type=checkbox] { width: 20px; height: 20px; }
+    label.chk { min-height: 44px; }
+    .howto summary { padding: 10px 0; }
+    .mini { min-width: 40px; min-height: 36px; font-size: 15px; }
+    .close { min-width: 44px; min-height: 44px; }
+    .qrow { grid-template-columns: 72px 1fr; }
+    .qrow .cover { width: 72px; height: 72px; }
+    .qrow .actions { grid-column: 2; }
+    .results-head h2 { white-space: nowrap; }
+    .sort-l { display: none; }
+    .head-tools { gap: 8px; }
     .filters { gap: 10px 14px; }
   }
 </style>
@@ -334,7 +352,7 @@ const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt
 
 const camelotColor = code => {
   const n = parseInt(code), minor = code.endsWith("A");
-  return `hsl(${(n - 1) * 30} 85% ${minor ? 62 : 72}%)`;
+  return `hsl(${(n - 1) * 30} 90% ${minor ? 74 : 82}%)`;
 };
 const energyBar = e => `<span class="chip energy" title="Energy ${e}/10">${Array.from({length: 10}, (_, i) => `<i class="${i < e ? "f" : ""}"></i>`).join("")}&nbsp;${e}</span>`;
 const ago = d => d < 1 ? "today" : d < 31 ? `${d}d ago` : d < 365 ? `${Math.round(d / 30)}mo ago` : `${(d / 365).toFixed(1)}y ago`;
@@ -424,15 +442,24 @@ async function run(exactUrl, fromHistory = false) {
 
 function render({ source, query, results }) {
   const embed = source.embed_html ? `<div class="embed">${source.embed_html}</div>` : "";
+  const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
+  const year = query.release_date ? query.release_date.slice(0, 4) : "";
   let html = `<section class="query">
-      <div class="top">
-        <img src="${esc(query.cover)}" alt="">
-        <div style="min-width:0">
-          <div class="eyebrow">Your track · via ${esc(source.source)}</div>
-          <div class="qt">${esc(query.artist)} – ${esc(query.title)}</div>
-          ${chips(query)}
-          <div class="actions" style="margin-top:10px">${addButton(query)}</div>
+      <div class="row qrow" data-id="${query.deezer_id}">
+        <button type="button" class="cover play" data-id="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
+          <img src="${esc(query.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
+        </button>
+        <div class="meta">
+          <div class="eyebrow">${from}</div>
+          <div class="qt">${esc(query.title)}</div>
+          <div class="a">${esc(query.artist)}${query.label ? " · " + esc(query.label) : ""}${query.style ? " · " + esc(query.style) : ""}${year ? " · " + year : ""}</div>
+          <div class="chips">
+            <span class="chip cam" style="background:${camelotColor(query.camelot)}" title="${esc(query.key)}">${esc(query.camelot)}</span>
+            <span class="chip">${esc(query.bpm)} BPM</span>
+            ${energyBar(query.energy)}
+          </div>
         </div>
+        <div class="actions">${addButton(query)}</div>
       </div>${embed}
     </section>`;
   trackCache = {};
@@ -457,7 +484,7 @@ function render({ source, query, results }) {
       <h2>${results.length} matches</h2>
       <span class="head-tools">
       ${results.length ? `<button type="button" class="icon" id="copy-link" title="Copy a link to these results">Copy link</button>` : ""}
-      ${results.length ? `<label class="sort">Sort <select id="sort">
+      ${results.length ? `<label class="sort"><span class="sort-l">Sort</span> <select id="sort" aria-label="Sort results">
         <option value="best">Best match</option><option value="mix">Smoothest mix</option>
         <option value="new">Newest</option><option value="bpm">Closest BPM</option></select></label>` : ""}
       </span>
