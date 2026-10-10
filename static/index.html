@@ -274,6 +274,14 @@
     .toast { bottom: 84px; }
   }
   .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .share-set { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; text-align: left; background: rgba(198,255,61,.07);
+               border: 1px solid #3b4a16; color: var(--text); border-radius: 12px; padding: 11px 14px; }
+  .share-set:hover:not(:disabled) { border-color: var(--accent); }
+  .share-set:disabled { opacity: .45; cursor: not-allowed; }
+  .share-set svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+  .share-set span { display: grid; gap: 1px; }
+  .share-set b { font-size: 14px; }
+  .share-set small { color: var(--muted); font-size: 12px; }
   .set-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
   .set-empty { color: var(--muted); text-align: center; padding: 40px 16px; }
   .set-list { list-style: none; margin: 0; padding: 0; }
@@ -410,10 +418,13 @@
       <div class="flow" id="set-flow"></div>
       <div class="set-tools">
         <button type="button" class="icon smart" id="set-smart" title="Reorder for the smoothest mixes and a steady energy build">✦ Smart order</button>
-        <button type="button" class="icon" id="set-share">Share set</button>
         <button type="button" class="icon" id="set-copy">Copy tracklist</button>
         <button type="button" class="icon" id="set-clear">Clear set</button>
       </div>
+      <button type="button" class="share-set" id="set-share">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span><b>Share your set with others</b><small id="share-sub">Send a link - they'll see your tracks in this order</small></span>
+      </button>
     </div>
     <div class="set-body">
       <ol class="set-list" id="set-list"></ol>
@@ -1079,6 +1090,7 @@ function smartOrder(tracks) {
 
 function renderSet() {
   $("#set-count").textContent = set.length;
+  $("#set-share").disabled = !set.length;
   $("#fab-count").textContent = set.length;
   $("#set-fab").hidden = !set.length;
   const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
@@ -1201,9 +1213,17 @@ document.addEventListener("keydown", e => {
 });
 
 $("#set-share").onclick = async () => {
-  if (!set.length) return toast("Your set is empty");
-  const url = `${location.origin}/?set=${set.map(t => t.deezer_id).join(",")}`;
-  try { await navigator.clipboard.writeText(url); toast("Set link copied - anyone can open it"); }
+  if (!set.length) return toast("Add some tracks to your set first");
+  const url = `https://www.similarsounds.com/?set=${set.map(t => t.deezer_id).join(",")}`;
+  const lines = set.slice(0, 5).map((t, i) => `${i + 1}. ${t.artist} - ${t.title} (${t.camelot}, ${t.bpm} BPM)`);
+  if (set.length > 5) lines.push(`…and ${set.length - 5} more`);
+  const text = `My house set on SimilarSounds (${set.length} track${set.length > 1 ? "s" : ""}):\n${lines.join("\n")}`;
+  // Phones: the native share sheet (WhatsApp, Messages, Instagram, AirDrop...). Elsewhere: copy the link.
+  if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+    try { await navigator.share({ title: "My SimilarSounds set", text, url }); return; }
+    catch (e) { if (e.name === "AbortError") return; }
+  }
+  try { await navigator.clipboard.writeText(`${text}\n${url}`); toast("Set link copied - paste it anywhere to share"); }
   catch { toast("Couldn't copy - your browser blocked it"); }
 };
 async function openSharedSet() {
