@@ -260,8 +260,13 @@
     .filters-wrap[open] .filters-sum::after { content: "▴"; }
     .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
-    .set-fab:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 15; align-items: center; gap: 10px;
-      background: var(--text); color: var(--bg); border: 0; border-radius: 14px; padding: 13px 16px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.5); text-align: left; }
+    .set-fab:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 15; align-items: stretch;
+      background: var(--text); color: var(--bg); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.5); overflow: hidden; }
+    .fab-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit;
+      padding: 13px 12px 13px 16px; font-weight: 700; text-align: left; }
+    .fab-clear { flex: none; background: none; border: 0; border-left: 1px solid #d6d6de; color: #8a2a1f; font-weight: 700; font-size: 14px; padding: 0 16px; }
+    .fab-clear:active { background: #e6e6ec; }
+    .fab-go { white-space: nowrap; }
     .fab-main b { background: var(--accent); color: var(--accent-ink); border-radius: 99px; padding: 1px 8px; margin-left: 4px; }
     .fab-sub { flex: 1; font-weight: 500; font-size: 13px; color: #4b4b5a; }
     .fab-sub.bad { color: #c0392b; }
@@ -415,9 +420,12 @@
       <div class="set-empty" id="set-empty">Add tracks with <b>+ Set</b>, then drag them into order.<br>Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</div>
     </div>
   </aside>
-  <button type="button" class="set-fab" id="set-fab" hidden aria-controls="set-panel">
-    <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go">Open ›</span>
-  </button>
+  <div class="set-fab" id="set-fab" hidden>
+    <button type="button" class="fab-open" id="fab-open" aria-controls="set-panel">
+      <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go">Open ›</span>
+    </button>
+    <button type="button" class="fab-clear" id="fab-clear" aria-label="Clear your whole set">Clear</button>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 
@@ -1181,7 +1189,8 @@ function openSet(open) {
   else setOpener?.focus?.();
 }
 $("#set-open").onclick = () => openSet(true);
-$("#set-fab").onclick = () => openSet(true);
+$("#fab-open").onclick = () => openSet(true);
+$("#fab-clear").onclick = () => clearSet();
 $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
 document.addEventListener("keydown", e => {
@@ -1220,10 +1229,14 @@ $("#set-smart").onclick = () => {
   undoOrder = set; set = next; saveSet(); renderSet();
   toastAction("Reordered for smoother mixes", "Undo", () => { set = undoOrder; saveSet(); renderSet(); });
 };
-$("#set-clear").onclick = () => {
+function clearSet() {
   if (!set.length) return;
-  set = []; saveSet(); renderSet(); refreshAddButtons(); toast("Set cleared");
-};
+  const before = set;
+  set = []; saveSet(); renderSet(); refreshAddButtons();
+  toastAction(`Set cleared (${before.length} track${before.length > 1 ? "s" : ""})`, "Undo",
+              () => { set = before; saveSet(); renderSet(); refreshAddButtons(); });
+}
+$("#set-clear").onclick = () => clearSet();
 $("#set-copy").onclick = async () => {
   if (!set.length) return toast("Your set is empty");
   const text = set.map((t, i) => `${i + 1}. ${t.artist} - ${t.title} (${t.camelot}, ${t.bpm} BPM, energy ${t.energy})`).join("\n");
