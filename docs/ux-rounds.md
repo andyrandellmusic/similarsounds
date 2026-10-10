@@ -53,3 +53,12 @@ Scores: Visual 8 · Clarity 7.5 · Search 8 · Results 7.5 · Set 8.5 · Mobile 
 - Clarity: "How to read these results" legend explaining the mix dot, Camelot key, energy bars
   and sound-match %.
 Scores: Visual 8 · Clarity 8.5 · Search 8 · Results 8.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 8
+
+### Round 5: 8.3 → 8.5 (kept)
+- Search: every search gets its own address (?t=<track id>), so the back button, refresh and
+  sharing all work; "Copy link" button on results; page title names the track; clicking into the
+  empty search box shows recent searches (last 6, saved in the browser).
+- Polish: designed 1200x630 share image (og.png) for WhatsApp/X/iMessage previews, large-image
+  share card, home-screen icons (180 + 512 px) - all drawn from the diamond logo by
+  brand/make_share_images.py.
+Scores: Visual 8 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobile 8.5 · Access 8 · Polish 9
