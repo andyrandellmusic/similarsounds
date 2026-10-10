@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SimilarSounds</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0b0b0f; --panel: #14141b; --panel-2: #1b1b24; --line: #2a2a36;
+    --text: #f2f2f5; --muted: #8d8da0; --accent: #c6ff3d; --accent-ink: #0b0b0f;
+    --warn: #ff8a5c;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 Inter, system-ui, sans-serif; }
+  a { color: inherit; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 16px 80px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .logo { font-weight: 800; font-size: 22px; letter-spacing: -0.02em; }
+  .logo span { color: var(--accent); }
+  .stats { color: var(--muted); font-size: 13px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.05; letter-spacing: -0.03em; margin: 40px 0 10px; font-weight: 800; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
+
+  form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
+  form.search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--text); font: inherit; font-size: 16px; padding: 12px 12px; outline: none; }
+  button { font: inherit; cursor: pointer; }
+  .go { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 0 22px; font-weight: 700; }
+  .go:disabled { opacity: .5; cursor: wait; }
+
+  .filters { display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; margin: 16px 0 0; color: var(--muted); font-size: 13px; }
+  .seg { display: inline-flex; background: var(--panel); border: 1px solid var(--line); border-radius: 9px; padding: 2px; }
+  .seg button { background: none; border: 0; color: var(--muted); padding: 6px 10px; border-radius: 7px; font-size: 13px; }
+  .seg button.on { background: var(--panel-2); color: var(--text); }
+  select { background: var(--panel); color: var(--text); border: 1px solid var(--line); border-radius: 9px; padding: 7px 8px; font: inherit; font-size: 13px; }
+  label.chk { display: inline-flex; gap: 6px; align-items: center; cursor: pointer; }
+
+  .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
+  .msg.err { border-color: #5a2c22; color: var(--warn); }
+
+  .query { margin-top: 32px; display: grid; grid-template-columns: 1fr; gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .query .top { display: flex; gap: 16px; align-items: center; }
+  .query img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--panel-2); flex: none; }
+  .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
+  .qt { font-size: 20px; font-weight: 700; letter-spacing: -0.01em; }
+  .embed iframe { width: 100%; border: 0; border-radius: 10px; }
+  .embed iframe[src*="youtube"] { aspect-ratio: 16/9; height: auto; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .chip { font: 600 12px/1 "JetBrains Mono", monospace; padding: 6px 8px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); white-space: nowrap; }
+  .cam { color: #0b0b0f; border: 0; }
+  .new { background: var(--accent); color: var(--accent-ink); border: 0; }
+  .energy { display: inline-flex; gap: 2px; align-items: center; }
+  .energy i { width: 4px; height: 10px; border-radius: 1px; background: var(--line); }
+  .energy i.f { background: var(--accent); }
+
+  .results-head { display: flex; justify-content: space-between; align-items: baseline; margin: 34px 0 10px; }
+  .results-head h2 { margin: 0; font-size: 18px; }
+  .list { display: grid; gap: 8px; }
+  .row { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+  .row img { width: 56px; height: 56px; border-radius: 8px; object-fit: cover; background: var(--panel-2); }
+  .row .t { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .a { color: var(--muted); font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .meta { min-width: 0; }
+  .actions { display: flex; gap: 6px; }
+  .icon { background: var(--panel-2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; height: 34px; padding: 0 10px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; }
+  .icon.play { background: var(--accent); color: var(--accent-ink); border: 0; }
+  .player { grid-column: 1 / -1; }
+  .player iframe { width: 100%; height: 92px; border: 0; border-radius: 10px; }
+  .match { font: 700 13px "JetBrains Mono", monospace; color: var(--accent); }
+
+  footer { margin-top: 50px; color: var(--muted); font-size: 12px; }
+  @media (max-width: 640px) {
+    .row { grid-template-columns: 48px 1fr; }
+    .row img { width: 48px; height: 48px; }
+    .actions { grid-column: 1 / -1; }
+    .go { padding: 0 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Similar<span>Sounds</span></div>
+    <div class="stats" id="stats"></div>
+  </header>
+
+  <h1>Paste a track.<br>Get <em>this month's</em> house that mixes with it.</h1>
+  <p class="sub">Matched on sound, key (Camelot), BPM and energy - with the newest releases ranked first.</p>
+
+  <form class="search" id="form">
+    <input id="url" placeholder="YouTube, SoundCloud, Beatport link… or 'Artist - Title'" autocomplete="off" required>
+    <button class="go" id="go">Find</button>
+  </form>
+
+  <div class="filters">
+    <span>Released</span>
+    <div class="seg" id="age">
+      <button type="button" data-v="30">30 days</button>
+      <button type="button" data-v="90">3 months</button>
+      <button type="button" data-v="365" class="on">1 year</button>
+      <button type="button" data-v="">All time</button>
+    </div>
+    <span>Sub-genre</span>
+    <select id="style"><option value="">Any</option></select>
+    <span>BPM ±</span>
+    <select id="bpm"><option>3</option><option selected>6</option><option>10</option></select>
+    <label class="chk"><input type="checkbox" id="strict"> Harmonic only</label>
+  </div>
+
+  <div id="out"></div>
+
+  <footer>Prototype. Previews &amp; players from Deezer; YouTube and SoundCloud are used for track lookup and players only - their audio is never downloaded. Analysis: key, BPM, energy and a timbre fingerprint computed from 30-second previews.</footer>
+</div>
+
+<script>
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const camelotColor = code => {
+  const n = parseInt(code), minor = code.endsWith("A");
+  return `hsl(${(n - 1) * 30} 85% ${minor ? 62 : 72}%)`;
+};
+const energyBar = e => `<span class="chip energy" title="Energy ${e}/10">${Array.from({length: 10}, (_, i) => `<i class="${i < e ? "f" : ""}"></i>`).join("")}&nbsp;${e}</span>`;
+const ago = d => d < 1 ? "today" : d < 31 ? `${d}d ago` : d < 365 ? `${Math.round(d / 30)}mo ago` : `${(d / 365).toFixed(1)}y ago`;
+const searchQ = r => encodeURIComponent(`${r.artist} ${r.title}`);
+
+function chips(t) {
+  return `<div class="chips">
+    <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
+    <span class="chip">${esc(t.bpm)} BPM</span>
+    ${energyBar(t.energy)}
+    ${t.style ? `<span class="chip">${esc(t.style)}</span>` : ""}
+    ${t.age_days !== undefined && t.age_days <= 30 ? `<span class="chip new">NEW</span>` : ""}
+    ${t.release_date ? `<span class="chip">${esc(t.release_date)}${t.age_days !== undefined ? " · " + ago(t.age_days) : ""}</span>` : ""}
+  </div>`;
+}
+
+let age = "365";
+document.querySelectorAll("#age button").forEach(b => b.onclick = () => {
+  document.querySelectorAll("#age button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on"); age = b.dataset.v; if ($("#url").value) run();
+});
+["#style", "#bpm", "#strict"].forEach(s => $(s).onchange = () => $("#url").value && run());
+
+fetch("/api/stats").then(r => r.json()).then(s => {
+  $("#stats").textContent = `${s.tracks.toLocaleString()} tracks · ${s.last_12_months.toLocaleString()} from the last 12 months`;
+  s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
+});
+
+$("#form").onsubmit = e => { e.preventDefault(); run(); };
+
+async function run() {
+  const params = new URLSearchParams({ url: $("#url").value, bpm_range: $("#bpm").value, strict_key: $("#strict").checked });
+  if (age) params.set("max_age_days", age);
+  if ($("#style").value) params.set("style", $("#style").value);
+  $("#go").disabled = true;
+  $("#out").innerHTML = `<div class="msg">Identifying the track and analysing it…</div>`;
+  try {
+    const r = await fetch(`/api/match?${params}`);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.detail || "Something went wrong");
+    render(data);
+  } catch (err) {
+    $("#out").innerHTML = `<div class="msg err">${esc(err.message)}</div>`;
+  } finally { $("#go").disabled = false; }
+}
+
+function render({ source, query, results }) {
+  const embed = source.embed_html ? `<div class="embed">${source.embed_html}</div>` : "";
+  let html = `<section class="query">
+      <div class="top">
+        <img src="${esc(query.cover)}" alt="">
+        <div style="min-width:0">
+          <div class="eyebrow">Your track · via ${esc(source.source)}</div>
+          <div class="qt">${esc(query.artist)} – ${esc(query.title)}</div>
+          ${chips(query)}
+        </div>
+      </div>${embed}
+    </section>
+    <div class="results-head"><h2>${results.length} matches</h2><span class="stats">newest &amp; closest first</span></div>`;
+  if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
+  html += `<div class="list">` + results.map((t, i) => `
+    <div class="row">
+      <img src="${esc(t.cover)}" alt="" loading="lazy">
+      <div class="meta">
+        <div class="t">${esc(t.title)}</div>
+        <div class="a">${esc(t.artist)}${t.label ? " · " + esc(t.label) : ""} · <span class="match">${t.similarity}% sound match</span></div>
+        ${chips(t)}
+      </div>
+      <div class="actions">
+        <button class="icon play" data-id="${t.deezer_id}" data-i="${i}">▶ Preview</button>
+        <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
+        <a class="icon" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SC</a>
+        <a class="icon" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YT</a>
+      </div>
+    </div>`).join("") + `</div>`;
+  $("#out").innerHTML = html;
+  document.querySelectorAll(".play").forEach(b => b.onclick = () => {
+    const row = b.closest(".row"), open = row.querySelector(".player");
+    document.querySelectorAll(".player").forEach(p => p.remove());
+    if (open) return;
+    row.insertAdjacentHTML("beforeend", `<div class="player"><iframe allow="encrypted-media; clipboard-write"
+      src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe></div>`);
+  });
+}
+</script>
+</body>
+</html>

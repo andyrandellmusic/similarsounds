@@ -1,0 +1,141 @@
+"""SimilarSounds prototype API.
+
+Run:  uv run uvicorn app.main:app --reload --port 8000
+"""
+import json
+import os
+import threading
+from datetime import date
+from pathlib import Path
+
+import numpy as np
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.concurrency import run_in_threadpool
+from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+
+from app import sources
+from app.analysis import analyse
+from app.catalogue import Index, energy_vector
+from app.ranking import rank
+from scripts.seed import STYLES
+
+STATIC = Path(__file__).resolve().parent.parent / "static"
+
+app = FastAPI(title="SimilarSounds")
+index = Index()
+_query_cache: dict[int, dict] = {}
+_analysis_lock = threading.Lock()
+
+# Once a custom domain is live, set CANONICAL_HOST=similarsounds.com and every other
+# address (e.g. similarsounds.onrender.com) permanently redirects to it.
+CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
+
+
+@app.middleware("http")
+async def redirect_to_canonical(request: Request, call_next):
+    host = request.headers.get("host", "").split(":")[0].lower()
+    if CANONICAL_HOST and host and host != CANONICAL_HOST and request.url.path != "/healthz":
+        query = f"?{request.url.query}" if request.url.query else ""
+        return RedirectResponse(f"https://{CANONICAL_HOST}{request.url.path}{query}", status_code=301)
+    return await call_next(request)
+
+
+@app.on_event("startup")
+def warm_up():
+    """Run one throwaway analysis in the background so librosa's JIT-compiled code is
+    ready before the first real visitor (otherwise their first search takes ~25 s)."""
+    import io
+
+    import soundfile as sf
+
+    def run():
+        buf = io.BytesIO()
+        sf.write(buf, (np.random.default_rng(0).standard_normal(22050 * 5) * 0.1).astype("float32"),
+                 22050, format="WAV")
+        analyse(buf.getvalue())
+
+    threading.Thread(target=run, daemon=True).start()
+
+
+@app.get("/healthz")
+def healthz():
+    return {"ok": True, "tracks": len(index.rows)}
+
+
+def analyse_query(deezer_id: int) -> dict:
+    """Features for the pasted track: from the catalogue if we have it, otherwise analyse its preview."""
+    if deezer_id in index.ids:
+        r = index.rows[index.ids[deezer_id]]
+        return {"key": r["key"], "camelot": r["camelot"], "bpm": r["bpm"], "energy": float(r["energy"]),
+                "embedding": json.loads(r["embedding"]), "title": r["title"], "artist": r["artist"],
+                "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],
+                "deezer_id": deezer_id, "in_catalogue": True}
+    if deezer_id in _query_cache:
+        return _query_cache[deezer_id]
+    t = sources.deezer_track(deezer_id)
+    if not t.get("preview"):
+        raise HTTPException(404, "No preview available for this track, so it can't be analysed.")
+    audio = sources.fetch_preview(t["preview"])
+    with _analysis_lock:   # one analysis at a time keeps peak memory inside the free 512 MB plan
+        feats = analyse(audio)
+    energy = float(index.energy_scores(np.array([energy_vector(feats["energy_raw"])], dtype="float32"))[0])
+    q = {**feats, "energy": energy, "title": t["title"], "artist": t["artist"]["name"],
+         "label": None, "cover": t["album"].get("cover_medium"), "release_date": t.get("release_date"),
+         "deezer_id": deezer_id, "in_catalogue": False}
+    _query_cache[deezer_id] = q
+    return q
+
+
+@app.get("/api/match")
+async def match(
+    url: str = Query(..., description="YouTube / SoundCloud / Beatport / Deezer link, or 'Artist - Title'"),
+    max_age_days: int | None = None,
+    strict_key: bool = False,
+    bpm_range: float = 6.0,
+    style: str | None = None,
+):
+    if not index.rows:
+        raise HTTPException(503, "The catalogue is empty - run the seed script first.")
+    try:
+        src = await run_in_threadpool(sources.resolve_link, url)
+    except ValueError as e:
+        raise HTTPException(400, str(e))
+
+    deezer_id = src.get("deezer_id")
+    if not deezer_id:
+        hit = await run_in_threadpool(sources.find_on_deezer, src["title"], src["author"])
+        if not hit:
+            raise HTTPException(404, f"Couldn't find \"{sources.clean_title(src['title'])}\" in our preview "
+                                     "source yet. Try typing 'Artist - Title'.")
+        deezer_id = hit["id"]
+
+    q = await run_in_threadpool(analyse_query, deezer_id)
+    results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
+                                  strict_key=strict_key, bpm_range=bpm_range, style=style or None)
+    query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw")}
+    query["style"] = guessed_style
+    query["energy"] = int(query["energy"])
+    return {"source": src, "query": query, "results": results}
+
+
+@app.get("/api/stats")
+def stats():
+    rows = index.rows
+    today = date.today()
+    recent = sum(1 for r in rows if r["release_date"] and (today - date.fromisoformat(r["release_date"])).days <= 365)
+    return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES)}
+
+
+@app.post("/api/reload")
+def reload():
+    index.reload()
+    return {"tracks": len(index.rows)}
+
+
+@app.get("/")
+def home():
+    return FileResponse(STATIC / "index.html")
+
+
+app.mount("/static", StaticFiles(directory=STATIC), name="static")

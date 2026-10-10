@@ -1,0 +1,17 @@
+[project]
+name = "similarsounds"
+version = "0.1.0"
+description = "Find new house music that mixes with any track: matched on sound, key, BPM and energy, newest first."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.143.0",
+    "httpx>=0.28.1",
+    "librosa>=1.0.0",
+    "numpy>=2.5.3",
+    "soundfile>=0.14.0",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[tool.uv]
+package = false

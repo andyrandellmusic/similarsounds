@@ -1,0 +1,6 @@
+.tools/
+.venv/
+__pycache__/
+*.pyc
+data/seed.log
+.DS_Store
