@@ -106,6 +106,7 @@ async def match(
     bpm_range: float = 6.0,
     style: str | None = None,
     allow_non_house: bool = False,
+    limit: int = Query(30, ge=1, le=90),
 ):
     if not index.rows:
         raise HTTPException(503, "The catalogue is empty - run the seed script first.")
@@ -124,7 +125,7 @@ async def match(
 
     q = await run_in_threadpool(analyse_query, deezer_id)
     results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
-                                  strict_key=strict_key, bpm_range=bpm_range, style=style or None)
+                                  strict_key=strict_key, bpm_range=bpm_range, style=style or None, limit=limit)
     query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm")}
     query["style"] = guessed_style if q["house_check"]["is_house"] else None
     query["energy"] = int(query["energy"])
@@ -132,6 +133,22 @@ async def match(
     if not q["house_check"]["is_house"] and not allow_non_house:
         results = []
     return {"source": src, "query": query, "results": results}
+
+
+@app.get("/api/tracks")
+async def tracks(ids: str = Query(..., max_length=400)):
+    """Key/BPM/energy for a list of Deezer ids (used to open a shared set)."""
+    out = []
+    for raw in ids.split(",")[:30]:
+        if not raw.strip().isdigit():
+            continue
+        try:
+            q = await run_in_threadpool(analyse_query, int(raw))
+        except HTTPException:
+            continue
+        out.append({"deezer_id": q["deezer_id"], "title": q["title"], "artist": q["artist"], "cover": q["cover"],
+                    "key": q["key"], "camelot": q["camelot"], "bpm": q["bpm"], "energy": int(q["energy"])})
+    return {"tracks": out}
 
 
 @app.get("/api/suggest")

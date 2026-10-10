@@ -71,3 +71,10 @@ Scores: Visual 8 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobile 
   one-tap preview, title/artist/label/sub-genre/year, same chips) and a clear "Your track" /
   "From YouTube" label instead of "via text". Match count no longer wraps on phones.
 Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 8.5 · Set 8.5 · Mobile 9 · Access 9 · Polish 9
+
+### Round 7: 8.8 → 8.9 (kept)
+- Build your set: "Find what mixes next →" on every set track (one tap searches from that track,
+  so a set can be built track by track); "Share set" copies a link (?set=ids) that opens the set
+  for anyone, with "Keep mine" to undo if it would replace theirs (new /api/tracks endpoint).
+- Results: "Show 30 more matches" (up to 90) keeps your scroll position.
+Scores: Visual 8.5 · Clarity 8.5 · Search 9 · Results 9 · Set 9.5 · Mobile 9 · Access 9 · Polish 9

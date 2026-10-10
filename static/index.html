@@ -222,6 +222,9 @@
   .set-card .t { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .set-card .a { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .set-card .chips { margin-top: 5px; }
+  .next-btn { background: none; border: 0; padding: 6px 0 0; color: var(--accent); font-size: 12px; font-weight: 700; cursor: pointer; }
+  .next-btn:hover { text-decoration: underline; }
+  .more-btn { display: flex; margin: 14px auto 0; height: 44px; padding: 0 20px; }
   .set-card .chip { font-size: 11px; padding: 4px 6px; }
   .grip { cursor: grab; color: var(--muted); font-size: 18px; line-height: 1; text-align: center; touch-action: none; padding: 6px 0; }
   .num { font: 700 11px "JetBrains Mono", monospace; color: var(--muted); }
@@ -327,6 +330,7 @@
       <div class="flow" id="set-flow"></div>
       <div class="set-tools">
         <button type="button" class="icon smart" id="set-smart" title="Reorder for the smoothest mixes and a steady energy build">✦ Smart order</button>
+        <button type="button" class="icon" id="set-share">Share set</button>
         <button type="button" class="icon" id="set-copy">Copy tracklist</button>
         <button type="button" class="icon" id="set-clear">Clear set</button>
       </div>
@@ -406,17 +410,19 @@ document.addEventListener("click", e => {
 // Set when the visitor chooses "show matches anyway" for a track that doesn't look like house;
 // a new search resets it, filter changes keep it.
 let allowNonHouse = false;
-$("#form").onsubmit = e => { e.preventDefault(); closeSuggest(); allowNonHouse = false; run(); };
+$("#form").onsubmit = e => { e.preventDefault(); closeSuggest(); allowNonHouse = false; resultLimit = 30; run(); };
+let resultLimit = 30;
 
 // When a track is picked from the suggestions, remember its exact Deezer link for as long
 // as the box still shows that track (so filter changes re-run the same version)
 let picked = { text: null, url: null };
 
 async function run(exactUrl, fromHistory = false) {
+  if (exactUrl && exactUrl !== picked.url) resultLimit = 30;
   if (exactUrl) picked = { text: $("#url").value, url: exactUrl };
   const url = $("#url").value === picked.text ? picked.url : $("#url").value;
   const params = new URLSearchParams({ url, bpm_range: $("#bpm").value,
-                                       strict_key: $("#strict").checked, allow_non_house: allowNonHouse });
+                                       strict_key: $("#strict").checked, allow_non_house: allowNonHouse, limit: resultLimit });
   if (age) params.set("max_age_days", age);
   if ($("#style").value) params.set("style", $("#style").value);
   $("#go").disabled = true;
@@ -498,12 +504,18 @@ function render({ source, query, results }) {
       </div></details>` : ""}`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
   html += `<div class="list" id="list"></div>`;
+  if (results.length >= resultLimit && resultLimit < 90)
+    html += `<button type="button" class="icon more-btn" id="show-more">Show 30 more matches</button>`;
   $("#out").innerHTML = html;
+  if ($("#show-more")) $("#show-more").onclick = () => {
+    resultLimit += 30; keepScroll = scrollY; run(picked.text === $("#url").value ? picked.url : undefined);
+  };
+  if (keepScroll !== null) { const y = keepScroll; keepScroll = null; requestAnimationFrame(() => scrollTo(0, y)); }
   if ($("#sort")) { $("#sort").value = sortBy; $("#sort").onchange = e => { sortBy = e.target.value; renderList(); }; }
   renderList();
 }
 
-let lastQuery = null, lastResults = [], sortBy = "best";
+let lastQuery = null, lastResults = [], sortBy = "best", keepScroll = null;
 const signed = (n, unit) => n === 0 ? `same ${unit}` : `${n > 0 ? "+" : "−"}${Math.abs(n)} ${unit}`;
 
 function whyLine(q, t) {
@@ -865,6 +877,7 @@ function renderSet() {
             <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
             <span class="chip">${esc(t.bpm)} BPM</span>${energyBar(t.energy)}
           </div>
+          <button type="button" class="next-btn" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}">Find what mixes next →</button>
         </div>
         <div class="item-btns">
           <button type="button" class="mini" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
@@ -876,6 +889,14 @@ function renderSet() {
 }
 
 $("#set-list").addEventListener("click", e => {
+  const nx = e.target.closest("[data-next]");
+  if (nx) {
+    openSet(false);
+    $("#url").value = nx.dataset.label; allowNonHouse = false; resultLimit = 30;
+    run(`https://www.deezer.com/track/${nx.dataset.next}`);
+    scrollTo({ top: 0, behavior: "smooth" });
+    return;
+  }
   const item = e.target.closest(".set-item");
   if (!item) return;
   const i = set.findIndex(t => t.deezer_id === Number(item.dataset.id));
@@ -944,6 +965,26 @@ $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
 document.addEventListener("keydown", e => { if (e.key === "Escape") openSet(false); });
 
+$("#set-share").onclick = async () => {
+  if (!set.length) return toast("Your set is empty");
+  const url = `${location.origin}/?set=${set.map(t => t.deezer_id).join(",")}`;
+  try { await navigator.clipboard.writeText(url); toast("Set link copied - anyone can open it"); }
+  catch { toast("Couldn't copy - your browser blocked it"); }
+};
+async function openSharedSet() {
+  const ids = new URLSearchParams(location.search).get("set");
+  if (!ids || !/^[\d,]+$/.test(ids)) return;
+  toast("Opening the shared set…");
+  try {
+    const { tracks } = await (await fetch(`/api/tracks?ids=${ids}`)).json();
+    if (!tracks.length) return toast("Couldn't open that set");
+    const mine = set;
+    set = tracks; saveSet(); renderSet(); refreshAddButtons(); openSet(true);
+    history.replaceState(null, "", location.pathname);
+    if (mine.length) toastAction(`Opened a shared set (${tracks.length} tracks)`, "Keep mine", () => { set = mine; saveSet(); renderSet(); refreshAddButtons(); });
+    else toast(`Opened a shared set (${tracks.length} tracks)`);
+  } catch { toast("Couldn't open that set"); }
+}
 let undoOrder = null;
 $("#set-smart").onclick = () => {
   if (set.length < 3) return toast("Add at least 3 tracks to sort them");
@@ -966,6 +1007,7 @@ $("#set-copy").onclick = async () => {
 
 renderSet();
 openFromUrl(true);
+openSharedSet();
 </script>
 </body>
 </html>
