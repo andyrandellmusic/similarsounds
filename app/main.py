@@ -27,7 +27,7 @@ index = Index()
 _query_cache: dict[int, dict] = {}
 _analysis_lock = threading.Lock()
 
-# Once a custom domain is live, set CANONICAL_HOST=similarsounds.com and every other
+# CANONICAL_HOST (www.similarsounds.com on Render): every other
 # address (e.g. similarsounds.onrender.com) permanently redirects to it.
 CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
 

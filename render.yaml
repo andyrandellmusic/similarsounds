@@ -12,7 +12,7 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: "3.12.11"
-      # Set to similarsounds.com once the domain is connected (redirects every other address there)
+      # Main address; every other address redirects here. Set in the Render dashboard: www.similarsounds.com
       - key: CANONICAL_HOST
         sync: false
       # Fewer glibc malloc arenas = much lower memory use with threads

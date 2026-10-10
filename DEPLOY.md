@@ -1,6 +1,6 @@
 # Putting SimilarSounds online (free)
 
-Hosting: **Render** free plan → `https://similarsounds.onrender.com` (or similar if taken)
+Live at **https://www.similarsounds.com** (Render free plan, also reachable at `similarsounds.onrender.com`)
 Daily new releases: **GitHub Actions** (free) updates the catalogue every morning, Render redeploys automatically.
 
 ## 1. One-time setup on your Mac
@@ -39,13 +39,16 @@ takes ~1 minute to wake up. If it ever runs out of memory, the Starter plan ($7/
 Nothing to do - `.github/workflows/daily-catalogue.yml` runs at 05:00 UTC every day.
 To run it now: GitHub repo → **Actions** → *Daily catalogue update* → **Run workflow**.
 
-## Later: switching to similarsounds.com
+## Custom domain (done: www.similarsounds.com)
 
-1. Buy `similarsounds.com` at any registrar.
-2. Render → your service → **Settings → Custom Domains → Add** `similarsounds.com`.
-3. Add the DNS records Render shows you at your registrar. HTTPS is set up automatically.
-4. Render → **Environment** → set `CANONICAL_HOST` = `similarsounds.com`.
-   The old `.onrender.com` address now permanently redirects to the new domain.
+- Namecheap → Advanced DNS host records:
+  - `A` record, host `@` → `216.24.57.1` (Render)
+  - `CNAME` record, host `www` → `similarsounds.onrender.com`
+- Render → Settings → Custom Domains: `similarsounds.com` (redirects to www) and `www.similarsounds.com`.
+- Render → Environment: `CANONICAL_HOST` = `www.similarsounds.com`, so the `.onrender.com`
+  address permanently redirects to the main address.
+- Keep `CANONICAL_HOST` matching the domain Render treats as primary (`www...`), otherwise the
+  two redirects send visitors back and forth.
 
 ## Before a public launch
 
