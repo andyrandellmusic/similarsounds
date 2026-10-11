@@ -774,10 +774,22 @@
     <div class="acct-box" role="dialog" aria-modal="true" aria-labelledby="pw-title">
       <button type="button" class="acct-x" data-pw-close aria-label="Close">×</button>
       <div data-pw="anon">
-        <h2 id="pw-title">You've used your 3 free searches</h2>
+        <h2 id="pw-title">You have used all your credits</h2>
         <p class="acct-sub">Create a free account to get 2 more searches. It only takes a minute.</p>
         <button type="button" class="primary" data-account-signup>Create a free account</button>
         <p class="acct-links"><a href="#" data-account-login>Already have an account? Log in</a></p>
+      </div>
+      <div data-pw="low-anon" hidden>
+        <h2>You have 1 credit left</h2>
+        <p class="acct-sub">Create a free account to get 2 more searches. It only takes a minute.</p>
+        <button type="button" class="primary" data-account-signup>Create a free account</button>
+        <p class="acct-links"><a href="#" data-account-login>Already have an account? Log in</a> · <a href="#" data-pw-close>Not now</a></p>
+      </div>
+      <div data-pw="low-account" hidden>
+        <h2>You have 1 credit left</h2>
+        <p class="acct-sub">When it's used, you'll get 2 more free searches 24 hours later.</p>
+        <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
+        <button type="button" class="primary" data-pw-close>Got it</button>
       </div>
       <div data-pw="account" hidden>
         <h2>You have used all your credits</h2>
@@ -1306,6 +1318,8 @@ setInterval(tickCountdown, 1000);
 function showTokens(t) {
   const el = $("#tok-pill");
   if (!t || t.metered === false) { el.hidden = true; return; }
+  // Running low: when a search leaves 1 credit, warn once (same box as "You have used all your credits")
+  if (lastTokens && !t.subscribed && t.left === 1 && lastTokens.left > 1) setTimeout(() => openPaywall(t.stage === "account" ? "low-account" : "low-anon"), 900);
   lastTokens = t;
   resetAt = t.reset_at ? Date.parse(t.reset_at) : null;
   tickCountdown();
@@ -1336,13 +1350,14 @@ function openPaywall(stage) {
   document.querySelectorAll("#paywall .refreshed").forEach(p => p.hidden = true);
   document.querySelectorAll("#paywall .refresh-box").forEach(b => b.hidden = !resetAt);
   tickCountdown();
-  document.querySelectorAll("#paywall [data-pw]").forEach(v => v.hidden = v.dataset.pw !== (stage === "account" ? "account" : "anon"));
+  const view = stage?.startsWith("low-") ? stage : stage === "account" ? "account" : "anon";
+  document.querySelectorAll("#paywall [data-pw]").forEach(v => v.hidden = v.dataset.pw !== view);
   $("#paywall").hidden = false;
   setTimeout(() => $("#paywall .primary:not([disabled]), #paywall .acct-x")?.focus(), 30);
 }
 function closePaywall() { $("#paywall").hidden = true; paywallOpener?.focus?.(); }
 document.addEventListener("click", e => {
-  if (e.target.id === "paywall" || e.target.closest("[data-pw-close]")) { closePaywall(); return; }
+  if (e.target.id === "paywall" || e.target.closest("[data-pw-close]")) { e.preventDefault(); closePaywall(); return; }
   const su = e.target.closest("[data-account-signup], [data-account-login]");
   if (su) { e.preventDefault(); closePaywall(); window.ssOpenAccount?.(su.matches("[data-account-login]") ? "login" : "signup"); }
 });
@@ -2075,6 +2090,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=6" defer></script>
-<script src="/static/i18n.js?v=27"></script>
+<script src="/static/i18n.js?v=28"></script>
 </body>
 </html>
