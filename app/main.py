@@ -144,7 +144,8 @@ async def match(
     # Each new track searched uses a token, once we know the search works (the same track again today is free)
     tk = await run_in_threadpool(tokens.check, request, int(deezer_id), True)
     if tk and not tk.get("allowed"):
-        raise HTTPException(402, {"code": "no_tokens", "stage": tk.get("stage"), "signed_in": tk.get("signed_in")})
+        raise HTTPException(402, {"code": "no_tokens", "stage": tk.get("stage"), "signed_in": tk.get("signed_in"),
+                                  "reset_at": tk.get("reset_at")})
     results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
                                   strict_key=strict_key, bpm_range=bpm_range, style=style or None, limit=limit)
     query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm", "row")}

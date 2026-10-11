@@ -349,6 +349,10 @@
   .acct-state { font-size: 11px; color: var(--accent); font-weight: 600; }
   .acct-state:empty { display: none; }
   .signed-in .acct-ico { background: var(--accent); color: var(--accent-ink); }
+  .refresh-box { display: grid; justify-items: center; gap: 4px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin: 6px 0 14px; }
+  .rb-label { color: var(--muted); font-size: 13px; }
+  .countdown { font: 800 32px "JetBrains Mono", monospace; letter-spacing: .02em; color: var(--accent); }
+  .problem .countdown { font-size: 22px; }
   .plan { border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.06); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
   .plan-price { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
   .plan-price span { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 2px; }
@@ -361,7 +365,8 @@
   .acct-box { position: relative; width: min(400px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 26px 22px 20px; box-shadow: 0 24px 70px rgba(0,0,0,.6); }
   .acct-box h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.02em; }
   .acct-sub { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
-  .acct-sub b { color: var(--text); word-break: break-all; }
+  .acct-sub b { color: var(--text); }
+  #acct-email { word-break: break-all; }
   .acct-box form { display: grid; gap: 12px; }
   .acct-box label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
   .acct-box input { width: 100%; background: var(--bg); border: 1px solid var(--line); color: var(--text); border-radius: 10px; padding: 12px; font: 16px Inter, system-ui, sans-serif; }
@@ -722,8 +727,10 @@
         <p class="acct-links"><a href="#" data-account-login>Already have an account? Log in</a></p>
       </div>
       <div data-pw="account" hidden>
-        <h2>Your free searches have run out</h2>
-        <p class="acct-sub" data-i18n="pwGet">Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
+        <h2>You have used all your credits</h2>
+        <div class="refresh-box"><span class="rb-label">Your 2 free searches refresh in</span><b class="countdown" data-countdown data-no-i18n>24:00:00</b></div>
+        <p class="acct-sub refreshed" hidden>Your free searches have refreshed. Close this and search away!</p>
+        <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
         <div class="plan"><div class="plan-price">£4.99<span>/month</span></div>
           <ul><li>Unlimited searches and "Similar" finds</li><li>Build and share as many sets as you like</li><li>Cancel anytime</li></ul></div>
         <button type="button" class="primary" disabled>Subscriptions coming soon</button>
@@ -873,6 +880,10 @@ async function run(exactUrl, fromHistory = false) {
     let r, data;
     try { r = await fetch(`/api/match?${params}`, { headers: await tokenHeaders() }); data = await r.json(); }
     catch { const e = new Error("offline"); e.kind = "offline"; throw e; }
+    if (r.status === 402 && data.detail?.stage === "anon" && document.documentElement.classList.contains("signed-in") && window.ssRefreshAuth) {
+      await window.ssRefreshAuth();
+      try { r = await fetch(`/api/match?${params}`, { headers: await tokenHeaders() }); data = await r.json(); } catch {}
+    }
     if (r.status === 402) { const e = new Error("no tokens"); e.kind = "tokens"; e.info = data.detail || {}; throw e; }
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
@@ -898,9 +909,10 @@ function showProblem(err, attempted) {
   let title, body, actions = "";
   if (err.kind === "tokens") {
     openPaywall(err.info.stage);
-    title = err.info.stage === "account" ? "Your free searches have run out" : "You've used your 3 free searches";
+    if (err.info.reset_at) resetAt = Date.parse(err.info.reset_at);
+    title = err.info.stage === "account" ? "You have used all your credits" : "You've used your 3 free searches";
     body = err.info.stage === "account"
-      ? `<p>Unlimited searches are coming soon with SimilarSounds Unlimited: £4.99 a month, cancel anytime.</p>`
+      ? `<p><span>Your 2 free searches refresh in</span> <b class="countdown" data-countdown data-no-i18n></b></p>`
       : `<p>Create a free account to get 2 more searches.</p>`;
     actions = err.info.stage === "account" ? "" : `<button type="button" class="icon" data-account-signup>Create a free account</button>`;
     $("#out").innerHTML = `<section class="problem" role="alert"><div class="problem-title">${title}</div>${body}${actions}</section>`;
@@ -1195,14 +1207,34 @@ function deviceId() {
 }
 async function tokenHeaders() {
   const h = { "X-Device-Id": deviceId() };
+  // wait (briefly) until we know whether this visitor is logged in
+  if (!window.ssAuthReady && document.readyState === "loading")
+    await new Promise(r => document.addEventListener("DOMContentLoaded", r, { once: true }));
+  if (window.ssAuthReady) await Promise.race([window.ssAuthReady, new Promise(r => setTimeout(r, 4000))]);
   try { Object.assign(h, await (window.ssAuthHeader?.() || {})); } catch {}
   return h;
 }
-let lastTokens = null;
+let lastTokens = null, resetAt = null;
+const pad = n => String(n).padStart(2, "0");
+function tickCountdown() {
+  if (!resetAt) return;
+  const ms = resetAt - Date.now();
+  const txt = ms <= 0 ? "00:00:00" : `${pad(Math.floor(ms / 3600000))}:${pad(Math.floor(ms / 60000) % 60)}:${pad(Math.floor(ms / 1000) % 60)}`;
+  document.querySelectorAll("[data-countdown]").forEach(el => el.textContent = txt);
+  if (ms <= 0) {                     // the 24 hours are up: 2 more searches
+    resetAt = null;
+    document.querySelectorAll("#paywall .refreshed").forEach(p => p.hidden = false);
+    document.querySelectorAll("#paywall .refresh-box").forEach(b => b.hidden = true);
+    refreshTokens();
+  }
+}
+setInterval(tickCountdown, 1000);
 function showTokens(t) {
   const el = $("#tok-pill");
   if (!t || t.metered === false) { el.hidden = true; return; }
   lastTokens = t;
+  resetAt = t.reset_at ? Date.parse(t.reset_at) : null;
+  tickCountdown();
   el.hidden = false;
   const out = !t.subscribed && t.left === 0;
   el.classList.toggle("out", out);
@@ -1227,6 +1259,9 @@ async function refreshTokens() {
 let paywallOpener = null;
 function openPaywall(stage) {
   paywallOpener = document.activeElement;
+  document.querySelectorAll("#paywall .refreshed").forEach(p => p.hidden = true);
+  document.querySelectorAll("#paywall .refresh-box").forEach(b => b.hidden = !resetAt);
+  tickCountdown();
   document.querySelectorAll("#paywall [data-pw]").forEach(v => v.hidden = v.dataset.pw !== (stage === "account" ? "account" : "anon"));
   $("#paywall").hidden = false;
   setTimeout(() => $("#paywall .primary:not([disabled]), #paywall .acct-x")?.focus(), 30);
@@ -1906,7 +1941,7 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/account.js?v=4" defer></script>
-<script src="/static/i18n.js?v=21"></script>
+<script src="/static/account.js?v=5" defer></script>
+<script src="/static/i18n.js?v=22"></script>
 </body>
 </html>

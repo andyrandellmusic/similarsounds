@@ -4,16 +4,19 @@
  */
 (async function () {
   const $ = s => document.querySelector(s);
+  // Searches wait for this, so a logged-in visitor's first search is counted against their account
+  let authReady;
+  window.ssAuthReady = new Promise(r => { authReady = r; });
   let cfg;
-  try { cfg = await (await fetch("/api/config")).json(); } catch { return; }
-  if (!cfg.supabase_url || !cfg.supabase_anon_key) return;   // accounts not switched on yet
+  try { cfg = await (await fetch("/api/config")).json(); } catch { authReady(); return; }
+  if (!cfg.supabase_url || !cfg.supabase_anon_key) { authReady(); return; }   // accounts not switched on yet
 
   await new Promise((ok, fail) => {
     const s = document.createElement("script");
     s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js";
     s.onload = ok; s.onerror = fail; document.head.appendChild(s);
   }).catch(() => null);
-  if (!window.supabase?.createClient) return;
+  if (!window.supabase?.createClient) { authReady(); return; }
   const sb = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key, {
     auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true, flowType: "implicit" },
   });
@@ -175,6 +178,8 @@
     return t ? { Authorization: `Bearer ${t}` } : {};
   };
   window.ssOpenAccount = view => open(view);
+  window.ssRefreshAuth = async () => { try { await sb.auth.refreshSession(); } catch {} };
+  sb.auth.getSession().then(({ data }) => { user = data.session?.user || user; paint(); authReady(); }, () => authReady());
   sb.auth.onAuthStateChange((event, session) => {
     const was = user?.id;
     user = session?.user || null;
