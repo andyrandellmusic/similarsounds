@@ -1,8 +1,9 @@
 """Turning pasted links into tracks, and fetching stand-in previews from Deezer.
 
-YouTube and SoundCloud are only used for metadata (oEmbed) and embedded players.
+YouTube and SoundCloud are only used for metadata (oEmbed) and embedded players; Bandcamp only for the page title.
 Their audio is never downloaded, per their terms.
 """
+import html
 import re
 import threading
 import time
@@ -98,8 +99,24 @@ def resolve_link(url: str) -> dict:
         return {"source": "beatport", "title": m.group(1).replace("-", " "), "author": "",
                 "embed_html": None}
 
+    if host.endswith("bandcamp.com"):
+        m = re.search(r"/track/([^/?#]+)", url)
+        if not m:
+            raise ValueError("Please paste a Bandcamp *track* link.")
+        # Read only the page's title ("Track, by Artist"); Bandcamp audio is never downloaded
+        title, author = m.group(1).replace("-", " "), ""
+        try:
+            r = client.get(url, headers={"User-Agent": "Mozilla/5.0 (compatible; similarsounds/0.1)"})
+            og = re.search(r'<meta property="og:title" content="([^"]+)"', r.text)
+            if og:
+                t, _, a = html.unescape(og.group(1)).rpartition(", by ")
+                title, author = (t, a) if t else (a, "")
+        except httpx.HTTPError:
+            pass
+        return {"source": "bandcamp", "title": title, "author": author, "url": url, "embed_html": None}
+
     if host:
-        raise ValueError("Supported links: YouTube, SoundCloud, Beatport, Deezer - or type 'Artist - Title'.")
+        raise ValueError("Supported links: YouTube, SoundCloud, Beatport, Bandcamp, Deezer - or type 'Artist - Title'.")
     return {"source": "text", "title": url, "author": "", "embed_html": None}
 
 

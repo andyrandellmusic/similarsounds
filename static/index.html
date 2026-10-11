@@ -425,7 +425,7 @@
     .filters { gap: 10px 14px; }
   }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no account, no ads and no tracking. Your set and recent searches are saved only on your own device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house, from deep and organic to tech, afro and bass house, so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no account, no ads and no tracking. Your set and recent searches are saved only on your own device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house, from deep and organic to tech, afro and bass house, so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
 <body>
 <div class="wrap">
@@ -546,7 +546,7 @@
     <h2 id="faq-title">Questions</h2>
       <details><summary>What is SimilarSounds?</summary><p>A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first.</p></details>
       <details><summary>How does it decide what mixes?</summary><p>Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend.</p></details>
-      <details><summary>What can I paste in?</summary><p>A YouTube, SoundCloud, Beatport or Deezer link, or just start typing an artist and pick the track from the list.</p></details>
+      <details><summary>What can I paste in?</summary><p>A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list.</p></details>
       <details><summary>Is it free? Do I need an account?</summary><p>It's completely free, with no account, no ads and no tracking. Your set and recent searches are saved only on your own device.</p></details>
       <details><summary>Why only house music?</summary><p>Doing one genre properly beats doing everything badly. Every track in the catalogue is house, from deep and organic to tech, afro and bass house, so matches stay usable in a house set.</p></details>
       <details><summary>How accurate are the key and BPM?</summary><p>They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix.</p></details>
@@ -739,7 +739,9 @@ function render({ source, query, results }) {
       <a class="sc-logo" href="${esc(scLink)}" target="_blank" rel="noopener" aria-label="Listen on SoundCloud">
         <img src="/static/brands/soundcloud/logo_white.png" width="120" height="15" alt="SoundCloud"></a>
     </div>` : "";
-  const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
+  const bcLink = source.source === "bandcamp" && /^https:\/\/[a-z0-9-]+\.bandcamp\.com\/track\//i.test(source.url || "") ? source.url : "";
+  const bcAttribution = bcLink ? `<div class="sc-attr"><a href="${esc(bcLink)}" target="_blank" rel="noopener">Listen on Bandcamp ↗</a></div>` : "";
+  const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", bandcamp: "From Bandcamp", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
   const year = query.release_date ? query.release_date.slice(0, 4) : "";
   let html = shared + `<section class="query">
       <div class="row qrow" data-id="${query.deezer_id}">
@@ -757,7 +759,7 @@ function render({ source, query, results }) {
           </div>
         </div>
         <div class="actions">${addButton(query)}</div>
-      </div>${attribution}${ytAttribution}${embed}
+      </div>${attribution}${ytAttribution}${bcAttribution}${embed}
     </section>`;
   trackCache = {};
   trackCache[query.deezer_id] = query;
@@ -1577,6 +1579,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=7"></script>
+<script src="/static/i18n.js?v=8"></script>
 </body>
 </html>
