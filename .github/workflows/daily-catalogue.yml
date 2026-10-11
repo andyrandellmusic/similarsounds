@@ -17,7 +17,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - name: Note the start time
+        run: echo "STARTED=$(date -u '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
       - run: uv run python -m scripts.seed --per-style 40
+      - name: Remove anything added today that isn't house
+        run: uv run python -m scripts.clean_catalogue --since "$STARTED" --apply
       - name: Commit updated catalogue
         run: |
           git config user.name "similarsounds-bot"

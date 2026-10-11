@@ -1054,6 +1054,7 @@ function rememberSearch(q) {
     const item = { id: q.deezer_id, label: `${q.artist} - ${q.title}`, cover: q.cover };
     const list = JSON.parse(localStorage.getItem("ss_recent") || "[]").filter(r => r.id !== item.id);
     localStorage.setItem("ss_recent", JSON.stringify([item, ...list].slice(0, 6)));
+    window.dispatchEvent(new Event("ss:saved"));
   } catch {}
 }
 function recentSearches() {
@@ -1336,6 +1337,7 @@ function loadSet() {
 }
 function saveSet() {
   try { localStorage.setItem("ss_set", JSON.stringify(set)); } catch {}
+  window.dispatchEvent(new Event("ss:saved"));   // lets a signed-in account keep a copy
 }
 const inSet = id => set.some(t => t.deezer_id === id);
 

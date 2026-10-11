@@ -8,13 +8,14 @@ or when its tempo is outside house range. Usage:
     python -m scripts.clean_catalogue --since "2026-10-11 02:28:10"   # only tracks added since
 """
 import argparse
+import re
 import sqlite3
 from concurrent.futures import ThreadPoolExecutor
 
 from app import sources
 from app.catalogue import DB_PATH
 
-DANCE = {"Dance", "Electro", "Techno/House"}
+DANCE = {"Dance", "Electro", "Techno/House", "Disco", "Soul & Funk", "African Music"}   # disco/afro house are often tagged only these
 OTHER = {"Dubstep", "Drum & Bass"}
 BPM_MIN, BPM_MAX = 108, 135
 
@@ -33,13 +34,15 @@ def genres(deezer_id: int) -> list[str] | None:
         return None   # couldn't check: keep it
 
 
-def verdict(bpm: float, g: list[str] | None) -> str | None:
+def verdict(bpm: float, g: list[str] | None, title: str = "") -> str | None:
     if not BPM_MIN <= bpm <= BPM_MAX:
         return f"tempo {round(bpm)} BPM"
     if g is None or not g:
         return None
     if not DANCE & set(g):
-        return "genres: " + ", ".join(g)
+        remix = re.search(r"\b(remix|mix|edit|dub|rework)\b", title, re.I)
+        if not (remix and set(g) <= {"Jazz", "R&B"}):
+            return "genres: " + ", ".join(g)
     if OTHER & set(g) and "Techno/House" not in g:
         return "genres: " + ", ".join(g)
     return None
@@ -58,7 +61,7 @@ def main():
         gs = list(pool.map(lambda r: genres(r[0]) if BPM_MIN <= r[3] <= BPM_MAX else [], rows))
     drop = []
     for (did, artist, title, bpm), g in zip(rows, gs):
-        why = verdict(bpm, g)
+        why = verdict(bpm, g, title)
         if why:
             drop.append(did)
             print(f"  remove: {artist} - {title} ({why})")
