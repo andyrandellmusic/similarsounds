@@ -904,6 +904,7 @@ let picked = { text: null, url: null };
 let pendingTrack = null;   // {title, artist, cover} of a track picked from a list, shown while loading
 async function run(exactUrl, fromHistory = false) {
   closeSuggest();
+  $("#url").blur();   // searching closes the phone keyboard
   if (exactUrl && exactUrl !== picked.url) resultLimit = 30;
   if (exactUrl) picked = { text: $("#url").value, url: exactUrl };
   const url = $("#url").value === picked.text ? picked.url : $("#url").value;
@@ -1550,7 +1551,10 @@ function choose(i) {
   if (!it) return;
   if (it.type === "artist") {
     // Show that artist's tracks next
-    input.value = `${it.value} - `; input.focus(); sgLastQ = null; fetchSuggest();
+    // (on phones the keyboard stays down so the artist's tracks can be seen)
+    input.value = `${it.value} - `; sgLastQ = null;
+    if (!matchMedia("(pointer: coarse)").matches) input.focus();
+    fetchSuggest(); updateClear();
   } else {
     // Search by the exact Deezer track, so the right version is analysed
     input.value = it.value; closeSuggest();
@@ -1604,6 +1608,13 @@ box.addEventListener("click", e => {
 const recentOpen = () => !box.hidden && !input.value.trim();
 document.addEventListener("pointerdown", e => { if (recentOpen() && !e.target.closest(".search-wrap")) closeSuggest(); }, true);
 input.addEventListener("blur", () => setTimeout(() => { if (recentOpen() && document.activeElement !== input) closeSuggest(); }, 150));
+// Phones: tapping anywhere outside the search box closes the keyboard straight away
+// (the track list stays open so it can still be browsed)
+document.addEventListener("pointerdown", e => {
+  if (document.activeElement !== input || e.target.closest("#url, #clear")) return;
+  if (recentOpen() && e.target.closest("#suggest")) return;   // recent searches close on blur, so keep focus to pick one
+  input.blur();
+}, true);
 box.addEventListener("click", e => {
   if (!e.target.closest("#sg-clear")) return;
   try { localStorage.removeItem("ss_recent"); } catch {}
