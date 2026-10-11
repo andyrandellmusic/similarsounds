@@ -19,6 +19,15 @@
 
   <h1>Terms of Use</h1>
   <p class="updated">Last updated: 11 October 2026</p>
+  <p class="note" id="en-only" hidden></p>
+<script>
+  (function () {
+    const m = { es: "Estas páginas solo están disponibles en inglés.", fr: "Ces pages ne sont disponibles qu'en anglais.", de: "Diese Seiten gibt es nur auf Englisch.", it: "Queste pagine sono disponibili solo in inglese.", pt: "Estas páginas estão disponíveis apenas em inglês.", nl: "Deze pagina's zijn alleen in het Engels beschikbaar." };
+    let l = "en"; try { l = localStorage.getItem("ss_lang") || "en"; } catch {}
+    const n = document.getElementById("en-only");
+    if (m[l]) { n.textContent = m[l]; n.lang = l; n.hidden = false; }
+  })();
+</script>
 
   <div class="summary">
     <b>The short version</b>
