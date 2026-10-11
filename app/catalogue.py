@@ -97,8 +97,10 @@ class Index:
 
     def energy_scores(self, feats: np.ndarray) -> np.ndarray:
         """Map raw energy features to a 1-10 scale by percentile against the catalogue."""
-        ref = self.energy_feats
-        pct = np.stack([(ref[None, :, j] <= feats[:, None, j]).mean(axis=1) for j in range(ref.shape[1])], axis=1)
+        # share of catalogue tracks at or below each value (sorted lookup: memory stays linear in size)
+        ref = np.sort(self.energy_feats, axis=0)
+        n = len(ref)
+        pct = np.stack([np.searchsorted(ref[:, j], feats[:, j], side="right") / n for j in range(ref.shape[1])], axis=1)
         combined = pct @ np.array([0.45, 0.35, 0.20])
         return np.clip(np.round(1 + combined * 9), 1, 10)
 

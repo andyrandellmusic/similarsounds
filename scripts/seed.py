@@ -29,13 +29,19 @@ STYLES = {
     "Funky / Disco House": [f"nu disco {YEAR}", "funky house"],
 }
 
+# Extra searches per style, so each run reaches beyond the same few playlists
+for _style, _qs in STYLES.items():
+    _name = _style.split(" / ")[0].lower()
+    _qs += [f"best {_name} {YEAR}", f"new {_name} releases", f"{_name} {YEAR} mix"]
+PLAYLISTS_PER_QUERY = 15
+
 _albums: dict[int, dict] = {}
 
 
 def candidates(style: str, queries: list[str], per_style: int, seen: set[int]) -> list[tuple[int, str]]:
     out = []
     for q in queries:
-        for pl in sources.deezer("/search/playlist", q=q, limit=4).get("data", []):
+        for pl in sources.deezer("/search/playlist", q=q, limit=PLAYLISTS_PER_QUERY).get("data", []):
             tracks = sources.deezer(f"/playlist/{pl['id']}/tracks", limit=100).get("data", [])
             for t in tracks:
                 if t["id"] in seen or not t.get("preview"):
