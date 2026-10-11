@@ -220,6 +220,14 @@
   .howto { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
   .howto summary { cursor: pointer; width: fit-content; }
   .howto summary:hover { color: var(--text); }
+  /* "How to read these results" and "Key wheel": bigger, with a green arrow so they're noticed */
+  .howto summary, .keywheel summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; width: fit-content;
+    font-size: 15px; font-weight: 600; color: var(--text); padding: 4px 0; }
+  .howto summary::-webkit-details-marker, .keywheel summary::-webkit-details-marker { display: none; }
+  .howto summary::before, .keywheel summary::before { content: ""; width: 0; height: 0; border-style: solid;
+    border-width: 6px 0 6px 10px; border-color: transparent transparent transparent var(--accent); transition: transform .15s; }
+  .howto[open] summary::before, .keywheel[open] summary::before { transform: rotate(90deg); }
+  .howto summary:hover, .keywheel summary:hover { color: var(--accent); }
   .howto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
   .howto-grid > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
   .howto-grid p { margin: 2px 0 0; flex-basis: 100%; }
