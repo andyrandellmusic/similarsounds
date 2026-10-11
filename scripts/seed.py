@@ -25,7 +25,8 @@ STYLES = {
     "Soulful House": [f"soulful house {YEAR}", "soulful house"],
     "Jackin House": [f"jackin house {YEAR}", "disco house", "classic house groove"],
     "Bass House": [f"bass house {YEAR}", "uk bass house"],
-    "Minimal / Deep Tech": [f"minimal deep tech {YEAR}", "minimal house"],
+    "Minimal / Deep Tech": [f"minimal deep tech {YEAR}", "minimal house", "uk minimal deep tech", "deep tech minimal groove",
+                            "rominimal", "minimal tech house rollers"],
     "Funky / Disco House": [f"nu disco {YEAR}", "funky house"],
 }
 
