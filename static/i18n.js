@@ -247,6 +247,15 @@
     "Couldn't delete your account. Please try again, or email us.": ["No se pudo eliminar tu cuenta. Inténtalo de nuevo o escríbenos.", "Impossible de supprimer votre compte. Réessayez ou écrivez-nous.", "Konto konnte nicht gelöscht werden. Versuch es erneut oder schreib uns.", "Impossibile eliminare l'account. Riprova o scrivici.", "Não foi possível excluir sua conta. Tente de novo ou envie um e-mail.", "Je account kon niet worden verwijderd. Probeer opnieuw of mail ons."],
     "Your account and saved data have been deleted": ["Tu cuenta y tus datos guardados se han eliminado", "Votre compte et vos données ont été supprimés", "Dein Konto und deine gespeicherten Daten wurden gelöscht", "Account e dati salvati eliminati", "Sua conta e seus dados foram excluídos", "Je account en opgeslagen gegevens zijn verwijderd"],
     "Email confirmed - you're logged in": ["Correo confirmado: ya has iniciado sesión", "E-mail confirmé : vous êtes connecté", "E-Mail bestätigt – du bist angemeldet", "Email confermata: hai effettuato l'accesso", "E-mail confirmado: você já entrou", "E-mailadres bevestigd – je bent ingelogd"],
+    "Log in / Sign up": ["Iniciar sesión / Registrarse", "Connexion / Inscription", "Anmelden / Registrieren", "Accedi / Registrati", "Entrar / Cadastrar", "Inloggen / Aanmelden"],
+    "Signed in": ["Sesión iniciada", "Connecté", "Angemeldet", "Connesso", "Conectado", "Ingelogd"],
+    "Name": ["Nombre", "Nom", "Name", "Nome", "Nome", "Naam"],
+    "Your name": ["Tu nombre", "Votre nom", "Dein Name", "Il tuo nome", "Seu nome", "Je naam"],
+    "Save name": ["Guardar nombre", "Enregistrer le nom", "Name speichern", "Salva nome", "Salvar nome", "Naam opslaan"],
+    "Name saved": ["Nombre guardado", "Nom enregistré", "Name gespeichert", "Nome salvato", "Nome salvo", "Naam opgeslagen"],
+    "Log in or sign up": ["Inicia sesión o regístrate", "Connectez-vous ou inscrivez-vous", "Anmelden oder registrieren", "Accedi o registrati", "Entre ou cadastre-se", "Inloggen of aanmelden"],
+    "Free. Just your name, email and a password of at least 8 characters.": ["Gratis. Solo tu nombre, tu correo y una contraseña de al menos 8 caracteres.", "Gratuit. Juste votre nom, votre e-mail et un mot de passe d'au moins 8 caractères.", "Kostenlos. Nur dein Name, deine E-Mail und ein Passwort mit mindestens 8 Zeichen.", "Gratis. Bastano nome, email e una password di almeno 8 caratteri.", "Grátis. Só seu nome, e-mail e uma senha de pelo menos 8 caracteres.", "Gratis. Alleen je naam, e-mailadres en een wachtwoord van minstens 8 tekens."],
+    "Signed in - your set is saved to your account": ["Sesión iniciada: tu set se guarda en tu cuenta", "Connecté : votre set est enregistré dans votre compte", "Angemeldet – dein Set wird in deinem Konto gespeichert", "Accesso eseguito: il set è salvato nel tuo account", "Você entrou: seu set fica salvo na sua conta", "Ingelogd – je set wordt in je account bewaard"],
     "Questions": ["Preguntas", "Questions", "Fragen", "Domande", "Perguntas", "Vragen"],
     "What is SimilarSounds?": ["¿Qué es SimilarSounds?", "Qu'est-ce que SimilarSounds ?", "Was ist SimilarSounds?", "Che cos'è SimilarSounds?", "O que é o SimilarSounds?", "Wat is SimilarSounds?"],
     "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first.": ["Una herramienta gratuita para DJs. Pega un tema y encuentra música house nueva que suena parecida y mezcla con él, empezando por los lanzamientos más recientes.", "Un outil gratuit pour les DJs. Collez un titre et il trouve de la house récente qui sonne pareil et s'enchaîne avec, en commençant par les dernières sorties.", "Ein kostenloses Tool für DJs. Füge einen Track ein und es findet neue House-Musik, die ähnlich klingt und dazu passt – neueste Releases zuerst.", "Uno strumento gratuito per DJ. Incolla un brano e trova nuova musica house che suona simile e si mixa con esso, partendo dalle uscite più recenti.", "Uma ferramenta gratuita para DJs. Cole uma faixa e ela encontra house music nova que soa parecida e mixa com ela, começando pelos lançamentos mais recentes.", "Een gratis tool voor DJ's. Plak een track en hij vindt nieuwe housemuziek die erop lijkt en ermee mixt, nieuwste releases eerst."],
@@ -301,6 +310,7 @@
     [/^Set cleared \((\d+) tracks?\)$/, ["Set vaciado ($1 temas)", "Set vidé ($1 titres)", "Set geleert ($1 Tracks)", "Set svuotato ($1 brani)", "Set limpo ($1 faixas)", "Set geleegd ($1 tracks)"]],
     [/^Opened a shared set \((\d+) tracks?\)$/, ["Set compartido abierto ($1 temas)", "Set partagé ouvert ($1 titres)", "Geteiltes Set geöffnet ($1 Tracks)", "Set condiviso aperto ($1 brani)", "Set compartilhado aberto ($1 faixas)", "Gedeelde set geopend ($1 tracks)"]],
     [/^(\d+) clash(?:es)?$/, ["$1 choque(s)", "$1 clash(s)", "$1 Kollision(en)", "$1 conflitto/i", "$1 choque(s)", "$1 botsing(en)"]],
+    [/^(.+), signed in - open your account$/, ["$1, sesión iniciada: abrir tu cuenta", "$1, connecté : ouvrir votre compte", "$1, angemeldet – Konto öffnen", "$1, connesso: apri il tuo account", "$1, conectado: abrir sua conta", "$1, ingelogd – open je account"]],
     [/^Tracks by (.+)$/, ["Temas de $1", "Titres de $1", "Tracks von $1", "Brani di $1", "Faixas de $1", "Tracks van $1"]],
     [/^No matching tracks by (.+) - press Find to search anyway\.$/, ["No hay temas de $1 que coincidan; pulsa Buscar para buscar igualmente.", "Aucun titre de $1 ne correspond : appuyez sur Rechercher pour chercher quand même.", "Keine passenden Tracks von $1 – drück auf Suchen, um trotzdem zu suchen.", "Nessun brano di $1 corrisponde: premi Cerca per cercare comunque.", "Nenhuma faixa de $1 encontrada; toque em Buscar para buscar mesmo assim.", "Geen passende tracks van $1 – druk op Zoeken om toch te zoeken."]],
     [/^We couldn't find "(.+)"$/, ["No encontramos \"$1\"", "Nous n'avons pas trouvé « $1 »", "Wir konnten „$1“ nicht finden", "Non abbiamo trovato \"$1\"", "Não encontramos \"$1\"", "We konden \"$1\" niet vinden"]],
@@ -399,7 +409,7 @@
   }
 
   // ---------- applying to the page
-  const SKIP = ".t, .a, .qt, .tt, .ta, .sg-name, .sg-sub, .logo, .brand, .chip.cam, .group-n, script, style, code, kbd, [data-no-i18n]";
+  const SKIP = ".acct-name.is-user, #acct-email, .t, .a, .qt, .tt, .ta, .sg-name, .sg-sub, .logo, .brand, .chip.cam, .group-n, script, style, code, kbd, [data-no-i18n]";
   const origText = new WeakMap();
   const ATTRS = ["placeholder", "aria-label", "title"];
   let applying = false;

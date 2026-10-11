@@ -37,7 +37,7 @@
   function show(view) {
     box.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== view);
     box.querySelectorAll(".acct-msg").forEach(m => { m.textContent = ""; m.className = "acct-msg"; });
-    if (view === "account") $("#acct-email").textContent = user?.email || "";
+    if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; }
   }
   function msg(view, text, ok) {
     const m = box.querySelector(`[data-view="${view}"] .acct-msg`);
@@ -76,14 +76,14 @@
     const { error } = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
     busy(f, false);
     if (error) return msg("login", friendly(error));
-    f.reset(); close(); say("Logged in - your set is saved to your account");
+    f.reset(); close(); say("Signed in - your set is saved to your account");
   });
   $("#f-signup").addEventListener("submit", async e => {
     e.preventDefault(); const f = e.target;
     if (f.password.value.length < 8) return msg("signup", "Please use a password of at least 8 characters.");
     busy(f, true);
     const { data, error } = await sb.auth.signUp({ email: f.email.value.trim(), password: f.password.value,
-      options: { emailRedirectTo: location.origin + "/" } });
+      options: { emailRedirectTo: location.origin + "/", data: { name: f.name.value.trim().slice(0, 50) } } });
     busy(f, false);
     if (error) return msg("signup", friendly(error));
     if (data.session) { f.reset(); close(); say("Account created - you're logged in"); return; }
@@ -105,6 +105,14 @@
     busy(f, false);
     if (error) return msg("reset", friendly(error));
     f.reset(); close(); say("Password changed - you're logged in");
+  });
+  $("#f-name").addEventListener("submit", async e => {
+    e.preventDefault(); const f = e.target; const name = f.name.value.trim().slice(0, 50);
+    if (!name) return; busy(f, true);
+    const { data, error } = await sb.auth.updateUser({ data: { name } });
+    busy(f, false);
+    if (error) return msg("account", friendly(error));
+    user = data.user; paint(); msg("account", "Name saved", true);
   });
   $("#acct-logout").addEventListener("click", async () => {
     await sb.auth.signOut(); close(); say("Logged out. Your set stays on this device.");
@@ -145,15 +153,22 @@
   });
 
   /* ---------- header + menu */
+  const nameOf = u => (u?.user_metadata?.name || "").trim() || (u?.email || "").split("@")[0];
   function paint() {
+    const name = user ? nameOf(user) : "";
     document.querySelectorAll("[data-account]").forEach(b => {
-      const label = b.querySelector("b") || b;
-      label.textContent = user ? "Account" : "Log in";
-      const sub = b.querySelector("small");
-      if (sub) sub.textContent = user ? user.email : "Save your set on every device";
+      const n = b.querySelector(".acct-name");
+      n.classList.toggle("is-user", !!user);   // a person's name is never translated
+      n.textContent = user ? name : "Log in / Sign up";
+      b.querySelector(".acct-state").textContent = user ? "Signed in" : "";
+      b.querySelector(".acct-ico").textContent = "";
+      if (user) b.querySelector(".acct-ico").textContent = name.charAt(0).toUpperCase();
+      else b.querySelector(".acct-ico").innerHTML = ICON;
+      b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : "Log in or sign up");
     });
     document.documentElement.classList.toggle("signed-in", !!user);
   }
+  const ICON = document.querySelector("[data-account] .acct-ico")?.innerHTML || "";
 
   sb.auth.onAuthStateChange((event, session) => {
     const was = user?.id;
