@@ -429,7 +429,9 @@
   .pk-hero .pk-ico { width: 56px; height: 56px; }
   .pk-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 4px 0 16px; padding: 12px 14px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 12px; }
   .pk-row small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
-  .quick-email { margin: 8px 0 0; text-align: center; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+  .quick-who { margin: 10px 0 0; text-align: center; display: grid; gap: 2px; }
+  .quick-who b { font-size: 16px; color: var(--text); overflow-wrap: anywhere; }
+  .quick-email { color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
   .quick .acct-links { justify-content: center; }
   .acct-links { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; margin: 14px 0 0; font-size: 13px; }
   .acct-links a, .acct-fine a { color: var(--text); }
@@ -731,8 +733,8 @@
         <h2 id="acct-title">Log in</h2>
         <p class="acct-sub">Keep your set and recent searches on every device.</p>
         <div class="quick" id="acct-quick" hidden>
-          <button type="button" class="primary pk-btn" id="quick-go"><svg class="pk-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5v3.5h-1M9.5 15.5c1.4 1.2 3.6 1.2 5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Sign in as <span id="quick-name" data-no-i18n></span></span></button>
-          <p class="quick-email" id="quick-email" data-no-i18n></p>
+          <button type="button" class="primary pk-btn" id="quick-go"><svg class="pk-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 9.5v1M15 9.5v1M12 9.5v3.5h-1M9.5 15.5c1.4 1.2 3.6 1.2 5 0" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Sign in</span></button>
+          <p class="quick-who"><b id="quick-name" data-no-i18n></b><span class="quick-email" id="quick-email" data-no-i18n></span></p>
           <p class="acct-msg" id="quick-msg" role="alert"></p>
           <p class="acct-links"><a href="#" id="quick-other">Use my password instead</a></p>
         </div>
