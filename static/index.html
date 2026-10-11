@@ -165,6 +165,11 @@
   .qrow .cover { width: 88px; height: 88px; border-radius: 10px; }
   .qrow .qt { font-size: 20px; font-weight: 800; letter-spacing: -0.01em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .qrow .eyebrow { color: var(--accent); }
+  .qsel { background: linear-gradient(180deg, #181822, var(--panel)); }
+  .rrow.qsel .meta { padding-right: 0; }
+  .qsel .eyebrow { color: var(--accent); }
+  .qsel .qt { font-size: 18px; font-weight: 800; letter-spacing: -0.01em; }
+  .qsel .side-match b { font: 800 10px Inter, sans-serif; letter-spacing: .06em; }
   .query .top { display: flex; gap: 16px; align-items: center; }
   .query img { width: 72px; height: 72px; border-radius: 10px; object-fit: cover; background: var(--panel-2); flex: none; }
   .eyebrow { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); }
@@ -1008,24 +1013,31 @@ function render({ source, query, results, similar_artists = [] }) {
   const bcLink = source.source === "bandcamp" && /^https:\/\/[a-z0-9-]+\.bandcamp\.com\/track\//i.test(source.url || "") ? source.url : "";
   const bcAttribution = bcLink ? `<div class="sc-attr"><a href="${esc(bcLink)}" target="_blank" rel="noopener">Listen on Bandcamp ↗</a></div>` : "";
   const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", bandcamp: "From Bandcamp", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
-  const year = query.release_date ? query.release_date.slice(0, 4) : "";
+  const qAge = query.release_date ? Math.max(0, Math.floor((Date.now() - Date.parse(query.release_date)) / 864e5)) : null;
   let html = shared + `<section class="query">
-      <div class="row qrow" data-id="${query.deezer_id}">
-        <button type="button" class="cover play" data-id="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
-          <img src="${esc(query.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
-        </button>
+      <div class="row rrow qsel" data-id="${query.deezer_id}">
+        <div class="side">
+          <span class="chip cam" style="background:${camelotColor(query.camelot)}" title="${esc(query.key)}">${esc(query.camelot)}</span>
+          <span class="side-match" title="The track you searched"><b>YOUR</b><small>track</small></span>
+          <button type="button" class="cover play" data-id="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
+            <img src="${esc(query.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
+          </button>
+        </div>
         <div class="meta">
-          <div class="eyebrow">${from}</div>
-          <div class="qt">${esc(query.title)}</div>
-          <div class="a">${esc(query.artist)}${query.label ? " · " + esc(query.label) : ""}${query.style ? " · " + esc(query.style) : ""}${year ? " · " + year : ""}</div>
+          ${from !== "Your track" ? `<div class="eyebrow">${from}</div>` : ""}
+          <div class="t qt">${esc(query.title)}${qAge != null && qAge <= 30 ? ` <span class="badge-new">NEW</span>` : ""}</div>
+          <div class="a">${esc(query.artist)}${query.label ? " · " + esc(query.label) : ""}${query.style ? " · " + esc(query.style) : ""}</div>
           <div class="chips">
-            <span class="chip cam" style="background:${camelotColor(query.camelot)}" title="${esc(query.key)}">${esc(query.camelot)}</span>
             <span class="chip">${esc(query.bpm)} BPM</span>
             ${energyBar(query.energy)}
+            ${qAge != null ? `<span class="chip" title="Released ${esc(query.release_date)}">${ago(qAge)}</span>` : ""}
           </div>
           ${query.sound?.length ? `<div class="sound" title="How it sounds compared with the rest of our catalogue"><span>Sound</span> ${query.sound.map(w => `<b>${esc(w)}</b>`).join(" · ")}</div>` : ""}
         </div>
-        <div class="actions">${addButton(query)}</div>
+        <div class="actions">
+          ${addButton(query)}
+          <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(query)}">Beatport ↗</a>
+        </div>
       </div>${attribution}${ytAttribution}${bcAttribution}${embed}
     </section>`;
   trackCache = {};
