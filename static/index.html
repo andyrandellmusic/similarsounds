@@ -436,6 +436,7 @@
       <nav class="menu" id="menu" hidden aria-label="Main menu">
         <button type="button" data-menu="home"><b>Home</b><small>Back to the start screen</small></button>
         <button type="button" data-menu="set"><b>Build your set</b><small id="menu-set-sub">Your saved tracks</small></button>
+        <button type="button" data-menu="browse"><b>Browse tracks</b><small>By sub-genre and BPM</small></button>
         <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
         <button type="button" data-menu="legal"><b>Privacy &amp; terms</b><small>Privacy, cookies and terms of use</small></button>
         <button type="button" data-menu="share"><b>Share SimilarSounds</b><small>Copy the site link</small></button>
@@ -534,7 +535,7 @@
   <footer>
     <p>SimilarSounds is in early preview. Previews and track details by Deezer; players from SoundCloud and YouTube load only when you choose. Key, BPM and energy are estimates, so always trust your ears. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
     <nav class="legal-links" aria-label="Legal">
-      <a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
+      <a href="/similar-to">Browse tracks</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
       <a href="mailto:andyrandellmusic@gmail.com">Contact</a>
     </nav>
     <p class="copy">© 2026 SimilarSounds</p>
@@ -1163,6 +1164,7 @@ menu.addEventListener("click", async e => {
   if (what === "home") goHome();
   if (what === "set") openSet(true);
   if (what === "legal") location.href = "/privacy";
+  if (what === "browse") location.href = "/similar-to";
   if (what === "how") { if (!$("#how")) newSearch(); $("#how").scrollIntoView({ behavior: "smooth", block: "center" }); }
   if (what === "share") {
     try { await navigator.clipboard.writeText("https://www.similarsounds.com/"); toast("Site link copied - www.similarsounds.com"); }
@@ -1554,6 +1556,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=5"></script>
+<script src="/static/i18n.js?v=6"></script>
 </body>
 </html>

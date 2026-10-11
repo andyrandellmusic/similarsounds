@@ -48,6 +48,8 @@
     "Home": ["Inicio", "Accueil", "Start", "Home", "Início", "Home"],
     "Back to the start screen": ["Volver a la pantalla de inicio", "Retour à l'écran d'accueil", "Zurück zum Startbildschirm", "Torna alla schermata iniziale", "Voltar para a tela inicial", "Terug naar het startscherm"],
     "Your saved tracks": ["Tus temas guardados", "Vos titres enregistrés", "Deine gespeicherten Tracks", "I tuoi brani salvati", "Suas faixas salvas", "Je opgeslagen tracks"],
+    "Browse tracks": ["Explorar temas", "Parcourir les titres", "Tracks durchsuchen", "Sfoglia i brani", "Explorar faixas", "Tracks bekijken"],
+    "By sub-genre and BPM": ["Por subgénero y BPM", "Par sous-genre et BPM", "Nach Subgenre und BPM", "Per sottogenere e BPM", "Por subgênero e BPM", "Op subgenre en BPM"],
     "How it works": ["Cómo funciona", "Comment ça marche", "So funktioniert's", "Come funziona", "Como funciona", "Zo werkt het"],
     "Three steps to a set that flows": ["Tres pasos para un set que fluye", "Trois étapes pour un set fluide", "Drei Schritte zu einem Set, das fließt", "Tre passi per un set fluido", "Três passos para um set que flui", "Drie stappen naar een set die loopt"],
     "Privacy & terms": ["Privacidad y términos", "Confidentialité et conditions", "Datenschutz & Bedingungen", "Privacy e termini", "Privacidade e termos", "Privacy & voorwaarden"],

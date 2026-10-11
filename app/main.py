@@ -12,10 +12,10 @@ from pathlib import Path
 import numpy as np
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.concurrency import run_in_threadpool
-from fastapi.responses import FileResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import house, reviews, sources
+from app import house, pages, reviews, sources
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
 from app.ranking import rank
@@ -219,6 +219,7 @@ async def review(request: Request):
 @app.post("/api/reload")
 def reload():
     index.reload()
+    _page_cache.clear()
     suggester.rebuild()
     return {"tracks": len(index.rows)}
 
@@ -226,6 +227,59 @@ def reload():
 @app.get("/")
 def home():
     return FileResponse(STATIC / "index.html")
+
+
+# ---------- public pages for search engines (one per catalogue track, plus browse pages)
+_page_cache: dict[int, str] = {}
+_style_by_slug = lambda: {pages.slugify(s): s for s in {r["style"] for r in index.rows if r["style"]}}
+
+
+@app.get("/similar-to", response_class=HTMLResponse)
+def similar_hub():
+    return pages.hub_page(index)
+
+
+@app.get("/similar-to/genre/{slug}", response_class=HTMLResponse)
+def similar_genre(slug: str, page: int = 1):
+    style = _style_by_slug().get(slug)
+    if not style:
+        raise HTTPException(404, "No such sub-genre")
+    return pages.style_page(index, style, page)
+
+
+@app.get("/similar-to/bpm/{lo}-{hi}", response_class=HTMLResponse)
+def similar_bpm(lo: int, hi: int, page: int = 1):
+    if (lo, hi) not in pages.BPM_WINDOWS:
+        raise HTTPException(404, "No such BPM range")
+    return pages.bpm_page(index, lo, hi, page)
+
+
+@app.get("/similar-to/{slug}", response_class=HTMLResponse)
+def similar_track(slug: str):
+    m = re.search(r"-(\d+)$", slug) or re.fullmatch(r"(\d+)", slug)
+    deezer_id = int(m.group(1)) if m else None
+    if deezer_id not in index.ids:
+        raise HTTPException(404, "We don't have a page for that track yet")
+    r = index.rows[index.ids[deezer_id]]
+    if pages.track_path(r) != f"/similar-to/{slug}":
+        return RedirectResponse(pages.track_path(r), status_code=301)
+    if deezer_id not in _page_cache:
+        q = analyse_query(deezer_id)
+        results, guessed = rank(index, q, exclude_id=deezer_id, limit=30)
+        if len(_page_cache) > 2000:
+            _page_cache.clear()
+        _page_cache[deezer_id] = pages.track_page(index, q, results, r["style"] or guessed)
+    return _page_cache[deezer_id]
+
+
+@app.get("/sitemap.xml")
+def sitemap():
+    return Response(pages.sitemap(index), media_type="application/xml")
+
+
+@app.get("/robots.txt", response_class=PlainTextResponse)
+def robots():
+    return pages.ROBOTS
 
 
 @app.get("/privacy")
