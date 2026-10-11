@@ -108,6 +108,7 @@
     "Mixes well": ["Mezcla bien", "S'enchaîne bien", "Passt gut", "Si mixa bene", "Mixa bem", "Mixt goed"],
     "Workable": ["Aceptable", "Jouable", "Machbar", "Accettabile", "Aceitável", "Werkbaar"],
     "Will clash": ["Chocará", "Va clasher", "Kollidiert", "Stonerà", "Vai chocar", "Botst"],
+    "TRY IT NOW": ["PRUÉBALO", "ESSAYEZ", "JETZT TESTEN", "PROVALO", "EXPERIMENTE", "PROBEER HET"],
     "NEW": ["NUEVO", "NOUVEAU", "NEU", "NUOVO", "NOVO", "NIEUW"],
     "✓ In set": ["✓ En el set", "✓ Dans le set", "✓ Im Set", "✓ Nel set", "✓ No set", "✓ In set"],
     "Find similar →": ["Buscar similares →", "Titres similaires →", "Ähnliche finden →", "Trova simili →", "Buscar parecidas →", "Vergelijkbare vinden →"],
