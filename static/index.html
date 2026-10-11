@@ -313,6 +313,11 @@
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   form.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,255,61,.12); }
   form.search input:focus-visible { outline: none; }
+  /* Close / clear X buttons everywhere: green X, no green box around it (a soft background shows keyboard focus) */
+  .acct-x, .review-x, .close, .clear, .mini { color: var(--accent) !important; outline: none !important; box-shadow: none !important; border: 0 !important; }
+  .acct-x:hover, .review-x:hover, .close:hover, .clear:hover { color: var(--accent) !important; background: rgba(198,255,61,.1); }
+  .acct-x:focus-visible, .review-x:focus-visible, .close:focus-visible, .clear:focus-visible, .mini:focus-visible { background: rgba(198,255,61,.12); }
+  .mini:disabled { color: var(--muted) !important; }
   .sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } }
 
