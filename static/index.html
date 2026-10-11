@@ -399,7 +399,8 @@
   @media (max-width: 640px) { .suggest { max-height: 62vh; } }
   /* Result rows: key, match % and artwork stacked down the left */
   .rrow { grid-template-columns: 64px 1fr auto; align-items: start; }
-  .rrow .side { display: grid; gap: 6px; }
+  .rrow .side { display: grid; gap: 6px; align-self: stretch; grid-template-rows: auto auto 1fr; }
+  .rrow .side .cover { align-self: end; }   /* artwork + play button sit in the bottom-left corner */
   .rrow .side .chip.cam { text-align: center; padding: 6px 0; }
   .side-match { display: grid; justify-items: center; line-height: 1; padding: 5px 0 4px; border-radius: 6px; border: 1px solid rgba(198,255,61,.35); color: var(--accent); }
   .side-match b { font: 700 13px "JetBrains Mono", monospace; }
