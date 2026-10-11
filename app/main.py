@@ -16,6 +16,7 @@ from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, Red
 from fastapi.staticfiles import StaticFiles
 
 from app import house, pages, reviews, sources
+from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
 from app.ranking import rank
@@ -27,6 +28,7 @@ STATIC = Path(__file__).resolve().parent.parent / "static"
 app = FastAPI(title="SimilarSounds")
 index = Index()
 suggester = Suggester(index)
+artists = Artists(index)
 _query_cache: dict[int, dict] = {}
 _analysis_lock = threading.Lock()
 
@@ -135,7 +137,9 @@ async def match(
     # Not house: hold results back unless the visitor chooses to see them anyway
     if not q["house_check"]["is_house"] and not allow_non_house:
         results = []
-    return {"source": src, "query": query, "results": results}
+    like = artists.like_vector(index.embed(q["embedding"]), exclude=main_artist(q["artist"]), k=6) if results else []
+    similar_artists = [{"name": a["name"], "slug": pages.slugify(a["name"])} for a in like]
+    return {"source": src, "query": query, "results": results, "similar_artists": similar_artists}
 
 
 @app.post("/api/prefetch/{deezer_id}")
@@ -219,6 +223,7 @@ async def review(request: Request):
 @app.post("/api/reload")
 def reload():
     index.reload()
+    artists.rebuild()
     _page_cache.clear()
     suggester.rebuild()
     return {"tracks": len(index.rows)}
@@ -272,9 +277,22 @@ def similar_track(slug: str):
     return _page_cache[deezer_id]
 
 
+@app.get("/artists-like", response_class=HTMLResponse)
+def artists_hub():
+    return pages.artists_hub(artists)
+
+
+@app.get("/artists-like/{slug}", response_class=HTMLResponse)
+def artists_like(slug: str):
+    name = next((n for n in artists.names if pages.slugify(n) == slug), None)
+    if not name:
+        raise HTTPException(404, "We don't have that artist yet")
+    return pages.artist_page(artists, name)
+
+
 @app.get("/sitemap.xml")
 def sitemap():
-    return Response(pages.sitemap(index), media_type="application/xml")
+    return Response(pages.sitemap(index, artists), media_type="application/xml")
 
 
 @app.get("/robots.txt", response_class=PlainTextResponse)

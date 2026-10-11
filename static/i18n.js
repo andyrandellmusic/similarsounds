@@ -48,6 +48,7 @@
     "Home": ["Inicio", "Accueil", "Start", "Home", "Início", "Home"],
     "Back to the start screen": ["Volver a la pantalla de inicio", "Retour à l'écran d'accueil", "Zurück zum Startbildschirm", "Torna alla schermata iniziale", "Voltar para a tela inicial", "Terug naar het startscherm"],
     "Your saved tracks": ["Tus temas guardados", "Vos titres enregistrés", "Deine gespeicherten Tracks", "I tuoi brani salvati", "Suas faixas salvas", "Je opgeslagen tracks"],
+    "Artists like…": ["Artistas como…", "Artistes comme…", "Ähnliche Artists…", "Artisti simili…", "Artistas parecidos…", "Artiesten zoals…"],
     "Browse tracks": ["Explorar temas", "Parcourir les titres", "Tracks durchsuchen", "Sfoglia i brani", "Explorar faixas", "Tracks bekijken"],
     "By sub-genre and BPM": ["Por subgénero y BPM", "Par sous-genre et BPM", "Nach Subgenre und BPM", "Per sottogenere e BPM", "Por subgênero e BPM", "Op subgenre en BPM"],
     "How it works": ["Cómo funciona", "Comment ça marche", "So funktioniert's", "Come funziona", "Como funciona", "Zo werkt het"],
@@ -251,6 +252,8 @@
     [/^Find tracks similar to (.+) by (.+)$/, ["Buscar temas parecidos a $1 de $2", "Trouver des titres similaires à $1 de $2", "Ähnliche Tracks wie $1 von $2 finden", "Trova brani simili a $1 di $2", "Buscar faixas parecidas com $1 de $2", "Tracks vinden die lijken op $1 van $2"]],
     [/^(.+) - similar house tracks \| SimilarSounds$/, ["$1 - temas house parecidos | SimilarSounds", "$1 - titres house similaires | SimilarSounds", "$1 - ähnliche House-Tracks | SimilarSounds", "$1 - brani house simili | SimilarSounds", "$1 - faixas de house parecidas | SimilarSounds", "$1 - vergelijkbare housetracks | SimilarSounds"]],
     // results summary
+    [/^Artists that sound like (.+):$/, ["Artistas que suenan como $1:", "Artistes qui sonnent comme $1 :", "Artists, die wie $1 klingen:", "Artisti che suonano come $1:", "Artistas que soam como $1:", "Artiesten die klinken als $1:"]],
+    [/^See tracks by (.+)$/, ["Ver temas de $1", "Voir les titres de $1", "Tracks von $1 ansehen", "Vedi i brani di $1", "Ver faixas de $1", "Tracks van $1 bekijken"]],
     [/^The closest sounds (\d+)% like your track\.$/, ["El más cercano se parece un $1% a tu tema.", "Le plus proche ressemble à $1 % à votre titre.", "Der ähnlichste klingt zu $1 % wie dein Track.", "Il più vicino somiglia al $1% al tuo brano.", "O mais próximo soa $1% como sua faixa.", "De dichtstbijzijnde lijkt voor $1% op jouw track."]],
     [/^Most are around (\d+) BPM\.$/, ["La mayoría rondan los $1 BPM.", "La plupart sont autour de $1 BPM.", "Die meisten liegen um $1 BPM.", "La maggior parte è intorno ai $1 BPM.", "A maioria fica por volta de $1 BPM.", "De meeste zitten rond $1 BPM."]],
     [/^Most sit between (\d+) and (\d+) BPM\.$/, ["La mayoría están entre $1 y $2 BPM.", "La plupart sont entre $1 et $2 BPM.", "Die meisten liegen zwischen $1 und $2 BPM.", "La maggior parte è tra $1 e $2 BPM.", "A maioria fica entre $1 e $2 BPM.", "De meeste zitten tussen $1 en $2 BPM."]],

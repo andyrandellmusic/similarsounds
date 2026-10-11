@@ -170,6 +170,11 @@
 
   .results-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 34px 0 8px; }
   .results-head h2 { margin: 0; font-size: 18px; }
+  .like-artists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 14px; font-size: 13px; }
+  .la-label { color: var(--muted); margin-right: 2px; }
+  .la { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
+  .la:hover { border-color: var(--accent); }
+  @media (max-width: 640px) { .la { min-height: 40px; } }
   .summary { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; max-width: 760px; }
   .head-tools { display: inline-flex; gap: 10px; align-items: center; }
   .sort { color: var(--muted); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
@@ -556,7 +561,7 @@
   <footer>
     <p>SimilarSounds is in early preview. Previews and track details by Deezer; players from SoundCloud and YouTube load only when you choose. Key, BPM and energy are estimates, so always trust your ears. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
     <nav class="legal-links" aria-label="Legal">
-      <a href="/similar-to">Browse tracks</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
+      <a href="/similar-to">Browse tracks</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
       <a href="mailto:andyrandellmusic@gmail.com">Contact</a>
     </nav>
     <p class="copy">© 2026 SimilarSounds</p>
@@ -715,7 +720,7 @@ function showProblem(err, attempted) {
   announce(title.replace(/&quot;/g, '"'));
 }
 
-function render({ source, query, results }) {
+function render({ source, query, results, similar_artists = [] }) {
   const embed = source.embed_html
     ? `<div class="embed">${PLAYERS[source.source] ? playerOrGate(source.source, source.embed_html) : source.embed_html}</div>` : "";
   const shared = sharedArrival
@@ -789,6 +794,8 @@ function render({ source, query, results }) {
       </span>
     </div>
     ${results.length ? summaryHtml(query, lastResults) : ""}
+    ${similar_artists.length ? `<div class="like-artists"><span class="la-label">Artists that sound like ${esc(query.artist)}:</span>
+      ${similar_artists.map(a => `<button type="button" class="la" data-artist="${esc(a.name)}" title="See tracks by ${esc(a.name)}">${esc(a.name)}</button>`).join("")}</div>` : ""}
     ${results.length ? `<details class="howto"><summary>How to read these results</summary>
       <div class="howto-grid">
         <div><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
@@ -915,6 +922,15 @@ document.addEventListener("click", e => {
       <a target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud ↗</a>
       <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube ↗</a>
     </div></div>`);
+});
+
+// "Artists that sound like…": show that artist's tracks in the search box list
+document.addEventListener("click", e => {
+  const b = e.target.closest(".la[data-artist]"); if (!b) return;
+  const input = $("#url");
+  input.value = `${b.dataset.artist} - `;
+  scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  input.focus({ preventScroll: true }); sgLastQ = null; fetchSuggest(); updateClear();
 });
 
 /* ================= Review pop-up: shown once, at a random moment after 60 plays ================= */
@@ -1579,6 +1595,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=8"></script>
+<script src="/static/i18n.js?v=9"></script>
 </body>
 </html>

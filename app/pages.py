@@ -8,6 +8,8 @@ from collections import Counter
 from datetime import date
 from html import escape
 
+from app.artists import main_artist
+
 SITE = "https://www.similarsounds.com"
 BPM_WINDOWS = [(lo, lo + 2) for lo in range(110, 136, 2)]   # 110-112 … 134-136
 
@@ -117,7 +119,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 {body}
   </main>
   <footer>
-    <nav aria-label="Browse"><a href="/">Home</a><a href="/similar-to">All similar-track pages</a><a href="/privacy">Privacy</a><a href="/cookies">Cookies</a><a href="/terms">Terms</a></nav>
+    <nav aria-label="Browse"><a href="/">Home</a><a href="/similar-to">All similar-track pages</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy</a><a href="/cookies">Cookies</a><a href="/terms">Terms</a></nav>
     <p>Previews and track details by Deezer. Key, BPM and energy are estimates from 30-second previews. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
   </footer>
 </div>
@@ -184,6 +186,7 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
   <h2>{len(results)} closest matches</h2>
   <ol class="list">{"".join(rows)}</ol>
   <p class="more"><a class="btn ghost" href="/?t={r['deezer_id']}">Open in SimilarSounds: filters, previews and more matches ›</a></p>
+  <p class="more"><a class="btn ghost" href="{artist_path(main_artist(r['artist']))}">Artists that sound like {escape(main_artist(r['artist']))} ›</a></p>
   <h2>Related pages</h2>
   <ul class="related">{related}</ul>
   <p class="note">Matched on sound, key, BPM and energy from 30-second previews on {today.strftime('%-d %B %Y')}. Rankings update as new releases are added.</p>"""
@@ -242,12 +245,50 @@ def bpm_page(index, lo: int, hi: int, page_no: int) -> str:
                      f"/similar-to/bpm/{lo}-{hi}", f"{lo}-{hi} BPM", page_no)
 
 
-def sitemap(index) -> str:
+def artist_path(name: str) -> str:
+    return f"/artists-like/{slugify(name)}"
+
+
+def artist_page(artists, name: str) -> str:
+    like = artists.like_artist(name, k=12)
+    own = sorted((artists.index.rows[i] for i in artists.rows_of[name]), key=lambda r: r["release_date"] or "", reverse=True)
+    items = []
+    for a in like:
+        ex = a["example"]
+        items.append(f"""<li><a class="row" href="{artist_path(a['name'])}">
+      <img src="{escape(ex['cover'] or '')}" alt="" loading="lazy" width="56" height="56">
+      <span class="meta"><span class="t">{escape(a['name'])}</span>
+      <span class="a">For example: {escape(ex['title'])}{' · ' + escape(ex['style']) if ex['style'] else ''}</span>
+      <span class="chips"><span class="chip match">{a['similarity']}% alike</span><span class="chip">{a['tracks']} track{'s' if a['tracks'] != 1 else ''}</span></span></span>
+    </a></li>""")
+    names = ", ".join(a["name"] for a in like[:3])
+    desc = f"House artists who sound like {name}" + (f", such as {names}" if names else "") + ", measured from the music itself."
+    body = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/artists-like">Artists like…</a> / {escape(name)}</nav>
+  <h1>Artists that sound like {escape(name)}</h1>
+  <p class="summary">We averaged the sound of {name}'s tracks in our catalogue and compared it with every other house artist. These sound closest. Tap an artist to see who sounds like them, or open a track below to find tracks that mix with it.</p>
+  <ol class="list">{"".join(items)}</ol>
+  <h2>{escape(name)} tracks in our catalogue</h2>{track_list(own[:30], date.today())}"""
+    return page(f"Artists like {name} | SimilarSounds", desc, artist_path(name), body)
+
+
+def artists_hub(artists) -> str:
+    links = "".join(f'<a class="pill" href="{artist_path(n)}">{escape(n)}</a>' for n in artists.names)
+    body = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Artists like…</nav>
+  <h1>Artists that sound alike</h1>
+  <p class="summary">Pick an artist to see the house artists who sound most like them, measured from the music itself rather than tags or listener stats. {len(artists.names):,} artists.</p>
+  <div class="pills">{links}</div>"""
+    return page("House artists that sound alike | SimilarSounds",
+                "Find house artists who sound like the ones you love, measured from the music itself.", "/artists-like", body)
+
+
+def sitemap(index, artists=None) -> str:
     today = date.today().isoformat()
     urls = [f"{SITE}/", f"{SITE}/similar-to"]
     urls += [SITE + style_path(s) for s in sorted({r["style"] for r in index.rows if r["style"]})]
     urls += [f"{SITE}/similar-to/bpm/{lo}-{hi}" for lo, hi in BPM_WINDOWS]
     urls += [SITE + track_path(r) for r in index.rows]
+    if artists:
+        urls += [f"{SITE}/artists-like"] + [SITE + artist_path(n) for n in artists.names]
     body = "".join(f"<url><loc>{escape(u)}</loc><lastmod>{today}</lastmod></url>" for u in urls)
     return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
 
