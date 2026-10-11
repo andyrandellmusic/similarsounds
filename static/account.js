@@ -153,7 +153,8 @@
     busy(f, false);
     if (error) return msg("login", friendly(error));
     saveLogin(f.email.value.trim(), f.password.value);
-    f.reset(); close(); say("Signed in - your set is saved to your account");
+    close(); say("Signed in - your set is saved to your account");
+    setTimeout(() => f.reset(), 3000);   // clear later, so Safari has the details for "Save Password?"
   });
   $("#f-signup").addEventListener("submit", async e => {
     e.preventDefault(); const f = e.target;
@@ -164,9 +165,9 @@
     busy(f, false);
     if (error) return msg("signup", friendly(error));
     saveLogin(f.email.value.trim(), f.password.value, f.name.value.trim());
-    if (data.session) { f.reset(); close(); say("Account created - you're logged in"); return; }
+    if (data.session) { close(); say("Account created - you're logged in"); setTimeout(() => f.reset(), 3000); return; }
     // Supabase hides whether the email already has an account; both cases end in an email
-    f.reset(); msg("signup", "Nearly done! We've sent you an email - click the link in it to confirm your account.", true);
+    setTimeout(() => f.reset(), 3000); msg("signup", "Nearly done! We've sent you an email - click the link in it to confirm your account.", true);
   });
   $("#f-forgot").addEventListener("submit", async e => {
     e.preventDefault(); const f = e.target; busy(f, true);
@@ -183,7 +184,8 @@
     busy(f, false);
     if (error) return msg("reset", friendly(error));
     saveLogin(user?.email, f.password.value);
-    f.reset(); close(); say("Password changed - you're logged in");
+    close(); say("Password changed - you're logged in");
+    setTimeout(() => f.reset(), 3000);
   });
   $("#f-name").addEventListener("submit", async e => {
     e.preventDefault(); const f = e.target; const name = f.name.value.trim().slice(0, 50);
