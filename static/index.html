@@ -821,6 +821,11 @@
         <button type="button" class="primary" data-account-signup>Create a free account</button>
         <p class="acct-links"><a href="#" data-account-login>Already have an account? Log in</a></p>
       </div>
+      <div data-pw="relogin" hidden>
+        <h2>Please log in again</h2>
+        <p class="acct-sub">Your login on this device has run out, so we couldn't use your account's credits. Log in again and search away.</p>
+        <button type="button" class="primary" data-account-login>Log in</button>
+      </div>
       <div data-pw="low-anon" hidden>
         <h2>You have 1 credit left</h2>
         <p class="acct-sub">Create a free account to get 2 more searches. It only takes a minute.</p>
@@ -998,9 +1003,13 @@ async function run(exactUrl, fromHistory = false) {
     let r, data;
     try { r = await fetch(`/api/match?${params}`, { headers: await tokenHeaders() }); data = await r.json(); }
     catch { const e = new Error("offline"); e.kind = "offline"; throw e; }
-    if (r.status === 402 && data.detail?.stage === "anon" && document.documentElement.classList.contains("signed-in") && window.ssRefreshAuth) {
-      await window.ssRefreshAuth();
+    const signedInHere = () => document.documentElement.classList.contains("signed-in") || hasSavedLogin();
+    if (r.status === 402 && data.detail?.stage === "anon" && signedInHere()) {
+      // We think they're signed in but the server didn't see it: wait for the login, refresh it, try again
+      try { await window.ssAuthReady; } catch {}
+      try { await window.ssRefreshAuth?.(); } catch {}
       try { r = await fetch(`/api/match?${params}`, { headers: await tokenHeaders() }); data = await r.json(); } catch {}
+      if (r.status === 402 && data.detail?.stage === "anon" && signedInHere()) data.detail.stage = "relogin";
     }
     if (r.status === 402) { const e = new Error("no tokens"); e.kind = "tokens"; e.info = data.detail || {}; throw e; }
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
@@ -1029,9 +1038,10 @@ function showProblem(err, attempted) {
   if (err.kind === "tokens") {
     openPaywall(err.info.stage);
     if (err.info.reset_at) resetAt = Date.parse(err.info.reset_at);
-    title = err.info.stage === "account" ? "You have used all your credits" : "You've used your 3 free searches";
+    title = err.info.stage === "account" || err.info.stage === "anon" ? "You have used all your credits" : "Please log in again";
     body = err.info.stage === "account"
       ? `<p><span>Your 2 free searches refresh in</span> <b class="countdown" data-countdown data-no-i18n></b></p>`
+      : err.info.stage === "relogin" ? `<p>Log in again to use your account's credits.</p>`
       : `<p>Create a free account to get 2 more searches.</p>`;
     actions = err.info.stage === "account" ? "" : `<button type="button" class="icon" data-account-signup>Create a free account</button>`;
     $("#out").innerHTML = `<section class="problem" role="alert"><div class="problem-title">${title}</div>${body}${actions}</section>`;
@@ -1335,12 +1345,16 @@ function deviceId() {
     return id;
   } catch { return ""; }
 }
+function hasSavedLogin() {
+  try { return Object.keys(localStorage).some(k => /^sb-.*-auth-token$/.test(k)); } catch { return false; }
+}
 async function tokenHeaders() {
   const h = { "X-Device-Id": deviceId() };
   // wait (briefly) until we know whether this visitor is logged in
   if (!window.ssAuthReady && document.readyState === "loading")
     await new Promise(r => document.addEventListener("DOMContentLoaded", r, { once: true }));
-  if (window.ssAuthReady) await Promise.race([window.ssAuthReady, new Promise(r => setTimeout(r, 4000))]);
+  // someone with a saved login waits longer (on a slow phone connection the login code can take a while)
+  if (window.ssAuthReady) await Promise.race([window.ssAuthReady, new Promise(r => setTimeout(r, hasSavedLogin() ? 15000 : 4000))]);
   try { Object.assign(h, await (window.ssAuthHeader?.() || {})); } catch {}
   return h;
 }
@@ -1394,7 +1408,7 @@ function openPaywall(stage) {
   document.querySelectorAll("#paywall .refreshed").forEach(p => p.hidden = true);
   document.querySelectorAll("#paywall .refresh-box").forEach(b => b.hidden = !resetAt);
   tickCountdown();
-  const view = stage?.startsWith("low-") ? stage : stage === "account" ? "account" : "anon";
+  const view = stage?.startsWith("low-") || stage === "relogin" ? stage : stage === "account" ? "account" : "anon";
   document.querySelectorAll("#paywall [data-pw]").forEach(v => v.hidden = v.dataset.pw !== view);
   $("#paywall").hidden = false;
   setTimeout(() => $("#paywall .primary:not([disabled]), #paywall .acct-x")?.focus(), 30);
@@ -2152,6 +2166,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=31"></script>
+<script src="/static/i18n.js?v=32"></script>
 </body>
 </html>

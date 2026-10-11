@@ -42,6 +42,7 @@ def check(request, seed: int | None, consume: bool) -> dict | None:
     try:
         r = _client.post(f"{URL}/rest/v1/rpc/search_tokens", headers=headers, json=body)
         if r.status_code == 401 and "Authorization" in headers:     # expired session: count as signed out
+            print(f"tokens: login not accepted ({r.text[:120]}), counting as signed out", flush=True)
             headers.pop("Authorization")
             r = _client.post(f"{URL}/rest/v1/rpc/search_tokens", headers=headers, json=body)
         r.raise_for_status()
