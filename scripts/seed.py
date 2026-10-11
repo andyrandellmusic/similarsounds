@@ -29,6 +29,7 @@ STYLES = {
     "Minimal / Deep Tech": [f"minimal deep tech {YEAR}", "minimal house", "uk minimal deep tech", "deep tech minimal groove",
                             "rominimal", "minimal tech house rollers"],
     "Funky / Disco House": [f"nu disco {YEAR}", "funky house"],
+    "Vocal House": [f"vocal house {YEAR}", "commercial vocal house"],
 }
 
 # Extra searches per style, so each run reaches beyond the same few playlists
