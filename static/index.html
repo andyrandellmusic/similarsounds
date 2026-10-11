@@ -41,7 +41,20 @@
   a.logo { color: inherit; text-decoration: none; }
   a.logo:focus-visible { outline-offset: 6px; border-radius: 6px; }
   .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 34px; }
-  .brand-row .logo { margin: 0; }
+  .brand-row .logo { margin: 0; font-size: 30px; }
+  .top-tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
+  .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
+  .tok-pill[hidden] { display: none; }
+  .tok-pill svg, .lang-mini svg { width: 17px; height: 17px; flex: none; }
+  .tok-pill svg { color: var(--accent); }
+  .tok-pill b { font: 700 14px "JetBrains Mono", monospace; color: var(--accent); }
+  .tok-pill.out svg, .tok-pill.out b { color: var(--warn); }
+  .lang-mini { position: relative; color: var(--muted); }
+  .lang-mini .lang-code { color: var(--text); }
+  .lang-mini select { position: absolute; inset: 0; width: 100%; opacity: 0; cursor: pointer; font-size: 16px; }
+  .lang-mini:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .top-tools .acct-btn { min-height: 38px; }
   /* The diamonds make one smooth turn, then rest - every 3 seconds */
   .logo .mark { transform-box: fill-box; transform-origin: 50% 50%; animation: mark-spin 3s cubic-bezier(.65,0,.35,1) infinite; }
   @keyframes mark-spin { 0% { transform: rotate(0deg); } 30% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
@@ -61,15 +74,6 @@
   .menu small { color: var(--muted); font-size: 12px; }
   .logo .mark { display: inline-block; height: 0.86em; width: 1.31em; margin-right: 0.07em; vertical-align: -0.065em; overflow: visible; }
   .stats { color: var(--muted); font-size: 13px; }
-  .lang-pick { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 0 8px; height: 35px; cursor: pointer; }
-  .lang-pick:hover, .lang-pick:focus-within { border-color: #4a4a5c; color: var(--text); }
-  .lang-pick svg, .menu-lang svg { width: 16px; height: 16px; flex: none; }
-  .lang-pick select, .menu-lang select { background: transparent; color: var(--text); border: 0; font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; padding: 6px 2px; }
-  .lang-pick select:focus-visible, .menu-lang select:focus-visible { outline: none; }
-  .lang-pick select option, .menu-lang select option { background: var(--panel); color: var(--text); }
-  .menu-lang { display: flex; align-items: center; gap: 10px; margin-top: 4px; padding: 10px 12px; border-top: 1px solid var(--line); color: var(--muted); cursor: pointer; }
-  .menu-lang b { color: var(--text); font-size: 14px; flex: 1; }
-  .menu-lang select { border: 1px solid var(--line); border-radius: 8px; padding: 7px 6px; min-height: 36px; }
   h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 16px 0 14px; font-weight: 700; max-width: 760px; }
   h1 em { font-style: normal; color: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
@@ -344,10 +348,6 @@
   .acct-state { font-size: 11px; color: var(--accent); font-weight: 600; }
   .acct-state:empty { display: none; }
   .signed-in .acct-ico { background: var(--accent); color: var(--accent-ink); }
-  .tokens-left { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
-  .tokens-left b { color: var(--accent); }
-  .tokens-left.out b { color: var(--warn); }
-  .tokens-left a { color: var(--text); }
   .plan { border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.06); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
   .plan-price { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
   .plan-price span { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 2px; }
@@ -429,11 +429,14 @@
   .set-fab { display: none; }
   @media (max-width: 640px) {
     header { display: none; }
-    .accounts-on header { display: flex; margin: 10px 0 -8px; }
-    .accounts-on header .stats, .accounts-on header .lang-pick, .accounts-on header #set-open { display: none; }
     .brand-row { margin-top: 18px; }
-    .brand-row .logo { font-size: min(42px, calc((100vw - 32px - 56px) / 8.45)); }
-    .menu-btn { width: 44px; height: 44px; }
+    .brand-row { gap: 10px 8px; flex-wrap: wrap; }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 196px) / 8.45), 24px); }
+    .top-tools { gap: 6px; }
+    .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
+    .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
+    .top-tools .acct-btn { padding: 4px; min-height: 40px; border-radius: 999px; }
+    .menu-btn { width: 40px; height: 40px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
     .filters-sum { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; list-style: none; font-weight: 600; font-size: 14px; }
     .filters-sum::-webkit-details-marker { display: none; }
@@ -532,6 +535,13 @@
     .head-tools { gap: 8px; }
     .filters { gap: 10px 14px; }
   }
+  @media (max-width: 360px) {
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 172px) / 8.45), 24px); }
+    .top-tools { gap: 4px; }
+    .tok-pill, .lang-mini { height: 36px; padding: 0 7px; }
+    .top-tools .acct-btn { min-height: 36px; padding: 3px; }
+    .menu-btn { width: 36px; height: 36px; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house, from deep and organic to tech, afro and bass house, so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -540,14 +550,16 @@
   <header>
     <div class="header-right">
       <div class="stats" id="stats"></div>
-      <label class="lang-pick" title="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
-      <button type="button" class="acct-btn acct-only" data-account aria-haspopup="dialog"><span class="acct-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="acct-txt"><b class="acct-name">Log in / Sign up</b><small class="acct-state"></small></span></button>
       <button type="button" class="set-toggle" id="set-open" aria-expanded="false" aria-controls="set-panel">Build your set <span class="count" id="set-count">0</span></button>
     </div>
   </header>
 
   <div class="brand-row">
     <a class="logo" href="/" id="home-link" aria-label="SimilarSounds - home"><svg class="mark" viewBox="16 39 64 42" aria-hidden="true"><path d="M37 39 L58 60 L37 81 L16 60 Z" fill="#f2f2f5"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#0b0b0f" stroke-width="12" stroke-linejoin="miter"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#c6ff3d" stroke-width="7" stroke-linejoin="miter"/></svg>Similar<span>Sounds</span></a>
+    <div class="top-tools">
+      <button type="button" class="tok-pill" id="tok-pill" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 6v12" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/></svg><b class="tok-n" data-no-i18n></b><span class="tok-l"></span></button>
+      <label class="lang-mini" title="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span class="lang-code" data-no-i18n>EN</span><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
+  <button type="button" class="acct-btn acct-only" data-account aria-haspopup="dialog"><span class="acct-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="acct-txt"><b class="acct-name">Log in / Sign up</b><small class="acct-state"></small></span></button>
     <div class="menu-wrap">
       <button type="button" class="menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu">
         <span></span><span></span><span></span>
@@ -558,8 +570,8 @@
         <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
         <button type="button" data-menu="legal"><b>Privacy &amp; terms</b><small>Privacy, cookies and terms of use</small></button>
         <button type="button" data-menu="share"><b>Share SimilarSounds</b><small>Copy the site link</small></button>
-        <label class="menu-lang"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><b>Language</b><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
       </nav>
+    </div>
     </div>
   </div>
   <h1>Paste a track.<br><span data-i18n="hero2">Get <em>the latest</em> house music, with the perfect mix.</span></h1>
@@ -597,7 +609,6 @@
     <label class="chk fld"><input type="checkbox" id="strict"> Harmonic matches only</label>
   </div>
   </details>
-  <p class="tokens-left" id="tokens-left" hidden></p>
   <button type="button" class="marquee" id="promo-set" aria-label="Try for free now: Set builder">
     <span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span><span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span>
   </button>
@@ -1182,17 +1193,29 @@ async function tokenHeaders() {
   try { Object.assign(h, await (window.ssAuthHeader?.() || {})); } catch {}
   return h;
 }
+let lastTokens = null;
 function showTokens(t) {
-  const el = $("#tokens-left");
+  const el = $("#tok-pill");
   if (!t || t.metered === false) { el.hidden = true; return; }
+  lastTokens = t;
   el.hidden = false;
-  el.classList.toggle("out", !t.subscribed && t.left === 0);
-  if (t.subscribed) el.innerHTML = `<span>Unlimited searches</span>`;
-  else if (t.left > 0) el.innerHTML = `<span>${esc(t.left === 1 ? "1 free search left" : `${t.left} free searches left`)}</span>`;
-  else el.innerHTML = t.stage === "anon"
-    ? `<span>No free searches left.</span> <a href="#" data-account-signup>Create a free account for 2 more</a>`
-    : `<span>No free searches left.</span>`;
+  const out = !t.subscribed && t.left === 0;
+  el.classList.toggle("out", out);
+  el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : String(t.left);
+  el.querySelector(".tok-l").textContent = t.subscribed ? "Unlimited" : t.left === 1 ? "free search" : "free searches";
+  el.title = t.subscribed ? "Unlimited searches" : t.left === 1 ? "1 free search left" : `${t.left} free searches left`;
+  el.setAttribute("aria-label", el.title);
 }
+$("#tok-pill").addEventListener("click", () => {
+  const t = lastTokens; if (!t) return;
+  if (!t.subscribed && t.left === 0) { openPaywall(t.stage); return; }
+  if (!t.subscribed && t.stage === "anon") { toast(`${t.title || $("#tok-pill").title} · each new track uses 1`); return; }
+  toast($("#tok-pill").title);
+});
+// Language button: show the current language's short code (EN, ES…)
+function paintLangCode() { const l = window.SSi18n?.lang || "en"; document.querySelectorAll(".lang-code").forEach(c => c.textContent = l.toUpperCase()); }
+window.addEventListener("ss:lang", paintLangCode);
+document.addEventListener("DOMContentLoaded", () => setTimeout(paintLangCode, 0));
 async function refreshTokens() {
   try { showTokens(await (await fetch("/api/tokens", { headers: await tokenHeaders() })).json()); } catch {}
 }
@@ -1879,6 +1902,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=4" defer></script>
-<script src="/static/i18n.js?v=19"></script>
+<script src="/static/i18n.js?v=20"></script>
 </body>
 </html>
