@@ -64,7 +64,7 @@ def og():
     d.text((tx, base_y - cap[1]), "Similar", font=big, fill=WHITE)
     d.text((tx + sim_w, base_y - cap[1]), "Sounds", font=big, fill=GREEN)
     tag = ImageFont.truetype(BOLD, 38 * SS)
-    line = "Paste a track. Get this month's house that mixes with it."
+    line = "Paste a track. Get the latest house music, with the perfect mix."
     tw = d.textlength(line, font=tag)
     d.text(((W - tw) / 2, 420 * SS), line, font=tag, fill=WHITE)
     small = ImageFont.truetype(REG, 26 * SS)
