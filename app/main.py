@@ -161,6 +161,20 @@ async def match(
     return {"source": src, "query": query, "results": results, "similar_artists": similar_artists, "tokens": tk}
 
 
+@app.post("/api/vote")
+async def vote(request: Request):
+    """Thumbs up / down on a match (helps us measure and improve matching)."""
+    try:
+        b = await request.json()
+        seed, match, value = int(b["seed"]), int(b["match"]), int(b["vote"])
+    except (ValueError, TypeError, KeyError):
+        raise HTTPException(400, "Bad vote")
+    if value not in (-1, 0, 1):
+        raise HTTPException(400, "Bad vote")
+    ok = await run_in_threadpool(tokens.vote, request, seed, match, value, b.get("rank"), b.get("similarity"), str(b.get("mix") or "")[:16])
+    return {"ok": ok}
+
+
 @app.get("/api/tokens")
 async def tokens_left(request: Request):
     """How many free searches this visitor has left (doesn't use one)."""

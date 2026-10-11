@@ -48,3 +48,23 @@ def check(request, seed: int | None, consume: bool) -> dict | None:
         return r.json()
     except (httpx.HTTPError, ValueError):
         return None
+
+
+def vote(request, seed: int, match: int, value: int, rank=None, similarity=None, mix=None) -> bool:
+    """Save a thumbs up (1) / down (-1) / undo (0) on one match. Never blocks the page."""
+    if not ENABLED:
+        return False
+    headers = {"apikey": KEY, "Content-Type": "application/json"}
+    auth = request.headers.get("authorization", "")
+    if auth.lower().startswith("bearer ") and auth.count(".") == 2:
+        headers["Authorization"] = auth
+    body = {"p_device": device_id(request.headers.get("x-device-id")), "p_seed": seed, "p_match": match,
+            "p_vote": value, "p_rank": rank, "p_similarity": similarity, "p_mix": mix}
+    try:
+        r = _client.post(f"{URL}/rest/v1/rpc/record_vote", headers=headers, json=body)
+        if r.status_code == 401 and "Authorization" in headers:
+            headers.pop("Authorization")
+            r = _client.post(f"{URL}/rest/v1/rpc/record_vote", headers=headers, json=body)
+        return r.status_code < 300
+    except httpx.HTTPError:
+        return False

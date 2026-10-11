@@ -403,6 +403,16 @@
   @media (prefers-reduced-motion: reduce) { .review-wrap, .review-box { animation: none; } }
 
   @media (max-width: 640px) { .suggest { max-height: 62vh; } }
+  /* Thumbs up / down on each match */
+  .rrow { position: relative; }
+  .rrow .meta { padding-right: 64px; }
+  .vote { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; z-index: 1; }
+  .vote-btn { width: 30px; height: 30px; padding: 6px; border-radius: 8px; background: none; border: 1px solid transparent; color: var(--muted); cursor: pointer; }
+  .vote-btn svg { width: 100%; height: 100%; display: block; }
+  .vote-btn:hover { color: var(--text); border-color: var(--line); }
+  .vote-btn.on { color: var(--accent); background: rgba(198,255,61,.12); border-color: rgba(198,255,61,.4); }
+  .vote-btn.on.down { color: var(--warn); background: rgba(255,138,92,.12); border-color: rgba(255,138,92,.4); }
+  @media (max-width: 640px) { .vote-btn { width: 34px; height: 34px; } .rrow .meta { padding-right: 70px; } }
   /* Result rows: key, match % and artwork stacked down the left */
   .rrow { grid-template-columns: 64px 1fr auto; align-items: start; }
   .rrow .side { display: grid; gap: 6px; align-self: stretch; grid-template-rows: auto auto 1fr; }
@@ -1131,6 +1141,10 @@ function renderList() {
   };
   list.innerHTML = rows.map(t => groupHead(t) + `
     <div class="row rrow" data-id="${t.deezer_id}">
+      <span class="vote" role="group" aria-label="Rate this match">
+        <button type="button" class="vote-btn${myVote(t.deezer_id) === 1 ? " on" : ""}" data-vote="1" data-match="${t.deezer_id}" aria-pressed="${myVote(t.deezer_id) === 1}" aria-label="Good match" title="Good match"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9h7.5a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 17.7 10H14V6.5A2.5 2.5 0 0 0 11.5 4L9 11v9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="vote-btn${myVote(t.deezer_id) === -1 ? " on down" : ""}" data-vote="-1" data-match="${t.deezer_id}" aria-pressed="${myVote(t.deezer_id) === -1}" aria-label="Bad match" title="Bad match"><svg viewBox="0 0 24 24" style="transform:rotate(180deg)" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9h7.5a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 17.7 10H14V6.5A2.5 2.5 0 0 0 11.5 4L9 11v9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
+      </span>
       <div class="side">
         <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
         <span class="side-match" title="How close it sounds to your track"><b>${t.similarity}%</b><small>match</small></span>
@@ -1275,6 +1289,27 @@ document.addEventListener("click", e => {
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#paywall").hidden) closePaywall(); });
 window.addEventListener("ss:auth", refreshTokens);
 refreshTokens();
+
+/* ================= Thumbs up / down: every vote is a DJ's judgement we can learn from ================= */
+function votes() { try { return JSON.parse(localStorage.getItem("ss_votes") || "{}"); } catch { return {}; } }
+function myVote(match) { return lastQuery ? votes()[`${lastQuery.deezer_id}:${match}`] || 0 : 0; }
+document.addEventListener("click", async e => {
+  const b = e.target.closest(".vote-btn"); if (!b || !lastQuery) return;
+  const match = Number(b.dataset.match), key = `${lastQuery.deezer_id}:${match}`, v = votes();
+  const value = v[key] === Number(b.dataset.vote) ? 0 : Number(b.dataset.vote);   // pressing again undoes it
+  if (value) v[key] = value; else delete v[key];
+  try { localStorage.setItem("ss_votes", JSON.stringify(v)); } catch {}
+  const group = b.closest(".vote");
+  group.querySelectorAll(".vote-btn").forEach(x => {
+    const on = Number(x.dataset.vote) === value; x.classList.toggle("on", on); x.classList.toggle("down", on && value === -1); x.setAttribute("aria-pressed", on);
+  });
+  if (value) toast(value === 1 ? "Thanks - marked as a good match" : "Thanks - marked as a bad match");
+  const t = lastResults.find(x => x.deezer_id === match) || {};
+  try {
+    await fetch("/api/vote", { method: "POST", headers: { "Content-Type": "application/json", ...(await tokenHeaders()) },
+      body: JSON.stringify({ seed: lastQuery.deezer_id, match, vote: value, rank: t.rank, similarity: t.similarity, mix: t.mix?.cls }) });
+  } catch {}
+});
 
 /* ================= Review pop-up: shown once, at a random moment after 60 plays ================= */
 const REVIEW_AFTER = 60;
@@ -1942,6 +1977,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=5" defer></script>
-<script src="/static/i18n.js?v=23"></script>
+<script src="/static/i18n.js?v=24"></script>
 </body>
 </html>
