@@ -114,6 +114,18 @@
   /* YouTube: file includes YouTube's clear space; 48px tall image = ~24px logo, on a solid background */
   .yt-logo { display: inline-flex; background: var(--bg); border-radius: 6px; }
   .query .yt-logo img { display: block; width: 143px; height: 48px; border-radius: 0; object-fit: contain; background: none; }
+  .gate { background: var(--panel-2); border: 1px dashed #3a3a4a; border-radius: 10px; padding: 12px 14px; color: var(--muted); font-size: 13px; }
+  .gate p { margin: 0 0 10px; }
+  .gate b { color: var(--text); }
+  .gate a { color: var(--text); }
+  .gate-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+  .gate-load { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 9px; height: 40px; padding: 0 16px; font-weight: 800; }
+  .gate-remember { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .legal-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 6px; }
+  .legal-links a { color: var(--text); text-decoration: none; font-weight: 600; }
+  .legal-links a:hover { color: var(--accent); }
+  footer p { margin: 0 0 6px; }
+  footer .copy { color: #6e6e80; }
   .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
   .problem-title { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
   .problem p { color: var(--muted); margin: 0 0 12px; }
@@ -396,6 +408,7 @@
         <button type="button" data-menu="home"><b>Home</b><small>Back to the start screen</small></button>
         <button type="button" data-menu="set"><b>Build your set</b><small id="menu-set-sub">Your saved tracks</small></button>
         <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
+        <button type="button" data-menu="legal"><b>Privacy &amp; terms</b><small>Privacy, cookies and terms of use</small></button>
         <button type="button" data-menu="share"><b>Share SimilarSounds</b><small>Copy the site link</small></button>
       </nav>
     </div>
@@ -478,7 +491,14 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 
-  <footer>SimilarSounds is in early preview. 30-second previews and players by Deezer; YouTube and SoundCloud links are used to look tracks up and play them, never to download audio. Key, BPM and energy are estimated from previews, so always trust your ears.</footer>
+  <footer>
+    <p>SimilarSounds is in early preview. Previews and track details by Deezer; players from SoundCloud and YouTube load only when you choose. Key, BPM and energy are estimates, so always trust your ears. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
+    <nav class="legal-links" aria-label="Legal">
+      <a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
+      <a href="mailto:andyrandellmusic@gmail.com">Contact</a>
+    </nav>
+    <p class="copy">© 2026 SimilarSounds</p>
+  </footer>
 </div>
 
 <script>
@@ -634,7 +654,8 @@ function showProblem(err, attempted) {
 }
 
 function render({ source, query, results }) {
-  const embed = source.embed_html ? `<div class="embed">${source.embed_html}</div>` : "";
+  const embed = source.embed_html
+    ? `<div class="embed">${PLAYERS[source.source] ? playerOrGate(source.source, source.embed_html) : source.embed_html}</div>` : "";
   const shared = sharedArrival
     ? `<div class="shared-note" role="status"><span>You're viewing a shared search for <b>${esc(query.artist)} – ${esc(query.title)}</b>.</span>
         <button type="button" class="icon" id="new-search">New search</button></div>` : "";
@@ -799,9 +820,10 @@ document.addEventListener("click", e => {
   if (wasOpen) return;
   const t = trackCache[b.dataset.id] || {};
   row.classList.add("playing");
+  const deezerPlayer = `<iframe title="Preview" allow="encrypted-media; clipboard-write"
+      src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe>`;
   row.insertAdjacentHTML("beforeend", `<div class="player">
-    <iframe title="Preview" allow="encrypted-media; clipboard-write"
-      src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe>
+    ${playerOrGate("deezer", deezerPlayer)}
     <div class="more">Also on
       <a target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud ↗</a>
       <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube ↗</a>
@@ -1017,11 +1039,47 @@ menu.addEventListener("click", async e => {
   const what = b.dataset.menu; toggleMenu(false);
   if (what === "home") goHome();
   if (what === "set") openSet(true);
+  if (what === "legal") location.href = "/privacy";
   if (what === "how") { if (!$("#how")) newSearch(); $("#how").scrollIntoView({ behavior: "smooth", block: "center" }); }
   if (what === "share") {
     try { await navigator.clipboard.writeText("https://www.similarsounds.com/"); toast("Site link copied - www.similarsounds.com"); }
     catch { toast("Couldn't copy - your browser blocked it"); }
   }
+});
+
+/* ================= Third-party players: load only after the visitor chooses ================= */
+const PLAYERS = {
+  deezer:     { name: "Deezer",     policy: "https://www.deezer.com/en/legal/personal-datas" },
+  soundcloud: { name: "SoundCloud", policy: "https://soundcloud.com/pages/cookies" },
+  youtube:    { name: "YouTube",    policy: "https://policies.google.com/technologies/cookies" },
+};
+function consents() { try { return JSON.parse(localStorage.getItem("ss_consent") || "{}"); } catch { return {}; } }
+function allowPlayer(p) {
+  const c = consents(); c[p] = true;
+  try { localStorage.setItem("ss_consent", JSON.stringify(c)); } catch {}
+}
+const gated = {};      // gate id -> the player HTML to show once allowed
+let gateSeq = 0;
+// Returns the player straight away if already allowed on this device, otherwise a short notice.
+function playerOrGate(p, html) {
+  if (consents()[p]) return html;
+  const id = `g${++gateSeq}`, info = PLAYERS[p];
+  gated[id] = html;
+  return `<div class="gate" data-gate="${id}" data-provider="${p}">
+    <p>This loads <b>${info.name}</b>'s player, which may set its own cookies.
+      <a href="${info.policy}" target="_blank" rel="noopener">${info.name} cookie info ↗</a> · <a href="/cookies">Our cookie policy</a></p>
+    <div class="gate-row">
+      <button type="button" class="gate-load">Load player</button>
+      <label class="gate-remember"><input type="checkbox" checked> Always allow ${info.name} players</label>
+    </div>
+  </div>`;
+}
+document.addEventListener("click", e => {
+  const btn = e.target.closest(".gate-load");
+  if (!btn) return;
+  const gate = btn.closest(".gate"), p = gate.dataset.provider;
+  if (gate.querySelector(".gate-remember input").checked) allowPlayer(p);
+  gate.outerHTML = gated[gate.dataset.gate] || "";
 });
 
 /* ================= Prefetch: analyse a track before it's clicked ================= */

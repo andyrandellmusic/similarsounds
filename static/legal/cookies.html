@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cookie Policy - SimilarSounds</title>
+<meta name="description" content="What SimilarSounds stores on your device, the third-party players it can load, and how to manage your choices.">
+<link rel="canonical" href="https://www.similarsounds.com/cookies">
+<link rel="icon" href="/static/apple-touch-icon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/legal/legal.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <a class="brand" href="/" aria-label="SimilarSounds - home"><svg viewBox="16 39 64 42" aria-hidden="true"><path d="M37 39 L58 60 L37 81 L16 60 Z" fill="#f2f2f5"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#0b0b0f" stroke-width="12"/><path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>Similar<span>Sounds</span></a>
+    <a class="back" href="/">← Back to SimilarSounds</a>
+  </div>
+
+  <h1>Cookie Policy</h1>
+  <p class="updated">Last updated: 11 October 2026</p>
+
+  <div class="summary">
+    <b>The short version</b>
+    <ul>
+      <li>SimilarSounds itself sets <b>no cookies</b> and uses <b>no advertising or analytics trackers</b>.</li>
+      <li>We save a few things <b>on your own device</b> so the site remembers your set - nothing is sent to us.</li>
+      <li>Players from <b>Deezer, SoundCloud and YouTube</b> can set their own cookies, so they only load <b>after you choose</b>.</li>
+    </ul>
+  </div>
+
+  <h2>1. What we store on your device</h2>
+  <p>These use your browser's local storage (similar to cookies). They are <b>strictly necessary</b> for features you ask for, never leave your device, and we can't see them.</p>
+  <div class="table-wrap"><table>
+    <tr><th>Name</th><th>What it remembers</th><th>How long</th></tr>
+    <tr><td><code>ss_set</code></td><td>The tracks in "Your set" and their order.</td><td>Until you clear it</td></tr>
+    <tr><td><code>ss_recent</code></td><td>Your last 5-6 searches, shown when you tap the search box.</td><td>Until you clear it</td></tr>
+    <tr><td><code>ss_consent</code></td><td>Which music players you've chosen to allow (Deezer, SoundCloud, YouTube).</td><td>Until you change or clear it</td></tr>
+  </table></div>
+
+  <h2>2. Third-party players (only if you choose)</h2>
+  <p>To play music we embed players run by other companies. They may set their own cookies or similar technology, for example to remember settings or measure plays. That's why each one shows a short notice first and only loads when you choose <b>Load player</b>. Your choice is remembered for that player on this device.</p>
+  <div class="table-wrap"><table>
+    <tr><th>Player</th><th>When it loads</th><th>Their cookie information</th></tr>
+    <tr><td>Deezer</td><td>When you press play on a track preview.</td><td><a href="https://www.deezer.com/en/legal/personal-datas" target="_blank" rel="noopener">Deezer privacy &amp; cookies</a></td></tr>
+    <tr><td>SoundCloud</td><td>When you paste a SoundCloud link and load its player.</td><td><a href="https://soundcloud.com/pages/cookies" target="_blank" rel="noopener">SoundCloud Cookie Policy</a></td></tr>
+    <tr><td>YouTube (Google)</td><td>When you paste a YouTube link and load its player.</td><td><a href="https://policies.google.com/technologies/cookies" target="_blank" rel="noopener">How Google uses cookies</a></td></tr>
+  </table></div>
+  <p class="note">Beatport: we only link to Beatport's website. Nothing from Beatport loads on SimilarSounds, so no Beatport cookies are set by visiting us.</p>
+  <p class="note">Other content: cover art images load from Deezer's servers and fonts load from Google Fonts. These requests share your IP address with those companies but SimilarSounds does not ask them to set cookies. See our <a href="/privacy">Privacy Policy</a>.</p>
+
+  <h2>3. Manage your choices</h2>
+  <p id="state" class="note">Checking your current choices…</p>
+  <button class="btn" id="reset">Reset player choices</button>
+  <button class="btn ghost" id="wipe">Clear everything SimilarSounds saved on this device</button>
+  <p class="note" id="done" role="status" aria-live="polite"></p>
+  <p>You can also clear or block site data in your browser settings. Blocking it won't stop the site working, but your set and recent searches won't be remembered.</p>
+
+  <h2>4. Changes</h2>
+  <p>If we add or change anything we store, we'll update this page and the date above. Questions: <a href="mailto:andyrandellmusic@gmail.com">andyrandellmusic@gmail.com</a>.</p>
+
+  <nav class="foot" aria-label="Legal">
+    <a href="/">SimilarSounds home</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
+  </nav>
+</div>
+<script>
+  const names = { deezer: "Deezer", soundcloud: "SoundCloud", youtube: "YouTube" };
+  function read() { try { return JSON.parse(localStorage.getItem("ss_consent") || "{}"); } catch { return {}; } }
+  function show() {
+    const c = read(), on = Object.keys(names).filter(k => c[k]).map(k => names[k]);
+    document.getElementById("state").textContent = on.length
+      ? `Players you've allowed on this device: ${on.join(", ")}.`
+      : "You haven't allowed any players on this device yet - each one will ask before loading.";
+  }
+  document.getElementById("reset").onclick = () => {
+    try { localStorage.removeItem("ss_consent"); } catch {}
+    show(); document.getElementById("done").textContent = "Done - each player will ask again before loading.";
+  };
+  document.getElementById("wipe").onclick = () => {
+    try { ["ss_consent", "ss_set", "ss_recent"].forEach(k => localStorage.removeItem(k)); } catch {}
+    show(); document.getElementById("done").textContent = "Done - your set, recent searches and player choices have been removed from this device.";
+  };
+  show();
+</script>
+</body>
+</html>

@@ -210,4 +210,19 @@ def home():
     return FileResponse(STATIC / "index.html")
 
 
+@app.get("/privacy")
+def privacy():
+    return FileResponse(STATIC / "legal" / "privacy.html")
+
+
+@app.get("/cookies")
+def cookies():
+    return FileResponse(STATIC / "legal" / "cookies.html")
+
+
+@app.get("/terms")
+def terms():
+    return FileResponse(STATIC / "legal" / "terms.html")
+
+
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
