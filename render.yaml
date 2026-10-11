@@ -21,3 +21,8 @@ services:
       # GitHub token that can write to the private reviews repo (set in the Render dashboard)
       - key: REVIEWS_TOKEN
         sync: false
+      # Supabase project for optional accounts (public values; set in the Render dashboard)
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false

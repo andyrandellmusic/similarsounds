@@ -63,6 +63,16 @@ def warm_up():
     threading.Thread(target=run, daemon=True).start()
 
 
+# Optional accounts (Supabase Auth). Both values are public by design: they go into the web page.
+SUPABASE_URL = os.environ.get("SUPABASE_URL", "https://ggcohybfbbspoeccdkud.supabase.co").strip()
+SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
+
+
+@app.get("/api/config")
+def config():
+    return {"supabase_url": SUPABASE_URL if SUPABASE_ANON_KEY else "", "supabase_anon_key": SUPABASE_ANON_KEY}
+
+
 @app.get("/healthz")
 def healthz():
     return {"ok": True, "tracks": len(index.rows)}
