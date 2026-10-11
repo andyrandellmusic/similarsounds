@@ -7,6 +7,7 @@ import argparse
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
+from concurrent.futures.process import BrokenProcessPool
 from datetime import date
 
 from app import sources
@@ -92,11 +93,12 @@ def main():
         print(f"  {style}: {len(c)} new candidates")
         todo += c
 
-    added = 0
-    with ThreadPoolExecutor(6) as io_pool, ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1)) as cpu:
-        fetches = [io_pool.submit(fetch, tid, style) for tid, style in todo]
-        analyses = {}
-        for f in as_completed(fetches):
+    # 1) download previews (network), 2) analyse them in worker processes (CPU).
+    # A track whose audio crashes a worker is skipped and the workers are restarted,
+    # so one bad file can't stop the whole daily update.
+    fetched = []
+    with ThreadPoolExecutor(6) as io_pool:
+        for f in as_completed([io_pool.submit(fetch, tid, style) for tid, style in todo]):
             try:
                 res = f.result()
             except Exception as e:
@@ -108,16 +110,29 @@ def main():
             if meta["isrc"] and meta["isrc"] in isrcs:
                 continue
             isrcs.add(meta["isrc"])
-            analyses[cpu.submit(analyse, audio)] = meta
-        for f in as_completed(analyses):
-            meta = analyses[f]
-            try:
-                upsert(conn, {**meta, **f.result()})
-                added += 1
-                if added % 25 == 0:
-                    print(f"  analysed {added}/{len(analyses)}")
-            except Exception as e:
-                print(f"  analysis failed for {meta['title']}: {e}", file=sys.stderr)
+            fetched.append((meta, audio))
+
+    added, pending = 0, list(range(len(fetched)))
+    while pending:
+        retry = []
+        with ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1)) as cpu:
+            futs = {cpu.submit(analyse, fetched[k][1]): k for k in pending}
+            for f in as_completed(futs):
+                k = futs[f]
+                meta = fetched[k][0]
+                try:
+                    upsert(conn, {**meta, **f.result()})
+                    added += 1
+                    if added % 25 == 0:
+                        print(f"  analysed {added}/{len(fetched)}", flush=True)
+                except BrokenProcessPool:
+                    retry.append(k)      # the pool died; try these again with fresh workers
+                except Exception as e:
+                    print(f"  analysis failed for {meta['title']}: {e}", file=sys.stderr)
+        if retry and len(retry) == len(pending):   # nothing got through: drop the first one and carry on
+            print(f"  skipped {fetched[retry[0]][0]['title']} (crashed the analyser)", file=sys.stderr)
+            retry = retry[1:]
+        pending = retry
 
     total = conn.execute("SELECT COUNT(*) FROM tracks").fetchone()[0]
     print(f"Added {added} tracks. Catalogue now has {total}.")
