@@ -93,8 +93,7 @@
     btn.disabled = false;
     if (res?.error || !res?.data) {
       const m = pkErr(res?.error);
-      if (where === "top") { if (m) { open("login"); const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; } }
-      else if (where === "quick") { const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; }
+      if (where === "quick") { const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; }
       else if (m) msg("login", m);
       return;
     }
@@ -223,12 +222,7 @@
   });
   document.addEventListener("keydown", e => { if (!dlg.hidden && e.key === "Escape") close(); });
   document.addEventListener("click", e => {
-    const ab = e.target.closest("[data-account]");
-    if (ab) {
-      e.preventDefault(); window.toggleMenu?.(false);
-      if (!user && pkSupported && pkHere()?.email) return pkSignIn(ab, "top");   // "Sign in as Boss": straight to Face ID
-      open();
-    }
+    if (e.target.closest("[data-account]")) { e.preventDefault(); window.toggleMenu?.(false); open(); }
   });
   box.querySelectorAll(".pw-toggle").forEach(b => b.addEventListener("click", () => {
     const i = b.previousElementSibling; const showIt = i.type === "password";
@@ -329,20 +323,17 @@
   const nameOf = u => (u?.user_metadata?.name || "").trim() || (u?.email || "").split("@")[0];
   function paint() {
     const name = user ? nameOf(user) : "";
-    const pk = !user && pkSupported ? pkHere() : null;   // this device can sign in with Face ID
-    const pkName = pk ? (pk.name || pk.email.split("@")[0]) : "";
     document.querySelectorAll("[data-account]").forEach(b => {
       const n = b.querySelector(".acct-name");
-      n.classList.toggle("is-user", !!user || !!pk);   // a person's name is never translated
-      n.textContent = user ? name : pk ? `Sign in as ${pkName}` : "Log in / Sign up";
-      b.querySelector(".acct-state").textContent = user ? "Signed in" : pk ? "with Face ID" : "";
+      n.classList.toggle("is-user", !!user);   // a person's name is never translated
+      n.textContent = user ? name : "Log in / Sign up";
+      b.querySelector(".acct-state").textContent = user ? "Signed in" : "";
       b.querySelector(".acct-ico").textContent = "";
       if (user) b.querySelector(".acct-ico").textContent = name.charAt(0).toUpperCase();
       else b.querySelector(".acct-ico").innerHTML = ICON;
-      b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : pk ? `Sign in as ${pkName} with Face ID` : "Log in or sign up");
+      b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : "Log in or sign up");
     });
     document.documentElement.classList.toggle("signed-in", !!user);
-    document.documentElement.classList.toggle("pk-ready", !!pk);
     if (user?.email) rememberLogin(user.email, user.user_metadata?.name);   // for "Continue as …" next time
   }
   const ICON = document.querySelector("[data-account] .acct-ico")?.innerHTML || "";
