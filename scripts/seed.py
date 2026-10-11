@@ -4,6 +4,7 @@ Run daily to keep the catalogue fresh:
     uv run python -m scripts.seed --per-style 120
 """
 import argparse
+from pathlib import Path
 import os
 import sys
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
@@ -69,8 +70,46 @@ def fetch(track_id: int, style: str) -> tuple[dict, bytes] | None:
     return meta, sources.fetch_preview(t["preview"])
 
 
+ARTIST_STATE = Path(__file__).resolve().parent.parent / "data" / "artist_follow.json"
+
+
+def artist_candidates(conn, n_artists: int, seen: set[int], max_age_days: int = 120) -> list[tuple[int, str]]:
+    """New releases from house artists already in the catalogue. Rotates through the artists a few
+    hundred a day, so every artist gets checked regularly. (Each track's style is set later by sound.)"""
+    import json
+    from datetime import date, timedelta
+    state = json.loads(ARTIST_STATE.read_text()) if ARTIST_STATE.exists() else {"ids": {}, "next": 0}
+    names = sorted({r[0].split(",")[0].split(" & ")[0].strip() for r in conn.execute("SELECT artist FROM tracks")})
+    start = state.get("next", 0) % max(1, len(names))
+    batch = (names[start:] + names[:start])[:n_artists]
+    cutoff = (date.today() - timedelta(days=max_age_days)).isoformat()
+    out = []
+    for name in batch:
+        aid = state["ids"].get(name)
+        try:
+            if aid is None:
+                hits = [a for a in sources.deezer("/search/artist", q=name, limit=5).get("data", [])
+                        if a["name"].lower() == name.lower()]
+                aid = max(hits, key=lambda a: a.get("nb_fan", 0))["id"] if hits else 0
+                state["ids"][name] = aid
+            if not aid:
+                continue
+            for al in sources.deezer(f"/artist/{aid}/albums", limit=15).get("data", []):
+                if (al.get("release_date") or "") < cutoff:
+                    continue
+                for t in sources.deezer(f"/album/{al['id']}/tracks", limit=30).get("data", []):
+                    if t["id"] not in seen and t.get("preview"):
+                        seen.add(t["id"]); out.append((t["id"], "House"))
+        except Exception as e:
+            print("  artist skipped:", name, e, file=sys.stderr)
+    state["next"] = (start + n_artists) % max(1, len(names))
+    ARTIST_STATE.write_text(json.dumps(state))
+    return out
+
+
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--artists", type=int, default=0, help="also check this many catalogue artists for new releases")
     ap.add_argument("--per-style", type=int, default=100)
     ap.add_argument("--styles", nargs="*", help="limit to these style names")
     args = ap.parse_args()
@@ -86,6 +125,10 @@ def main():
             continue
         c = candidates(style, queries, args.per_style, seen)
         print(f"  {style}: {len(c)} new candidates")
+        todo += c
+    if args.artists:
+        c = artist_candidates(conn, args.artists, seen)
+        print(f"  new releases from {args.artists} catalogue artists: {len(c)} candidates")
         todo += c
 
     # 1) download previews (network), 2) analyse them in worker processes (CPU).
