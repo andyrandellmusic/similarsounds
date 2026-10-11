@@ -60,6 +60,16 @@ def energy_vector(raw: dict) -> list[float]:
     return [raw["loudness"], raw["onset"], raw["brightness"]]
 
 
+# Plain-word sound tags. Each axis: (feature, word when high, word when low), judged against the catalogue
+SOUND_AXES = [("onset", "driving", "laid-back"), ("brightness", "bright", "dark"),
+              ("bass", "bass-heavy", "airy"), ("flatness", "gritty", "smooth"), ("movement", "evolving", "steady")]
+
+
+def sound_axes(raw: dict, emb) -> list[float]:
+    # embedding layout: 20 MFCC means, 20 MFCC stds, 7 contrast means, 7 contrast stds, flatness, onset std, centroid std
+    return [raw["onset"], raw["brightness"], float(emb[1]), float(emb[54]), float(emb[56])]
+
+
 class Index:
     """All catalogue tracks held in numpy arrays for fast scoring."""
 
@@ -77,6 +87,8 @@ class Index:
             if not rows:
                 return
             emb = np.array([json.loads(r["embedding"]) for r in rows], dtype="float32")
+            self.sound_ref = np.sort(np.array([sound_axes(json.loads(r["energy_raw"]), e)
+                                               for r, e in zip(rows, emb)], dtype="float32"), axis=0)
             self.emb_mean = emb.mean(axis=0)
             self.emb_std = emb.std(axis=0) + 1e-6
             z = (emb - self.emb_mean) / self.emb_std
@@ -103,6 +115,13 @@ class Index:
         pct = np.stack([np.searchsorted(ref[:, j], feats[:, j], side="right") / n for j in range(ref.shape[1])], axis=1)
         combined = pct @ np.array([0.45, 0.35, 0.20])
         return np.clip(np.round(1 + combined * 9), 1, 10)
+
+    def describe(self, raw: dict, embedding: list[float], n: int = 3) -> list[str]:
+        """Up to n words for how a track sounds compared with the rest of the catalogue."""
+        vals = sound_axes(raw, embedding)
+        pct = [np.searchsorted(self.sound_ref[:, j], v) / len(self.sound_ref) for j, v in enumerate(vals)]
+        picks = sorted(((abs(p - 0.5), hi if p > 0.5 else lo) for p, (_, hi, lo) in zip(pct, SOUND_AXES)), reverse=True)
+        return [w for d, w in picks if d >= 0.25][:n]
 
     def embed(self, embedding: list[float]) -> np.ndarray:
         z = (np.array(embedding, dtype="float32") - self.emb_mean) / self.emb_std

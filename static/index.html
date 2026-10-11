@@ -170,6 +170,9 @@
 
   .results-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 34px 0 8px; }
   .results-head h2 { margin: 0; font-size: 18px; }
+  .sound { margin-top: 8px; font-size: 13px; color: var(--muted); }
+  .sound span { font: 700 11px "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; margin-right: 4px; }
+  .sound b { color: var(--text); font-weight: 600; }
   .like-artists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 14px; font-size: 13px; }
   .la-label { color: var(--muted); margin-right: 2px; }
   .la { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
@@ -762,6 +765,7 @@ function render({ source, query, results, similar_artists = [] }) {
             <span class="chip">${esc(query.bpm)} BPM</span>
             ${energyBar(query.energy)}
           </div>
+          ${query.sound?.length ? `<div class="sound" title="How it sounds compared with the rest of our catalogue"><span>Sound</span> ${query.sound.map(w => `<b>${esc(w)}</b>`).join(" · ")}</div>` : ""}
         </div>
         <div class="actions">${addButton(query)}</div>
       </div>${attribution}${ytAttribution}${bcAttribution}${embed}
@@ -1595,6 +1599,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=9"></script>
+<script src="/static/i18n.js?v=11"></script>
 </body>
 </html>

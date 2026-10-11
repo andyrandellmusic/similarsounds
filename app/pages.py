@@ -106,7 +106,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=1">
+<link rel="stylesheet" href="/static/pages.css?v=2">
 {jsonld}
 </head>
 <body>
@@ -148,6 +148,7 @@ def track_list(rows: list[dict], today: date) -> str:
 
 # ---------- pages
 def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
+    sound = index.describe(q["energy_raw"], q["embedding"])
     today = date.today()
     r = q
     path = track_path(r)
@@ -179,6 +180,7 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
     <div><div class="label">Reference track</div>
       <div class="t">{escape(r['title'])}</div><div class="a">{escape(r['artist'])}{' · ' + meta if meta else ''}</div>
       <div class="chips">{chips(r)}</div>
+      {f'<div class="sound"><span>Sound</span> {" · ".join(escape(w) for w in sound)}</div>' if sound else ''}
       <a class="btn" href="/?t={r['deezer_id']}">▶ Play previews &amp; build a set</a>
     </div>
   </section>

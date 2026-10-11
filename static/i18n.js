@@ -188,6 +188,18 @@
     "Give us a review": ["Danos tu opinión", "Donnez-nous votre avis", "Bewerte uns", "Lasciaci una recensione", "Deixe sua avaliação", "Geef ons een review"],
     "Thank you!": ["¡Gracias!", "Merci !", "Danke!", "Grazie!", "Obrigado!", "Bedankt!"],
     "1 star": ["1 estrella", "1 étoile", "1 Stern", "1 stella", "1 estrela", "1 ster"],
+    "Sound": ["Sonido", "Son", "Sound", "Suono", "Som", "Sound"],
+    "driving": ["contundente", "percutant", "treibend", "incalzante", "pulsante", "stuwend"],
+    "laid-back": ["relajado", "posé", "entspannt", "rilassato", "relaxado", "relaxed"],
+    "bright": ["brillante", "brillant", "hell", "brillante", "brilhante", "helder"],
+    "dark": ["oscuro", "sombre", "dunkel", "scuro", "escuro", "donker"],
+    "bass-heavy": ["con mucho bajo", "riche en basses", "bassbetont", "ricco di bassi", "grave pesado", "basrijk"],
+    "airy": ["etéreo", "aérien", "luftig", "arioso", "leve", "luchtig"],
+    "gritty": ["áspero", "granuleux", "rau", "graffiante", "sujo", "rauw"],
+    "smooth": ["suave", "doux", "weich", "morbido", "suave", "zacht"],
+    "evolving": ["cambiante", "évolutif", "wandelnd", "in evoluzione", "em evolução", "evoluerend"],
+    "steady": ["constante", "régulier", "gleichmäßig", "costante", "constante", "gelijkmatig"],
+    "How it sounds compared with the rest of our catalogue": ["Cómo suena comparado con el resto de nuestro catálogo", "Comment il sonne par rapport au reste de notre catalogue", "Wie er im Vergleich zum Rest unseres Katalogs klingt", "Come suona rispetto al resto del nostro catalogo", "Como soa em comparação com o resto do catálogo", "Hoe hij klinkt vergeleken met de rest van onze catalogus"],
     "Questions": ["Preguntas", "Questions", "Fragen", "Domande", "Perguntas", "Vragen"],
     "What is SimilarSounds?": ["¿Qué es SimilarSounds?", "Qu'est-ce que SimilarSounds ?", "Was ist SimilarSounds?", "Che cos'è SimilarSounds?", "O que é o SimilarSounds?", "Wat is SimilarSounds?"],
     "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first.": ["Una herramienta gratuita para DJs. Pega un tema y encuentra música house nueva que suena parecida y mezcla con él, empezando por los lanzamientos más recientes.", "Un outil gratuit pour les DJs. Collez un titre et il trouve de la house récente qui sonne pareil et s'enchaîne avec, en commençant par les dernières sorties.", "Ein kostenloses Tool für DJs. Füge einen Track ein und es findet neue House-Musik, die ähnlich klingt und dazu passt – neueste Releases zuerst.", "Uno strumento gratuito per DJ. Incolla un brano e trova nuova musica house che suona simile e si mixa con esso, partendo dalle uscite più recenti.", "Uma ferramenta gratuita para DJs. Cole uma faixa e ela encontra house music nova que soa parecida e mixa com ela, começando pelos lançamentos mais recentes.", "Een gratis tool voor DJ's. Plak een track en hij vindt nieuwe housemuziek die erop lijkt en ermee mixt, nieuwste releases eerst."],
@@ -383,12 +395,12 @@
       translateTitle();
     } finally { applying = false; mo.takeRecords(); }
   }
-  let titleSrc = null;
+  let titleSrc = null, titleOut = null;
   function translateTitle() {
     const cur = document.title;
-    if (titleSrc == null || (cur !== tr(titleSrc) && cur !== titleSrc)) titleSrc = cur;
-    const out = tr(titleSrc);
-    if (document.title !== out) document.title = out;
+    if (cur !== titleOut) titleSrc = cur;          // the page set a new (English) title
+    titleOut = tr(titleSrc);
+    if (document.title !== titleOut) document.title = titleOut;
   }
 
   const mo = new MutationObserver(muts => {

@@ -73,7 +73,8 @@ def analyse_query(deezer_id: int) -> dict:
     if deezer_id in index.ids:
         r = index.rows[index.ids[deezer_id]]
         return {"key": r["key"], "camelot": r["camelot"], "bpm": r["bpm"], "energy": float(r["energy"]),
-                "embedding": json.loads(r["embedding"]), "title": r["title"], "artist": r["artist"],
+                "embedding": json.loads(r["embedding"]), "energy_raw": json.loads(r["energy_raw"]),
+                "title": r["title"], "artist": r["artist"],
                 "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],
                 "deezer_id": deezer_id, "in_catalogue": True,
                 # Everything in the catalogue was collected as house
@@ -134,6 +135,7 @@ async def match(
     query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm")}
     query["style"] = guessed_style if q["house_check"]["is_house"] else None
     query["energy"] = int(query["energy"])
+    query["sound"] = index.describe(q["energy_raw"], q["embedding"])
     # Not house: hold results back unless the visitor chooses to see them anyway
     if not q["house_check"]["is_house"] and not allow_non_house:
         results = []
