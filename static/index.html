@@ -173,6 +173,22 @@
   .sound { margin-top: 8px; font-size: 13px; color: var(--muted); }
   .sound span { font: 700 11px "JetBrains Mono", monospace; letter-spacing: .06em; text-transform: uppercase; margin-right: 4px; }
   .sound b { color: var(--text); font-weight: 600; }
+  .keywheel { margin: 0 0 12px; }
+  .keywheel summary { cursor: pointer; color: var(--muted); font-size: 13px; }
+  .keywheel summary span { color: var(--accent); font-weight: 700; }
+  .kw-body { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 12px 0 4px; }
+  .kw { width: 220px; height: 220px; flex: none; }
+  .kw-seg path { stroke: var(--bg); stroke-width: 2; cursor: pointer; transition: opacity .15s; }
+  .kw-seg text { font: 700 10px "JetBrains Mono", monospace; fill: #0b0b0f; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  .kw-seg.empty { opacity: .22; } .kw-seg.empty path { cursor: default; }
+  .kw-seg.good path { stroke: #fff; stroke-width: 2.5; }
+  .kw-seg.mine path { stroke: var(--accent); stroke-width: 4; }
+  .kw-seg.on path { stroke: var(--accent); stroke-width: 4; }
+  .kw:has(.kw-seg.on) .kw-seg:not(.on) { opacity: .35; }
+  .kw-seg:focus-visible { outline: none; } .kw-seg:focus-visible path { stroke: var(--accent); stroke-width: 4; }
+  .kw-hub { fill: var(--panel); stroke: var(--line); }
+  .kw-side { flex: 1; min-width: 200px; color: var(--muted); font-size: 13px; }
+  .kw-side p { margin: 0 0 8px; } .kw-now { color: var(--accent); font-weight: 700; }
   .like-artists { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 14px; font-size: 13px; }
   .la-label { color: var(--muted); margin-right: 2px; }
   .la { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
@@ -806,7 +822,8 @@ function render({ source, query, results, similar_artists = [] }) {
         <div><span class="chip cam" style="background:${camelotColor("8A")}">8A</span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
         <div>${energyBar(6)}<p><b>Track energy</b> How hard the track hits, from 1 (deep and chilled) to 10 (peak-time).</p></div>
         <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
-      </div></details>` : ""}`;
+      </div></details>` : ""}
+    ${results.length ? `<details class="keywheel" id="keywheel"><summary>Key wheel <span id="kw-state"></span></summary><div class="kw-body" id="kw-body"></div></details>` : ""}`;
   if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
   html += `<div class="list" id="list"></div>`;
   if (results.length >= resultLimit && resultLimit < 90)
@@ -816,11 +833,49 @@ function render({ source, query, results, similar_artists = [] }) {
     resultLimit += 30; keepScroll = scrollY; run(picked.text === $("#url").value ? picked.url : undefined);
   };
   if (keepScroll !== null) { const y = keepScroll; keepScroll = null; requestAnimationFrame(() => scrollTo(0, y)); }
+  keyFilter = null; drawWheel();
   if ($("#sort")) { $("#sort").value = sortBy; $("#sort").onchange = e => { sortBy = e.target.value; renderList(); }; }
   renderList();
 }
 
-let lastQuery = null, lastResults = [], sortBy = "mix", keepScroll = null;
+let lastQuery = null, lastResults = [], sortBy = "mix", keepScroll = null, keyFilter = null;
+
+// Camelot wheel: minor keys (A) inside, major keys (B) outside, 12 at the top like a clock
+function drawWheel() {
+  const body = $("#kw-body"); if (!body || !lastQuery) return;
+  const counts = {}; lastResults.forEach(t => counts[t.camelot] = (counts[t.camelot] || 0) + 1);
+  const C = 110, seg = (n, r0, r1) => {
+    const a0 = ((n - 0.5) * 30 - 90) * Math.PI / 180, a1 = ((n + 0.5) * 30 - 90) * Math.PI / 180;
+    const p = (r, a) => `${(C + r * Math.cos(a)).toFixed(1)},${(C + r * Math.sin(a)).toFixed(1)}`;
+    return `M${p(r1, a0)} A${r1},${r1} 0 0 1 ${p(r1, a1)} L${p(r0, a1)} A${r0},${r0} 0 0 0 ${p(r0, a0)} Z`;
+  };
+  let svg = "";
+  for (const [letter, r0, r1] of [["B", 70, 106], ["A", 32, 70]]) {
+    for (let n = 1; n <= 12; n++) {
+      const code = `${n}${letter}`, c = counts[code] || 0, mine = code === lastQuery.camelot;
+      const good = keyMix(lastQuery.camelot, code)[0] === 2, on = keyFilter === code;
+      const a = (n * 30 - 90) * Math.PI / 180, rm = (r0 + r1) / 2;
+      svg += `<g class="kw-seg${c ? "" : " empty"}${good ? " good" : ""}${mine ? " mine" : ""}${on ? " on" : ""}" data-key="${code}"${c ? ` tabindex="0" role="button" aria-label="${code}: ${c} tracks" aria-pressed="${on}"` : ""}>
+        <path d="${seg(n, r0, r1)}" fill="${camelotColor(code)}"/>
+        <text x="${(C + rm * Math.cos(a)).toFixed(1)}" y="${(C + rm * Math.sin(a)).toFixed(1)}">${code}</text>
+        <title>${code}: ${c} tracks</title></g>`;
+    }
+  }
+  const shown = keyFilter ? lastResults.filter(t => t.camelot === keyFilter).length : 0;
+  body.innerHTML = `<svg viewBox="0 0 220 220" class="kw" aria-label="Camelot key wheel">${svg}<circle cx="110" cy="110" r="30" class="kw-hub"/></svg>
+    <div class="kw-side"><p>${esc(`Your key is ${lastQuery.camelot}. Keys outlined in white mix with it. Tap a key to show only those matches.`)}</p>
+    ${keyFilter ? `<p class="kw-now">${esc(`Showing ${shown} in ${keyFilter}`)}</p><button type="button" class="icon" id="kw-all">Show all keys</button>` : ""}</div>`;
+  $("#kw-state").textContent = keyFilter ? `· ${keyFilter}` : "";
+}
+document.addEventListener("click", e => {
+  const g = e.target.closest(".kw-seg:not(.empty)");
+  if (g) { keyFilter = keyFilter === g.dataset.key ? null : g.dataset.key; drawWheel(); renderList(); return; }
+  if (e.target.closest("#kw-all")) { keyFilter = null; drawWheel(); renderList(); }
+});
+document.addEventListener("keydown", e => {
+  const g = e.target.closest?.(".kw-seg:not(.empty)");
+  if (g && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); g.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
+});
 
 // A few plain sentences about the whole result list (each sentence is its own span so it can be translated)
 function summaryHtml(q, rs) {
@@ -861,7 +916,7 @@ function renderList() {
     new: (a, b) => a.age_days - b.age_days || a.rank - b.rank,
     bpm: (a, b) => Math.abs(a.bpm - lastQuery.bpm) - Math.abs(b.bpm - lastQuery.bpm) || a.rank - b.rank,
   };
-  const rows = [...lastResults].sort(sorters[sortBy] || sorters.mix);
+  const rows = [...lastResults].filter(t => !keyFilter || t.camelot === keyFilter).sort(sorters[sortBy] || sorters.mix);
   // In "Mixes well first", start each colour group with a small heading and count
   const counts = { good: 0, ok: 0, bad: 0 };
   rows.forEach(t => counts[t.mix.cls]++);
@@ -1599,6 +1654,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=11"></script>
+<script src="/static/i18n.js?v=12"></script>
 </body>
 </html>
