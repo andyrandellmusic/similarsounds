@@ -13,7 +13,7 @@
 
   await new Promise((ok, fail) => {
     const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js";
+    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.0/dist/umd/supabase.min.js";
     s.onload = ok; s.onerror = fail; document.head.appendChild(s);
   }).catch(() => null);
   if (!window.supabase?.createClient) { authReady(); return; }
@@ -36,37 +36,119 @@
     show(view);
     dlg.hidden = false;
     setTimeout(() => box.querySelector("input:not([hidden]), button.primary")?.focus(), 30);
-    if (view === "login") { paintQuick(); offerSaved(); }
+    if (view === "login") { paintQuick(); if (!(pkSupported && pkHere())) offerSaved(); }
   }
-  /* ---------- "Continue as Boss": one button back into the last account used on this device.
-   * Only the email and name are remembered here (never the password). The button fills the email and
-   * opens the password box, where iPhone/Mac Keychain or the password manager offers the saved
-   * password; picking it logs straight in. */
-  const LAST = "ss_last_login";
-  const lastLogin = () => { try { return JSON.parse(localStorage.getItem(LAST) || "null"); } catch { return null; } };
-  const rememberLogin = (email, name) => { try { localStorage.setItem(LAST, JSON.stringify({ email, name: name || "" })); } catch {} };
-  const forgetLogin = () => { try { localStorage.removeItem(LAST); } catch {} };
+  /* ---------- Face ID sign-in (passkeys), optional.
+   * After logging in with a password, people are asked once whether they'd like to use Face ID /
+   * Touch ID / fingerprint next time. If they say yes, their phone creates a passkey (kept by the phone,
+   * e.g. in iCloud Keychain; SimilarSounds only gets a public key). Next time the Log in screen shows
+   * "Sign in as <name>": one tap + Face ID. They can turn it off any time in their account. */
+  const PK = "ss_passkey", PK_NO = "ss_passkey_no", LAST = "ss_last_login";
+  let pkSupported = false;   // true once we know this browser can do it and it's switched on in Supabase
+  if (window.PublicKeyCredential && typeof sb.auth.signInWithPasskey === "function") {
+    (async () => {
+      let on = null;
+      try { on = sessionStorage.getItem("ss_pk_on"); } catch {}
+      if (on === null) {
+        try {
+          const r = await fetch(`${cfg.supabase_url}/auth/v1/passkeys/authentication/options`, {
+            method: "POST", headers: { apikey: cfg.supabase_anon_key, "Content-Type": "application/json" }, body: "{}" });
+          on = r.ok ? "1" : "0";
+        } catch { on = "0"; }
+        try { sessionStorage.setItem("ss_pk_on", on); } catch {}
+      }
+      pkSupported = on === "1";
+      if (!dlg.hidden && !box.querySelector('[data-view="login"]').hidden) paintQuick();
+    })();
+  }
+  const getJ = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } };
+  const setJ = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+  const rememberLogin = (email, name) => setJ(LAST, { email, name: name || "" });
+  const forgetLogin = () => { setJ(LAST, null); setJ(PK, null); setJ(PK_NO, null); };
+  const pkHere = () => getJ(PK);
+  const pkErr = e => /NotAllowed|cancel|abort/i.test(`${e?.name} ${e?.message}`) ? "" :
+    /disabled/i.test(e?.message || "") ? "Face ID sign-in isn't switched on yet. Please use your password for now." :
+    "Face ID sign-in didn't work. Please try again, or use your password.";
   function paintQuick(useForm) {
-    const last = lastLogin(), f = $("#f-login");
-    const quick = !!last?.email && !useForm;
+    const pk = pkHere(), f = $("#f-login");
+    const quick = pkSupported && !!pk?.email && !useForm;
     $("#acct-quick").hidden = !quick;
     f.hidden = quick;
+    $("#pk-login").hidden = !pkSupported || quick;
+    $("#quick-msg").textContent = "";
     if (quick) {
-      $("#quick-name").textContent = last.name || last.email.split("@")[0];
-      $("#quick-email").textContent = last.email;
+      $("#quick-name").textContent = pk.name || pk.email.split("@")[0];
+      $("#quick-email").textContent = pk.email;
       setTimeout(() => $("#quick-go").focus(), 40);
+    } else {
+      const last = getJ(LAST);
+      if (last?.email && !f.email.value) f.email.value = last.email;   // at least fill in their email
     }
   }
-  $("#quick-go").addEventListener("click", () => {
-    const last = lastLogin(), f = $("#f-login");
-    if (!last) return paintQuick(true);
-    f.email.value = last.email; f.password.value = "";
-    $("#acct-quick").hidden = true; f.hidden = false;
-    f.password.focus();   // iPhone shows the Keychain password above the keyboard
+  async function pkSignIn(btn, where) {
+    btn.disabled = true;
+    let res;
+    try { res = await sb.auth.signInWithPasskey(); } catch (e) { res = { error: e }; }
+    btn.disabled = false;
+    if (res?.error || !res?.data) {
+      const m = pkErr(res?.error);
+      if (where === "quick") { const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; }
+      else if (m) msg("login", m);
+      return;
+    }
+    const u = res.data.user || res.data.session?.user || (await sb.auth.getUser()).data.user;
+    if (u?.email) setJ(PK, { email: u.email, name: u.user_metadata?.name || "" });
+    close(); say(`Signed in - welcome back${u?.user_metadata?.name ? ", " + u.user_metadata.name : ""}`);
+  }
+  $("#quick-go").addEventListener("click", () => pkSignIn($("#quick-go"), "quick"));
+  $("#pk-login").addEventListener("click", () => pkSignIn($("#pk-login"), "form"));
+  $("#quick-other").addEventListener("click", e => { e.preventDefault(); paintQuick(true); $("#f-login").password.focus(); });
+
+  // Offer Face ID once, right after a password log-in or sign-up (unless they've said no, or it's set up here)
+  function offerFaceId(email) {
+    if (!pkSupported || !email) return false;
+    if (pkHere()?.email === email || getJ(PK_NO) === email) return false;
+    show("faceid"); dlg.hidden = false;
+    setTimeout(() => $("#pk-yes").focus(), 40);
+    return true;
+  }
+  async function turnOnFaceId(btn, view) {
+    btn.disabled = true;
+    let res;
+    try { res = await sb.auth.registerPasskey(); } catch (e) { res = { error: e }; }
+    btn.disabled = false;
+    if (res?.error) { const m = pkErr(res.error); if (m) msg(view, m); return false; }
+    setJ(PK, { email: user?.email, name: user?.user_metadata?.name || "" }); setJ(PK_NO, null);
+    return true;
+  }
+  $("#pk-yes").addEventListener("click", async () => {
+    if (await turnOnFaceId($("#pk-yes"), "faceid")) { close(); say("Face ID sign-in is on - next time, just tap Sign in"); }
   });
-  $("#quick-other").addEventListener("click", e => {
-    e.preventDefault(); forgetLogin(); const f = $("#f-login"); f.reset(); paintQuick(true); f.email.focus();
+  $("#pk-no").addEventListener("click", e => {
+    e.preventDefault(); setJ(PK_NO, user?.email || ""); close();
+    say("No problem - you can turn on Face ID sign-in in your account any time");
   });
+  // In "Your account": Face ID sign-in on / off
+  async function paintPkRow() {
+    const row = $("#pk-row");
+    row.hidden = !pkSupported || !user;
+    if (row.hidden) return;
+    let list = [];
+    try { const { data } = await sb.auth.passkey.list(); list = Array.isArray(data) ? data : data?.passkeys || []; } catch {}
+    const on = list.length > 0;
+    $("#pk-state").textContent = on ? `On · ${list.length === 1 ? "1 device" : list.length + " devices"}` : "Off · sign in with a tap instead of a password";
+    const b = $("#pk-toggle");
+    b.textContent = on ? "Turn off" : "Turn on";
+    b.onclick = async () => {
+      if (!on) { if (await turnOnFaceId(b, "account")) { msg("account", "Face ID sign-in is on", true); paintPkRow(); } return; }
+      b.disabled = true;
+      for (const k of list) { try { await sb.auth.passkey.delete({ passkeyId: k.id }); } catch {} }
+      b.disabled = false;
+      setJ(PK, null); setJ(PK_NO, user?.email || "");
+      msg("account", "Face ID sign-in is off. You can also remove it from your phone in Settings > Passwords.", true);
+      paintPkRow();
+    };
+  }
   // A password filled in by Keychain / a password manager logs in straight away (typing doesn't)
   $("#f-login").password.addEventListener("input", e => {
     const f = $("#f-login");
@@ -96,7 +178,7 @@
     box.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== view);
     box.querySelectorAll(".acct-msg").forEach(m => { m.textContent = ""; m.className = "acct-msg"; });
     if (view === "reset") $("#f-reset").email.value = user?.email || "";   // so Keychain updates the right login
-    if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; ownerStats(); }
+    if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; ownerStats(); paintPkRow(); }
   }
   // Private visitor numbers: only the owner account is allowed to read them (checked in Supabase)
   async function ownerStats() {
@@ -153,7 +235,8 @@
     busy(f, false);
     if (error) return msg("login", friendly(error));
     saveLogin(f.email.value.trim(), f.password.value);
-    close(); say("Signed in - your set is saved to your account");
+    if (!offerFaceId(f.email.value.trim())) close();
+    say("Signed in - your set is saved to your account");
     setTimeout(() => f.reset(), 3000);   // clear later, so Safari has the details for "Save Password?"
   });
   $("#f-signup").addEventListener("submit", async e => {
@@ -165,7 +248,7 @@
     busy(f, false);
     if (error) return msg("signup", friendly(error));
     saveLogin(f.email.value.trim(), f.password.value, f.name.value.trim());
-    if (data.session) { close(); say("Account created - you're logged in"); setTimeout(() => f.reset(), 3000); return; }
+    if (data.session) { if (!offerFaceId(data.session.user?.email)) close(); say("Account created - you're logged in"); setTimeout(() => f.reset(), 3000); return; }
     // Supabase hides whether the email already has an account; both cases end in an email
     setTimeout(() => f.reset(), 3000); msg("signup", "Nearly done! We've sent you an email - click the link in it to confirm your account.", true);
   });
@@ -276,7 +359,7 @@
     if (user?.id !== was) window.dispatchEvent(new Event("ss:auth"));
     if (event === "PASSWORD_RECOVERY") { open("reset"); return; }
     if (user && user.id !== was) pull();
-    if (event === "SIGNED_IN" && /type=signup/.test(location.hash)) say("Email confirmed - you're logged in");
+    if (event === "SIGNED_IN" && /type=signup/.test(location.hash)) { say("Email confirmed - you're logged in"); setTimeout(() => offerFaceId(user?.email), 800); }
     if (/access_token|type=/.test(location.hash)) history.replaceState(null, "", location.pathname + location.search);
   });
   paint();
