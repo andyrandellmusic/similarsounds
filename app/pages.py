@@ -127,9 +127,10 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 </html>"""
 
 
-def chips(t: dict) -> str:
+def chips(t: dict, match: int | None = None) -> str:
     return (f'<span class="chip cam" style="background:{camelot_color(t["camelot"])}" title="{escape(t["key"] or "")}">{escape(t["camelot"])}</span>'
-            f'<span class="chip">{round(t["bpm"])} BPM</span>'
+            + (f'<span class="chip match">{match}% match</span>' if match is not None else '')
+            + f'<span class="chip">{round(t["bpm"])} BPM</span>'
             f'<span class="chip">Energy {int(t["energy"])}/10</span>')
 
 
@@ -161,7 +162,7 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
       <span class="n">{i}</span>
       <img src="{escape(t['cover'] or '')}" alt="" loading="lazy" width="56" height="56">
       <span class="meta"><span class="t">{escape(t['title'])}</span><span class="a">{meta}</span>
-      <span class="chips">{chips(t)}<span class="chip match">{t['similarity']}% match</span><span class="chip">{ago(age)}</span></span>
+      <span class="chips">{chips(t, t['similarity'])}<span class="chip">{ago(age)}</span></span>
       <span class="mix {cls}"><i></i>{label}</span></span>
     </a></li>""")
     title = f"Tracks similar to {r['title']} by {r['artist']} | SimilarSounds"

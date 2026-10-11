@@ -1030,10 +1030,10 @@ function renderList() {
         <div class="a">${esc(t.artist)}${t.label ? " · " + esc(t.label) : ""}${t.style ? " · " + esc(t.style) : ""}</div>
         <div class="chips">
           <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
+          <span class="chip match" title="How close it sounds to your track">${t.similarity}% match</span>
           <span class="chip">${esc(t.bpm)} BPM</span>
           ${energyBar(t.energy)}
           <span class="chip" title="Released ${esc(t.release_date)}">${ago(t.age_days)}</span>
-          <span class="chip match" title="How close it sounds to your track">${t.similarity}% match</span>
         </div>
         <div class="why"><span class="dot ${t.mix.cls}" aria-hidden="true"></span><span><b class="${t.mix.cls}">${t.mix.label}</b> · ${esc(whyLine(lastQuery, t))}</span></div>
       </div>
