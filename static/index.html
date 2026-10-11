@@ -18,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.similarsounds.com/static/og.png">
 <link rel="apple-touch-icon" href="/static/apple-touch-icon.png">
-<title>SimilarSounds</title>
+<title>Find House Music That Mixes With Your Track | SimilarSounds</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' rx='26' fill='%230b0b0f'/%3E%3Cpath d='M49 39 L70 60 L49 81 L28 60 Z' fill='%23f2f2f5'/%3E%3Cpath d='M71 43.95 L87.05 60 L71 76.05 L54.95 60 Z' fill='none' stroke='%230b0b0f' stroke-width='12' stroke-linejoin='miter'/%3E%3Cpath d='M71 43.95 L87.05 60 L71 76.05 L54.95 60 Z' fill='none' stroke='%23c6ff3d' stroke-width='7' stroke-linejoin='miter'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
@@ -892,7 +892,7 @@
   <footer>
     <p>SimilarSounds is in early preview. Previews and track details by Deezer; players from SoundCloud and YouTube load only when you choose. Key, BPM and energy are estimates, so always trust your ears. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
     <nav class="legal-links" aria-label="Legal">
-      <a href="/similar-to">Browse tracks</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
+      <a href="/guides">DJ guides</a><a href="/similar-to">Browse tracks</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
       <a href="mailto:andyrandellmusic@gmail.com">Contact</a>
     </nav>
     <p class="copy">© 2026 SimilarSounds</p>
@@ -1550,7 +1550,7 @@ function newSearch(pushHistory = true) {
   $("#out").innerHTML = startHTML;
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
   if (pushHistory && location.search) history.pushState(null, "", location.pathname);
-  document.title = "SimilarSounds";
+  document.title = "Find House Music That Mixes With Your Track | SimilarSounds";
   updateClear(); closeSuggest();
   $("#url").focus();
 }

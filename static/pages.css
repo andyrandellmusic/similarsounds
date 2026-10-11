@@ -64,3 +64,27 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
   .row .n { display: none; }
 }
 .g-arr { font-style: normal; color: var(--accent); font-weight: 800; }
+
+/* Guides */
+.guide { max-width: 720px; }
+.lead { font-size: 17px; color: #c9c9d6; margin: 0 0 8px; }
+.guide p, .guide li { color: #d6d6e0; line-height: 1.65; }
+.guide a:not(.btn) { color: var(--accent); }
+.guide h2 { font-size: 21px; margin: 34px 0 10px; }
+.guide b { color: var(--text); }
+.steps { padding-left: 20px; display: grid; gap: 8px; }
+.tbl { overflow-x: auto; margin: 12px 0; }
+.tbl table { border-collapse: collapse; width: 100%; font-size: 14px; }
+.tbl th, .tbl td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.tbl th { color: var(--muted); font-weight: 600; }
+.guide-cta { margin: 28px 0 8px; }
+.guide .faq details { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; }
+.guide .faq summary { cursor: pointer; font-weight: 700; color: var(--text); }
+.guide .faq summary::marker { color: var(--accent); }
+.guide .faq p { margin: 8px 0 0; }
+.more { padding-left: 20px; }
+.guide-list { list-style: none; padding: 0; display: grid; gap: 10px; margin: 18px 0; }
+.guide-card { display: grid; gap: 4px; text-decoration: none; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; transition: border-color .15s; }
+.guide-card:hover { border-color: rgba(198,255,61,.6); }
+.guide-card b { font-size: 16px; }
+.guide-card span { color: var(--muted); font-size: 14px; }
