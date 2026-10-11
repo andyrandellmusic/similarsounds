@@ -10,7 +10,7 @@
 
   await new Promise((ok, fail) => {
     const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js";
+    s.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js";
     s.onload = ok; s.onerror = fail; document.head.appendChild(s);
   }).catch(() => null);
   if (!window.supabase?.createClient) return;
