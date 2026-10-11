@@ -18,18 +18,12 @@ YEAR = date.today().year
 
 # style -> playlist search queries (newest first)
 STYLES = {
-    "Tech House": [f"tech house {YEAR}", f"tech house {YEAR - 1}", "tech house new releases"],
+    "House": [f"house music {YEAR}", "classic house", f"vocal house {YEAR}", "jackin house", f"soulful house {YEAR}"],
     "Deep House": [f"deep house {YEAR}", f"deep house {YEAR - 1}", "deep house new"],
-    "Afro House": [f"afro house {YEAR}", f"afro house {YEAR - 1}"],
-    "Melodic House": [f"melodic house {YEAR}", f"melodic house techno {YEAR}", "progressive house melodic"],
-    "Organic House": [f"organic house {YEAR}", "organic downtempo house"],
-    "Soulful House": [f"soulful house {YEAR}", "soulful house"],
-    "Jackin House": [f"jackin house {YEAR}", "disco house", "classic house groove"],
-    "Bass House": [f"bass house {YEAR}", "uk bass house"],
+    "Tech House": [f"tech house {YEAR}", f"tech house {YEAR - 1}", "tech house new releases"],
     "Minimal / Deep Tech": [f"minimal deep tech {YEAR}", "minimal house", "uk minimal deep tech", "deep tech minimal groove",
                             "rominimal", "minimal tech house rollers"],
-    "Funky / Disco House": [f"nu disco {YEAR}", "funky house"],
-    "Vocal House": [f"vocal house {YEAR}", "commercial vocal house"],
+    "Funky / Disco House": [f"nu disco {YEAR}", "funky house", "disco house", "nu disco classics"],
 }
 
 # Extra searches per style, so each run reaches beyond the same few playlists

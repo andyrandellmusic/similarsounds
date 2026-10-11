@@ -272,8 +272,8 @@ def similar_hub():
 @app.get("/similar-to/genre/{slug}", response_class=HTMLResponse)
 def similar_genre(slug: str, page: int = 1):
     style = _style_by_slug().get(slug)
-    if not style:
-        raise HTTPException(404, "No such sub-genre")
+    if not style:   # a sub-genre we no longer use (e.g. afro-house): send people to the browse page
+        return RedirectResponse("/similar-to", status_code=301)
     return pages.style_page(index, style, page)
 
 

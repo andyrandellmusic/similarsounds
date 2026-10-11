@@ -56,14 +56,35 @@ def main():
                 except Exception as e:
                     print("  skip", did, e, flush=True)
     np.savez(OUT, ids=np.array(list(done), dtype="int64"), emb=np.array(list(done.values()), dtype="float32"))
-    # Label the new tracks' sub-genre by sound, the same way the catalogue was relabelled
+    # Drop new tracks that don't sound enough like Beatport's house charts (same test used on the catalogue)
+    ref = np.load(ROOT / "data" / "beatport_house_refs.npz")
+    norm = lambda X: (lambda Z: Z / np.linalg.norm(Z, axis=1, keepdims=True))((X - ref["mu"]) / ref["sd"])
+    new_ids = [d for d in todo if d in done]
+    if new_ids:
+        closeness = np.sort(norm(np.array([done[d] for d in new_ids], dtype="float32")) @ norm(ref["emb"]).T, axis=1)[:, -10:].mean(1)
+        weak = [d for d, c in zip(new_ids, closeness) if c < float(ref["cut"])]
+        if weak:
+            conn = sqlite3.connect(ROOT / "data" / "catalogue.db")
+            conn.executemany("DELETE FROM tracks WHERE deezer_id = ?", [(d,) for d in weak]); conn.commit()
+            for d in weak:
+                done.pop(d, None)
+            np.savez(OUT, ids=np.array(list(done), dtype="int64"), emb=np.array(list(done.values()), dtype="float32"))
+            print("removed", len(weak), "new tracks that don't sound like house", flush=True)
+            todo = [d for d in todo if d not in set(weak)]
+
+    # Label the new tracks' sub-genre by sound: a classifier taught with 629 Beatport chart tracks
+    # (Deep House / Tech House / Minimal / Deep Tech / Nu Disco). "House" when it isn't clearly one of them.
     st = np.load(ROOT / "data" / "clap_styles.npz")
     new = [d for d in todo if d in done]
     if new:
-        E = np.array([done[d] for d in new]); E /= np.linalg.norm(E, axis=1, keepdims=True)
-        best = (((E @ st["S"].T) - st["mu"]) / st["sd"]).argmax(1)
+        E = np.array([done[d] for d in new], dtype="float32")
+        Z = (E - st["mu"]) / st["sd"]; Z /= np.linalg.norm(Z, axis=1, keepdims=True)
+        logits = Z @ st["W"].T + st["b"]
+        p = np.exp(logits - logits.max(1, keepdims=True)); p /= p.sum(1, keepdims=True)
+        labels = [str(st["names"][k]) if p[i, k] >= float(st["threshold"]) else str(st["fallback"])
+                  for i, k in enumerate(p.argmax(1))]
         conn = sqlite3.connect(ROOT / "data" / "catalogue.db")
-        conn.executemany("UPDATE tracks SET style = ? WHERE deezer_id = ?", [(str(st["names"][b]), d) for b, d in zip(best, new)])
+        conn.executemany("UPDATE tracks SET style = ? WHERE deezer_id = ?", list(zip(labels, new)))
         conn.commit()
         print("labelled", len(new), "new tracks", flush=True)
     print("CLAP fingerprints:", len(done), flush=True)
