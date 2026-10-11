@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
-from app import house, sources
+from app import house, reviews, sources
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
 from app.ranking import rank
@@ -196,6 +196,24 @@ def stats():
         if len(examples) == 4:
             break
     return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples}
+
+
+LANG_CODES = {"en", "es", "fr", "de", "it", "pt", "nl"}
+
+
+@app.post("/api/review")
+async def review(request: Request):
+    try:
+        body = await request.json()
+        stars = int(body.get("stars"))
+        plays = max(0, min(int(body.get("plays") or 0), 1_000_000))
+    except (ValueError, TypeError, AttributeError):
+        raise HTTPException(400, "Bad review")
+    if not 1 <= stars <= 5:
+        raise HTTPException(400, "Stars must be 1-5")
+    lang = body.get("lang") if body.get("lang") in LANG_CODES else "en"
+    await run_in_threadpool(reviews.save, stars, lang, plays)
+    return {"ok": True}
 
 
 @app.post("/api/reload")

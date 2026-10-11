@@ -179,6 +179,9 @@
       "SimilarSounds è in anteprima. Anteprime e dati dei brani da Deezer; i player di SoundCloud e YouTube si caricano solo quando lo scegli. Tonalità, BPM ed energia sono stime: fidati sempre delle tue orecchie. Non affiliato a Deezer, SoundCloud, YouTube o Beatport.",
       "O SimilarSounds está em prévia. Prévias e dados das faixas pela Deezer; os players do SoundCloud e do YouTube só carregam quando você escolhe. Tom, BPM e energia são estimativas, então confie sempre nos seus ouvidos. Sem afiliação com Deezer, SoundCloud, YouTube ou Beatport.",
       "SimilarSounds is een vroege preview. Previews en trackgegevens via Deezer; spelers van SoundCloud en YouTube laden alleen als jij dat kiest. Toonsoort, BPM en energie zijn schattingen, dus vertrouw altijd op je oren. Niet gelieerd aan Deezer, SoundCloud, YouTube of Beatport."],
+    "Give us a review": ["Danos tu opinión", "Donnez-nous votre avis", "Bewerte uns", "Lasciaci una recensione", "Deixe sua avaliação", "Geef ons een review"],
+    "Thank you!": ["¡Gracias!", "Merci !", "Danke!", "Grazie!", "Obrigado!", "Bedankt!"],
+    "1 star": ["1 estrella", "1 étoile", "1 Stern", "1 stella", "1 estrela", "1 ster"],
     "These pages are only available in English.": ["Estas páginas solo están disponibles en inglés.", "Ces pages ne sont disponibles qu'en anglais.", "Diese Seiten gibt es nur auf Englisch.", "Queste pagine sono disponibili solo in inglese.", "Estas páginas estão disponíveis apenas em inglês.", "Deze pagina's zijn alleen in het Engels beschikbaar."],
   };
 
@@ -199,6 +202,7 @@
   const P = [
     [/^1 track$/, ["1 tema", "1 titre", "1 Track", "1 brano", "1 faixa", "1 track"]],
     [/^(\d+) tracks? · (\d+) smooth, (\d+) workable, (\d+) clashing$/, ["$1 temas · $2 suaves, $3 aceptables, $4 chocan", "$1 titres · $2 fluides, $3 jouables, $4 en clash", "$1 Tracks · $2 geschmeidig, $3 machbar, $4 kollidierend", "$1 brani · $2 fluidi, $3 accettabili, $4 in conflitto", "$1 faixas · $2 suaves, $3 aceitáveis, $4 em choque", "$1 tracks · $2 soepel, $3 werkbaar, $4 botsend"]],
+    [/^(\d) stars$/, ["$1 estrellas", "$1 étoiles", "$1 Sterne", "$1 stelle", "$1 estrelas", "$1 sterren"]],
     [/^(\d+) tracks$/, ["$1 temas", "$1 titres", "$1 Tracks", "$1 brani", "$1 faixas", "$1 tracks"]],
     [/^([\d,]+) tracks · ([\d,]+) from the last 12 months$/, ["$1 temas · $2 del último año", "$1 titres · $2 des 12 derniers mois", "$1 Tracks · $2 aus den letzten 12 Monaten", "$1 brani · $2 degli ultimi 12 mesi", "$1 faixas · $2 dos últimos 12 meses", "$1 tracks · $2 van de afgelopen 12 maanden"]],
     [/^(\d+) matches for (.+)$/, ["$1 coincidencias para $2", "$1 résultats pour $2", "$1 Treffer für $2", "$1 risultati per $2", "$1 resultados para $2", "$1 matches voor $2"]],

@@ -4,3 +4,4 @@ __pycache__/
 *.pyc
 data/seed.log
 .DS_Store
+data/reviews.csv

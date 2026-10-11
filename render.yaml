@@ -18,3 +18,6 @@ services:
       # Fewer glibc malloc arenas = much lower memory use with threads
       - key: MALLOC_ARENA_MAX
         value: "2"
+      # GitHub token that can write to the private reviews repo (set in the Render dashboard)
+      - key: REVIEWS_TOKEN
+        sync: false

@@ -291,6 +291,23 @@
                animation-name: toast-countdown; animation-timing-function: linear; animation-fill-mode: forwards; }
   @keyframes toast-countdown { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 
+  .review-wrap { position: fixed; inset: 0; z-index: 40; display: grid; place-items: center; padding: 16px; background: rgba(5,5,8,.62); animation: rv-fade .2s ease-out; }
+  .review-wrap[hidden] { display: none; }
+  .review-box { position: relative; width: min(360px, 100%); background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 30px 22px 26px; text-align: center; box-shadow: 0 24px 70px rgba(0,0,0,.6); animation: rv-pop .22s ease-out; }
+  .review-box h2 { margin: 0 0 16px; font-size: 22px; letter-spacing: -0.02em; }
+  .review-x { position: absolute; top: 8px; right: 8px; width: 40px; height: 40px; border-radius: 10px; background: none; border: 0; color: var(--muted); font-size: 24px; line-height: 1; }
+  .review-box:focus { outline: none; }
+  .review-x:hover { color: var(--text); }
+  .stars { display: inline-flex; gap: 4px; }
+  .star { width: 48px; height: 48px; padding: 4px; background: none; border: 0; border-radius: 10px; color: var(--accent); cursor: pointer; }
+  .star svg { width: 100%; height: 100%; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; transition: fill .1s, transform .1s; }
+  .star.on svg { fill: currentColor; transform: scale(1.08); }
+  .review-thanks { font-size: 24px; font-weight: 800; color: var(--accent); padding: 14px 0; }
+  .review-ask[hidden], .review-thanks[hidden] { display: none; }
+  @keyframes rv-fade { from { opacity: 0; } }
+  @keyframes rv-pop { from { opacity: 0; transform: scale(.94); } }
+  @media (prefers-reduced-motion: reduce) { .review-wrap, .review-box { animation: none; } }
+
   .filters-sum { display: none; }
   .set-fab { display: none; }
   @media (max-width: 640px) {
@@ -498,6 +515,16 @@
       <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go">Open ›</span>
     </button>
     <button type="button" class="fab-clear" id="fab-clear" aria-label="Clear your whole set">Clear</button>
+  </div>
+  <div class="review-wrap" id="review" hidden>
+    <div class="review-box" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="review-title">
+      <button type="button" class="review-x" id="review-x" aria-label="Close">×</button>
+      <div class="review-ask" id="review-ask">
+        <h2 id="review-title">Give us a review</h2>
+        <div class="stars" role="group" aria-label="Give us a review"><button type="button" class="star" data-stars="1" aria-label="1 star"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star" data-stars="2" aria-label="2 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star" data-stars="3" aria-label="3 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star" data-stars="4" aria-label="4 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star" data-stars="5" aria-label="5 stars"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button></div>
+      </div>
+      <div class="review-thanks" id="review-thanks" hidden role="status">Thank you!</div>
+    </div>
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
@@ -831,6 +858,7 @@ document.addEventListener("click", e => {
   if (wasOpen) return;
   const t = trackCache[b.dataset.id] || {};
   row.classList.add("playing");
+  countPlay();
   const deezerPlayer = `<iframe title="Preview" allow="encrypted-media; clipboard-write"
       src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe>`;
   row.insertAdjacentHTML("beforeend", `<div class="player">
@@ -840,6 +868,62 @@ document.addEventListener("click", e => {
       <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube ↗</a>
     </div></div>`);
 });
+
+/* ================= Review pop-up: shown once, at a random moment after 60 plays ================= */
+const REVIEW_AFTER = 60;
+const store = { get: k => { try { return localStorage.getItem(k); } catch { return null; } },
+                set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
+let reviewTimer = null, reviewFocus = null;
+function plays() { return Number(store.get("ss_plays")) || 0; }
+function reviewDue() { return !store.get("ss_reviewed") && plays() >= (Number(store.get("ss_review_at")) || REVIEW_AFTER); }
+function countPlay() { store.set("ss_plays", plays() + 1); scheduleReview(); }
+function scheduleReview() {
+  if (reviewTimer || !reviewDue()) return;
+  reviewTimer = setTimeout(function tryShow() {
+    // wait until the visitor is looking at the page and nothing else is open
+    if (document.hidden || $("#set-panel").classList.contains("open") || !$("#menu").hidden) { reviewTimer = setTimeout(tryShow, 5000); return; }
+    reviewTimer = null; showReview();
+  }, 8000 + Math.random() * 42000);   // somewhere between 8 and 50 seconds later
+}
+function showReview() {
+  if (!reviewDue() || !$("#review").hidden) return;
+  reviewFocus = document.activeElement;
+  $("#review-ask").hidden = false; $("#review-thanks").hidden = true;
+  document.querySelectorAll(".star").forEach(s => s.classList.remove("on"));
+  $("#review").hidden = false;
+  $(".review-box").focus({ preventScroll: true });   // focus the box, so no star lights up until chosen
+}
+function hideReview() {
+  $("#review").hidden = true;
+  reviewFocus?.focus?.();
+}
+function lightStars(n) { document.querySelectorAll(".star").forEach(s => s.classList.toggle("on", Number(s.dataset.stars) <= n)); }
+$("#review").addEventListener("pointerover", e => { const s = e.target.closest(".star"); if (s) lightStars(Number(s.dataset.stars)); });
+$("#review").addEventListener("pointerleave", () => lightStars(0));
+$("#review").addEventListener("focusin", e => { const s = e.target.closest(".star"); lightStars(s ? Number(s.dataset.stars) : 0); });
+$("#review").addEventListener("click", e => {
+  if (e.target.id === "review" || e.target.closest("#review-x")) {   // closed without rating: ask again after 60 more plays
+    store.set("ss_review_at", plays() + REVIEW_AFTER); hideReview(); return;
+  }
+  const s = e.target.closest(".star"); if (!s) return;
+  const stars = Number(s.dataset.stars);
+  lightStars(stars);
+  store.set("ss_reviewed", String(stars));
+  fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ stars, plays: plays(), lang: window.SSi18n?.lang || "en" }), keepalive: true }).catch(() => {});
+  $("#review-ask").hidden = true; $("#review-thanks").hidden = false;
+  setTimeout(hideReview, 1200);
+});
+document.addEventListener("keydown", e => {
+  if ($("#review").hidden) return;
+  if (e.key === "Escape") { store.set("ss_review_at", plays() + REVIEW_AFTER); hideReview(); }
+  if (e.key === "Tab") {   // keep focus inside the box
+    const f = [...$("#review").querySelectorAll("button")].filter(b => b.offsetParent);
+    if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f.at(-1).focus(); }
+    else if (!e.shiftKey && document.activeElement === f.at(-1)) { e.preventDefault(); f[0].focus(); }
+  }
+});
+scheduleReview();   // already past 60 plays on an earlier visit
 
 /* ================= Shareable searches + recent searches ================= */
 function rememberSearch(q) {
@@ -1442,6 +1526,6 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/i18n.js?v=1"></script>
+<script src="/static/i18n.js?v=2"></script>
 </body>
 </html>
