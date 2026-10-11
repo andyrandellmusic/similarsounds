@@ -46,7 +46,7 @@
   const PK = "ss_passkey", PK_NO = "ss_passkey_no", LAST = "ss_last_login";
   let pkSupported = false;   // true once we know this browser can do it and it's switched on in Supabase
   if (window.PublicKeyCredential && typeof sb.auth.signInWithPasskey === "function") {
-    (async () => {
+    setTimeout(async () => {   // after the rest of this file has set up
       let on = null;
       try { on = sessionStorage.getItem("ss_pk_on"); } catch {}
       if (on === null) {
@@ -55,11 +55,12 @@
             method: "POST", headers: { apikey: cfg.supabase_anon_key, "Content-Type": "application/json" }, body: "{}" });
           on = r.ok ? "1" : "0";
         } catch { on = "0"; }
-        try { sessionStorage.setItem("ss_pk_on", on); } catch {}
+        if (on === "1") { try { sessionStorage.setItem("ss_pk_on", on); } catch {} }   // only remember "on"
       }
       pkSupported = on === "1";
+      paint();
       if (!dlg.hidden && !box.querySelector('[data-view="login"]').hidden) paintQuick();
-    })();
+    }, 0);
   }
   const getJ = k => { try { return JSON.parse(localStorage.getItem(k) || "null"); } catch { return null; } };
   const setJ = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
@@ -92,7 +93,8 @@
     btn.disabled = false;
     if (res?.error || !res?.data) {
       const m = pkErr(res?.error);
-      if (where === "quick") { const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; }
+      if (where === "top") { if (m) { open("login"); const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; } }
+      else if (where === "quick") { const q = $("#quick-msg"); q.textContent = m; q.className = "acct-msg err"; }
       else if (m) msg("login", m);
       return;
     }
@@ -221,7 +223,12 @@
   });
   document.addEventListener("keydown", e => { if (!dlg.hidden && e.key === "Escape") close(); });
   document.addEventListener("click", e => {
-    if (e.target.closest("[data-account]")) { e.preventDefault(); window.toggleMenu?.(false); open(); }
+    const ab = e.target.closest("[data-account]");
+    if (ab) {
+      e.preventDefault(); window.toggleMenu?.(false);
+      if (!user && pkSupported && pkHere()?.email) return pkSignIn(ab, "top");   // "Sign in as Boss": straight to Face ID
+      open();
+    }
   });
   box.querySelectorAll(".pw-toggle").forEach(b => b.addEventListener("click", () => {
     const i = b.previousElementSibling; const showIt = i.type === "password";
@@ -322,17 +329,20 @@
   const nameOf = u => (u?.user_metadata?.name || "").trim() || (u?.email || "").split("@")[0];
   function paint() {
     const name = user ? nameOf(user) : "";
+    const pk = !user && pkSupported ? pkHere() : null;   // this device can sign in with Face ID
+    const pkName = pk ? (pk.name || pk.email.split("@")[0]) : "";
     document.querySelectorAll("[data-account]").forEach(b => {
       const n = b.querySelector(".acct-name");
-      n.classList.toggle("is-user", !!user);   // a person's name is never translated
-      n.textContent = user ? name : "Log in / Sign up";
-      b.querySelector(".acct-state").textContent = user ? "Signed in" : "";
+      n.classList.toggle("is-user", !!user || !!pk);   // a person's name is never translated
+      n.textContent = user ? name : pk ? `Sign in as ${pkName}` : "Log in / Sign up";
+      b.querySelector(".acct-state").textContent = user ? "Signed in" : pk ? "with Face ID" : "";
       b.querySelector(".acct-ico").textContent = "";
       if (user) b.querySelector(".acct-ico").textContent = name.charAt(0).toUpperCase();
       else b.querySelector(".acct-ico").innerHTML = ICON;
-      b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : "Log in or sign up");
+      b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : pk ? `Sign in as ${pkName} with Face ID` : "Log in or sign up");
     });
     document.documentElement.classList.toggle("signed-in", !!user);
+    document.documentElement.classList.toggle("pk-ready", !!pk);
     if (user?.email) rememberLogin(user.email, user.user_metadata?.name);   // for "Continue as …" next time
   }
   const ICON = document.querySelector("[data-account] .acct-ico")?.innerHTML || "";
