@@ -275,6 +275,18 @@
   .faq summary::after { content: "+"; position: absolute; right: 4px; top: 12px; color: var(--muted); font-size: 18px; }
   .faq details[open] summary::after { content: "−"; }
   .faq p { margin: 0 0 14px; color: var(--muted); }
+  .rate { margin-top: 48px; max-width: 760px; padding: 20px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 16px; }
+  .rate h2 { margin: 0 0 8px; font-size: 20px; }
+  .rate label { display: block; margin: 12px 0 6px; font-weight: 600; }
+  .rate textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3));
+    background: transparent; color: inherit; font: inherit; resize: vertical; }
+  .rate-row { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
+  .rate .primary { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 10px; padding: 10px 22px; font: 700 15px Inter, sans-serif; cursor: pointer; min-height: 44px; }
+  .rate .primary:disabled { opacity: .6; cursor: default; }
+  .rate textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .rate-msg { color: var(--muted); font-size: 14px; }
+  .rate-msg.err { color: #e5534b; }
+  .fstar { width: 40px; height: 40px; }
   footer { margin-top: 50px; color: var(--muted); font-size: 12px; max-width: 640px; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   form.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,255,61,.12); }
@@ -366,6 +378,13 @@
   .acct-box h2 { margin: 0 0 4px; font-size: 22px; letter-spacing: -0.02em; }
   .acct-sub { margin: 0 0 16px; color: var(--muted); font-size: 14px; }
   .acct-sub b { color: var(--text); }
+  #acct-stats { margin: 4px 0 18px; padding: 14px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 12px; }
+  #acct-stats h3 { margin: 0 0 10px; font-size: 14px; }
+  .st-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 10px; font-size: 12px; color: var(--muted); text-align: center; }
+  .st-grid b { display: block; font-size: 20px; color: var(--text); }
+  .st-days { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .st-days th, .st-days td { padding: 3px 4px; text-align: left; border-top: 1px solid rgba(127,127,127,.15); }
+  .st-days th { color: var(--muted); font-weight: 500; }
   #acct-email { word-break: break-all; }
   .acct-box form { display: grid; gap: 12px; }
   .acct-box label { display: grid; gap: 6px; font-size: 13px; font-weight: 600; }
@@ -715,6 +734,7 @@
         <form id="f-name"><label>Your name<input name="name" type="text" autocomplete="name" required maxlength="50"></label>
           <button class="secondary" type="submit">Save name</button>
           <p class="acct-msg" role="alert"></p></form>
+        <div id="acct-stats" hidden></div>
         <button type="button" class="primary" id="acct-logout">Log out</button>
         <p class="acct-links"><a href="#" id="acct-delete">Delete my account</a></p>
       </div>
@@ -771,6 +791,15 @@
       <details><summary>How accurate are the key and BPM?</summary><p>They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix.</p></details>
       <details><summary>Can I download the tracks?</summary><p>No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist.</p></details>
       <details><summary>How do I build a set?</summary><p>Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link.</p></details>
+  </section>
+  <section class="rate" id="rate" aria-labelledby="rate-title">
+    <h2 id="rate-title">Rate SimilarSounds</h2>
+    <form id="rate-form">
+      <div class="stars" role="group" aria-label="Your rating"><button type="button" class="star fstar" data-fstars="1" aria-label="1 star" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="2" aria-label="2 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="3" aria-label="3 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="4" aria-label="4 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="5" aria-label="5 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button></div>
+      <label for="rate-comment">How can we improve?</label>
+      <textarea id="rate-comment" name="comment" rows="3" maxlength="1000" placeholder="Tell us what would make SimilarSounds better for you"></textarea>
+      <div class="rate-row"><button type="submit" class="primary">Send</button><span class="rate-msg" role="status" aria-live="polite"></span></div>
+    </form>
   </section>
   <footer>
     <p>SimilarSounds is in early preview. Previews and track details by Deezer; players from SoundCloud and YouTube load only when you choose. Key, BPM and energy are estimates, so always trust your ears. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
@@ -1331,7 +1360,7 @@ function showReview() {
   if (!reviewDue() || !$("#review").hidden) return;
   reviewFocus = document.activeElement;
   $("#review-ask").hidden = false; $("#review-thanks").hidden = true;
-  document.querySelectorAll(".star").forEach(s => s.classList.remove("on"));
+  document.querySelectorAll("#review .star").forEach(s => s.classList.remove("on"));
   $("#review").hidden = false;
   $(".review-box").focus({ preventScroll: true });   // focus the box, so no star lights up until chosen
 }
@@ -1339,7 +1368,7 @@ function hideReview() {
   $("#review").hidden = true;
   reviewFocus?.focus?.();
 }
-function lightStars(n) { document.querySelectorAll(".star").forEach(s => s.classList.toggle("on", Number(s.dataset.stars) <= n)); }
+function lightStars(n) { document.querySelectorAll("#review .star").forEach(s => s.classList.toggle("on", Number(s.dataset.stars) <= n)); }
 $("#review").addEventListener("pointerover", e => { const s = e.target.closest(".star"); if (s) lightStars(Number(s.dataset.stars)); });
 $("#review").addEventListener("pointerleave", () => lightStars(0));
 $("#review").addEventListener("focusin", e => { const s = e.target.closest(".star"); lightStars(s ? Number(s.dataset.stars) : 0); });
@@ -1356,6 +1385,34 @@ $("#review").addEventListener("click", e => {
   $("#review-ask").hidden = true; $("#review-thanks").hidden = false;
   setTimeout(hideReview, 1200);
 });
+/* ================= Rating + "How can we improve?" box at the bottom of the page ================= */
+(function () {
+  const form = $("#rate-form"); if (!form) return;
+  const msg = form.querySelector(".rate-msg");
+  let chosen = 0;
+  const light = n => form.querySelectorAll(".fstar").forEach(b => { const on = Number(b.dataset.fstars) <= n; b.classList.toggle("on", on); b.setAttribute("aria-pressed", String(Number(b.dataset.fstars) === chosen)); });
+  form.addEventListener("pointerover", e => { const b = e.target.closest(".fstar"); if (b) light(Number(b.dataset.fstars)); });
+  form.querySelector(".stars").addEventListener("pointerleave", () => light(chosen));
+  form.addEventListener("click", e => {
+    const b = e.target.closest(".fstar"); if (!b) return;
+    chosen = Number(b.dataset.fstars); light(chosen); msg.textContent = ""; msg.className = "rate-msg";
+  });
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    const comment = form.comment.value.trim();
+    if (!chosen) { msg.textContent = "Please choose a star rating first."; msg.className = "rate-msg err"; return; }
+    const btn = form.querySelector("button[type=submit]"); btn.disabled = true;
+    try {
+      const r = await fetch("/api/review", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ stars: chosen, plays: plays(), lang: window.SSi18n?.lang || "en", comment, source: "page" }) });
+      if (!r.ok) throw 0;
+      store.set("ss_reviewed", String(chosen));   // no need for the pop-up any more
+      form.comment.value = ""; chosen = 0; light(0);
+      msg.textContent = "Thank you! Your feedback has been sent."; msg.className = "rate-msg";
+    } catch { msg.textContent = "Sorry, that didn't send. Please try again."; msg.className = "rate-msg err"; }
+    btn.disabled = false;
+  });
+})();
 document.addEventListener("keydown", e => {
   if ($("#review").hidden) return;
   if (e.key === "Escape") { store.set("ss_review_at", plays() + REVIEW_AFTER); hideReview(); }
@@ -1976,7 +2033,7 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/account.js?v=5" defer></script>
-<script src="/static/i18n.js?v=24"></script>
+<script src="/static/account.js?v=6" defer></script>
+<script src="/static/i18n.js?v=25"></script>
 </body>
 </html>

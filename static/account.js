@@ -40,7 +40,24 @@
   function show(view) {
     box.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== view);
     box.querySelectorAll(".acct-msg").forEach(m => { m.textContent = ""; m.className = "acct-msg"; });
-    if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; }
+    if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; ownerStats(); }
+  }
+  // Private visitor numbers: only the owner account is allowed to read them (checked in Supabase)
+  async function ownerStats() {
+    const el = $("#acct-stats");
+    el.hidden = true;
+    const { data: st, error } = await sb.rpc("visitor_stats");
+    if (error || !st) return;
+    const n = v => Number(v || 0).toLocaleString();
+    const days = (st.days || []).slice(0, 14).map(d =>
+      `<tr><td>${new Date(d.day).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</td><td>${n(d.visitors)}</td><td>${n(d.views)}</td></tr>`).join("");
+    el.innerHTML = `<h3>Visitors (private, only you can see this)</h3>
+      <div class="st-grid"><div><b>${n(st.today)}</b>today</div><div><b>${n(st.last_7_days)}</b>last 7 days</div>
+      <div><b>${n(st.last_30_days)}</b>last 30 days</div><div><b>${n(st.all_time)}</b>all time</div></div>
+      <p class="acct-sub">${n(st.accounts)} accounts · ${n(st.searches_used)} free searches used · 👍 ${n(st.votes_up)} / 👎 ${n(st.votes_down)}. Your own visits aren't counted.</p>
+      ${days ? `<table class="st-days"><tr><th>Day</th><th>Visitors</th><th>Page views</th></tr>${days}</table>` : ""}
+      <p class="acct-links"><a href="/stats">Open the full stats page (visitors and reviews) →</a></p>`;
+    el.hidden = false;
   }
   function msg(view, text, ok) {
     const m = box.querySelector(`[data-view="${view}"] .acct-msg`);
@@ -179,7 +196,15 @@
   };
   window.ssOpenAccount = view => open(view);
   window.ssRefreshAuth = async () => { try { await sb.auth.refreshSession(); } catch {} };
-  sb.auth.getSession().then(({ data }) => { user = data.session?.user || user; paint(); authReady(); }, () => authReady());
+  sb.auth.getSession().then(({ data }) => { user = data.session?.user || user; paint(); authReady(); logVisit(); }, () => { authReady(); logVisit(); });
+  // Count this visit (a random device number and the day, nothing else). The owner is skipped in Supabase.
+  function logVisit() {
+    try {
+      let id = localStorage.getItem("ss_device");
+      if (!id) { id = crypto.randomUUID(); localStorage.setItem("ss_device", id); }
+      sb.rpc("log_visit", { p_device: id }).then(() => {}, () => {});
+    } catch {}
+  }
   sb.auth.onAuthStateChange((event, session) => {
     const was = user?.id;
     user = session?.user || null;

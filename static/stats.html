@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>SimilarSounds Stats</title>
+<style>
+  :root { --bg: #f6f6f3; --card: #fff; --text: #16161a; --muted: #6b6b75; --line: #e4e4de; --accent: #1db954; --star: #f5a623; }
+  @media (prefers-color-scheme: dark) { :root { --bg: #0f0f12; --card: #18181d; --text: #f1f1f3; --muted: #9a9aa6; --line: #2a2a31; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 24px 16px 48px; }
+  header { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 18px; }
+  h1 { margin: 0; font-size: 22px; }
+  h2 { margin: 0 0 12px; font-size: 16px; }
+  a { color: inherit; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .big { font-size: 30px; font-weight: 700; line-height: 1.1; }
+  .two { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .chart { display: flex; align-items: flex-end; gap: 3px; height: 140px; margin-bottom: 6px; }
+  .chart div { flex: 1; background: var(--accent); border-radius: 3px 3px 0 0; min-height: 2px; position: relative; }
+  .chart div:hover::after { content: attr(data-tip); position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+    background: var(--text); color: var(--bg); font-size: 11px; padding: 2px 6px; border-radius: 4px; white-space: nowrap; margin-bottom: 4px; }
+  .axis { display: flex; justify-content: space-between; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 6px 4px; border-top: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 500; font-size: 13px; }
+  .bar { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 14px; }
+  .bar span:first-child { width: 28px; }
+  .bar .track { flex: 1; height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+  .bar .fill { height: 100%; background: var(--star); }
+  .bar span:last-child { width: 32px; text-align: right; color: var(--muted); }
+  .stars { color: var(--star); letter-spacing: 1px; }
+  .scroll { max-height: 420px; overflow: auto; }
+  .rev { padding: 10px 0; border-top: 1px solid var(--line); }
+  .rev:first-child { border-top: 0; padding-top: 0; }
+  .rev p { margin: 4px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .tag { font-size: 11px; padding: 1px 6px; border-radius: 6px; background: var(--line); color: var(--muted); }
+  #gate { text-align: center; padding: 60px 16px; }
+  button { font: inherit; padding: 8px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; }
+  @media (max-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } .two { grid-template-columns: 1fr; } .big { font-size: 24px; } }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>SimilarSounds stats</h1>
+    <span class="muted"><span id="updated"></span> · <button type="button" id="refresh">Refresh</button> · <a href="/">Back to site</a></span>
+  </header>
+  <div id="gate" class="card"><p id="gate-msg">Loading…</p></div>
+  <div id="dash" hidden>
+    <div class="grid">
+      <div class="card"><div class="big" id="today">0</div><div class="muted">visitors today</div></div>
+      <div class="card"><div class="big" id="d7">0</div><div class="muted">last 7 days</div></div>
+      <div class="card"><div class="big" id="d30">0</div><div class="muted">last 30 days</div></div>
+      <div class="card"><div class="big" id="all">0</div><div class="muted">all time</div></div>
+    </div>
+    <div class="grid">
+      <div class="card"><div class="big" id="avg">–</div><div class="muted">average review (<span id="nrev">0</span> reviews)</div></div>
+      <div class="card"><div class="big" id="accounts">0</div><div class="muted">accounts</div></div>
+      <div class="card"><div class="big" id="searches">0</div><div class="muted">free searches used</div></div>
+      <div class="card"><div class="big"><span id="up">0</span> / <span id="down">0</span></div><div class="muted">👍 / 👎 on matches</div></div>
+    </div>
+    <div class="two">
+      <div class="card">
+        <h2>Visitors per day (last 30 days)</h2>
+        <div class="chart" id="chart"></div>
+        <div class="axis muted"><span id="ax-start"></span><span>today</span></div>
+      </div>
+      <div class="card">
+        <h2>Reviews by stars</h2>
+        <div id="starbars"></div>
+      </div>
+    </div>
+    <div class="two">
+      <div class="card scroll">
+        <h2>Daily breakdown</h2>
+        <table><thead><tr><th>Day</th><th>Visitors</th><th>New</th><th>Page views</th></tr></thead><tbody id="days"></tbody></table>
+      </div>
+      <div class="card scroll">
+        <h2>Latest reviews and comments</h2>
+        <div id="reviews"></div>
+      </div>
+    </div>
+    <p class="muted">Only you can see these numbers. Your own visits aren't counted. A "visitor" is one device per day.</p>
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.75.0/dist/umd/supabase.min.js"></script>
+<script>
+(async function () {
+  const $ = id => document.getElementById(id);
+  const n = v => Number(v || 0).toLocaleString();
+  const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const gate = msg => { $("gate-msg").innerHTML = msg; $("gate").hidden = false; $("dash").hidden = true; };
+  let sb;
+  try {
+    const cfg = await (await fetch("/api/config")).json();
+    sb = window.supabase.createClient(cfg.supabase_url, cfg.supabase_anon_key, { auth: { persistSession: true, autoRefreshToken: true } });
+  } catch { return gate("Couldn't connect. Try again later."); }
+
+  async function load() {
+    const { data: s } = await sb.auth.getSession();
+    if (!s.session) return gate('This page is private. <a href="/">Log in on the main site</a> with the owner account, then come back.');
+    const { data: st, error } = await sb.rpc("visitor_stats");
+    if (error || !st) return gate("This page is private to the site owner.");
+    $("gate").hidden = true; $("dash").hidden = false;
+    $("today").textContent = n(st.today); $("d7").textContent = n(st.last_7_days);
+    $("d30").textContent = n(st.last_30_days); $("all").textContent = n(st.all_time);
+    $("avg").textContent = st.stars_avg ? `${Number(st.stars_avg).toFixed(1)} ★` : "–";
+    $("nrev").textContent = n(st.reviews); $("accounts").textContent = n(st.accounts);
+    $("searches").textContent = n(st.searches_used); $("up").textContent = n(st.votes_up); $("down").textContent = n(st.votes_down);
+
+    // 30-day chart, filling in days with no visitors
+    const byDay = Object.fromEntries((st.days || []).map(d => [d.day, d]));
+    const days = [];
+    for (let i = 29; i >= 0; i--) {
+      const d = new Date(); d.setDate(d.getDate() - i);
+      const key = d.toISOString().slice(0, 10);
+      days.push({ key, date: d, v: byDay[key]?.visitors || 0 });
+    }
+    const max = Math.max(1, ...days.map(d => d.v));
+    const fmt = d => d.toLocaleDateString(undefined, { day: "numeric", month: "short" });
+    $("chart").innerHTML = days.map(d => `<div style="height:${(d.v / max) * 100}%" data-tip="${fmt(d.date)}: ${d.v}"></div>`).join("");
+    $("ax-start").textContent = fmt(days[0].date);
+
+    $("days").innerHTML = (st.days || []).map(d => `<tr><td>${new Date(d.day).toLocaleDateString(undefined, { weekday: "short", day: "numeric", month: "short" })}</td>
+      <td>${n(d.visitors)}</td><td>${n(d.new)}</td><td>${n(d.views)}</td></tr>`).join("") || '<tr><td colspan="4" class="muted">No visitors yet</td></tr>';
+
+    const counts = st.stars || {}, total = Math.max(1, st.reviews || 0);
+    $("starbars").innerHTML = [5, 4, 3, 2, 1].map(k => `<div class="bar"><span>${k} ★</span>
+      <span class="track"><span class="fill" style="display:block;width:${((counts[k] || 0) / total) * 100}%"></span></span><span>${n(counts[k])}</span></div>`).join("");
+
+    $("reviews").innerHTML = (st.recent_reviews || []).map(r => `<div class="rev"><span class="stars">${"★".repeat(r.stars)}${"☆".repeat(5 - r.stars)}</span>
+      <span class="muted"> ${new Date(r.at).toLocaleString(undefined, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })} · ${esc(r.language)} · ${n(r.tracks_played)} plays</span>
+      <span class="tag">${r.source === "page" ? "bottom box" : "pop-up"}</span>${r.comment ? `<p>${esc(r.comment)}</p>` : ""}</div>`).join("") || '<p class="muted">No reviews yet</p>';
+    $("updated").textContent = "Updated " + new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  }
+  $("refresh").onclick = load;
+  load();
+})();
+</script>
+</body>
+</html>

@@ -255,7 +255,9 @@ async def review(request: Request):
     if not 1 <= stars <= 5:
         raise HTTPException(400, "Stars must be 1-5")
     lang = body.get("lang") if body.get("lang") in LANG_CODES else "en"
-    await run_in_threadpool(reviews.save, stars, lang, plays)
+    comment = str(body.get("comment") or "").strip()[:1000]
+    source = "page" if body.get("source") == "page" else "popup"
+    await run_in_threadpool(reviews.save, stars, lang, plays, comment, source)
     return {"ok": True}
 
 
@@ -337,6 +339,13 @@ def sitemap():
 @app.get("/robots.txt", response_class=PlainTextResponse)
 def robots():
     return pages.ROBOTS
+
+
+@app.get("/stats", include_in_schema=False)
+def stats_page():
+    """Private dashboard: visitors and reviews. The page is public but the numbers only load for
+    the owner account (checked inside Supabase)."""
+    return FileResponse(STATIC / "stats.html", headers={"X-Robots-Tag": "noindex, nofollow", "Cache-Control": "no-store"})
 
 
 @app.get("/privacy")
