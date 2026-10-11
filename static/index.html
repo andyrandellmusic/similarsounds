@@ -82,7 +82,7 @@
   form.search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--text); font: inherit; font-size: 16px; padding: 12px 12px; outline: none; }
   button { font: inherit; cursor: pointer; }
   /* Scrolling "Try for free now · SET BUILDER" banner */
-  .marquee { display: flex; width: 100%; overflow: hidden; margin: 14px 0 0; padding: 0; border: 1px solid rgba(198,255,61,.45); border-radius: 10px; background: rgba(198,255,61,.08); color: var(--text); cursor: pointer; height: 38px; align-items: center; }
+  .marquee { display: flex; width: 100%; overflow: hidden; margin: 16px 0 0; padding: 0; border: 1px solid rgba(198,255,61,.45); border-radius: 10px; background: rgba(198,255,61,.08); color: var(--text); cursor: pointer; height: 38px; align-items: center; }
   .marquee:hover { border-color: var(--accent); }
   .mq-track { display: flex; flex: none; animation: mq-scroll 22s linear infinite; }
   .marquee:hover .mq-track, .marquee:focus-visible .mq-track { animation-play-state: paused; }
@@ -609,14 +609,14 @@
     <label class="chk fld"><input type="checkbox" id="strict"> Harmonic matches only</label>
   </div>
   </details>
-  <button type="button" class="marquee" id="promo-set" aria-label="Try for free now: Set builder">
-    <span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span><span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span>
-  </button>
 
   <div id="out">
     <section class="start" id="start">
       <div class="start-label">Try a fresh release</div>
       <div class="try" id="try"></div>
+    <button type="button" class="marquee" id="promo-set" aria-label="Try for free now: Set builder">
+      <span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span><span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span>
+    </button>
     </section>
   </div>
 
@@ -1827,7 +1827,7 @@ function openSet(open) {
   else setOpener?.focus?.();
 }
 $("#set-open").onclick = () => openSet(true);
-$("#promo-set").onclick = () => openSet(true);
+document.addEventListener("click", e => { if (e.target.closest("#promo-set")) openSet(true); });
 $("#fab-open").onclick = () => openSet(true);
 $("#fab-clear").onclick = () => clearSet();
 $("#set-close").onclick = () => openSet(false);
