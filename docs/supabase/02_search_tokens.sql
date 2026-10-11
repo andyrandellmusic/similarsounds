@@ -66,11 +66,11 @@ begin
       into subscribed;
   end if;
 
-  insert into public.token_usage(owner) values (d) on conflict do nothing;
-  select used into d_used from public.token_usage where owner = d;
+  if p_consume then insert into public.token_usage(owner) values (d) on conflict do nothing; end if;
+  d_used := coalesce((select used from public.token_usage where owner = d), 0);
   if u is not null then
-    insert into public.token_usage(owner) values (u) on conflict do nothing;
-    select used into u_used from public.token_usage where owner = u;
+    if p_consume then insert into public.token_usage(owner) values (u) on conflict do nothing; end if;
+    u_used := coalesce((select used from public.token_usage where owner = u), 0);
   end if;
   select coalesce((select used from public.token_ip where ip_hash = p_ip and day = current_date), 0) into ip_used;
 
