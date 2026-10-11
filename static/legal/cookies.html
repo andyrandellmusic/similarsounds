@@ -45,6 +45,7 @@
     <tr><td><code>ss_set</code></td><td>The tracks in "Your set" and their order.</td><td>Until you clear it</td></tr>
     <tr><td><code>ss_recent</code></td><td>Your last 5-6 searches, shown when you tap the search box.</td><td>Until you clear it</td></tr>
     <tr><td><code>ss_plays</code>, <code>ss_reviewed</code>, <code>ss_review_at</code></td><td>How many previews you've played, and whether you've already rated us, so the "Give us a review" box only appears once (after 60 plays).</td><td>Until you clear it</td></tr>
+    <tr><td><code>ss_last_login</code></td><td>The email and name of the last account used on this device, for the "Continue as…" button. Never your password.</td><td>Until you clear it or choose "Use a different account"</td></tr>
     <tr><td><code>ss_device</code></td><td>A random number for this device, used only to count its free searches and the number of visitors.</td><td>Until you clear it</td></tr>
     <tr><td><code>sb-…-auth-token</code></td><td>Only if you log in: keeps you logged in to your SimilarSounds account on this device.</td><td>Until you log out</td></tr>
     <tr><td><code>ss_lang</code></td><td>The language you picked for the site.</td><td>Until you clear it</td></tr>
@@ -90,7 +91,7 @@
     show(); document.getElementById("done").textContent = "Done - each player will ask again before loading.";
   };
   document.getElementById("wipe").onclick = () => {
-    try { ["ss_consent", "ss_set", "ss_recent", "ss_plays", "ss_reviewed", "ss_review_at", "ss_lang", "ss_device"].forEach(k => localStorage.removeItem(k)); } catch {}
+    try { ["ss_consent", "ss_set", "ss_recent", "ss_plays", "ss_reviewed", "ss_review_at", "ss_lang", "ss_device", "ss_last_login"].forEach(k => localStorage.removeItem(k)); } catch {}
     show(); document.getElementById("done").textContent = "Done - your set, recent searches, player choices, language and review status have been removed from this device.";
   };
   show();

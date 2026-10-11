@@ -36,8 +36,43 @@
     show(view);
     dlg.hidden = false;
     setTimeout(() => box.querySelector("input:not([hidden]), button.primary")?.focus(), 30);
-    if (view === "login") offerSaved();
+    if (view === "login") { paintQuick(); offerSaved(); }
   }
+  /* ---------- "Continue as Boss": one button back into the last account used on this device.
+   * Only the email and name are remembered here (never the password). The button fills the email and
+   * opens the password box, where iPhone/Mac Keychain or the password manager offers the saved
+   * password; picking it logs straight in. */
+  const LAST = "ss_last_login";
+  const lastLogin = () => { try { return JSON.parse(localStorage.getItem(LAST) || "null"); } catch { return null; } };
+  const rememberLogin = (email, name) => { try { localStorage.setItem(LAST, JSON.stringify({ email, name: name || "" })); } catch {} };
+  const forgetLogin = () => { try { localStorage.removeItem(LAST); } catch {} };
+  function paintQuick(useForm) {
+    const last = lastLogin(), f = $("#f-login");
+    const quick = !!last?.email && !useForm;
+    $("#acct-quick").hidden = !quick;
+    f.hidden = quick;
+    if (quick) {
+      $("#quick-name").textContent = last.name || last.email.split("@")[0];
+      $("#quick-email").textContent = last.email;
+      setTimeout(() => $("#quick-go").focus(), 40);
+    }
+  }
+  $("#quick-go").addEventListener("click", () => {
+    const last = lastLogin(), f = $("#f-login");
+    if (!last) return paintQuick(true);
+    f.email.value = last.email; f.password.value = "";
+    $("#acct-quick").hidden = true; f.hidden = false;
+    f.password.focus();   // iPhone shows the Keychain password above the keyboard
+  });
+  $("#quick-other").addEventListener("click", e => {
+    e.preventDefault(); forgetLogin(); const f = $("#f-login"); f.reset(); paintQuick(true); f.email.focus();
+  });
+  // A password filled in by Keychain / a password manager logs in straight away (typing doesn't)
+  $("#f-login").password.addEventListener("input", e => {
+    const f = $("#f-login");
+    const autofilled = !e.inputType || e.inputType === "insertReplacementText";
+    if (autofilled && f.email.value.includes("@") && f.password.value.length >= 8) setTimeout(() => f.requestSubmit(), 150);
+  });
   /* ---------- saved logins (iPhone/Mac Keychain, Chrome, password managers)
    * The forms use the standard autocomplete names, so Keychain and password managers offer to save
    * the login and fill it in with one tap. Where the browser supports it (Chrome, Edge, Android),
@@ -168,6 +203,7 @@
     const { error } = await sb.rpc("delete_my_account");
     b.disabled = false;
     if (error) return msg("delete", "Couldn't delete your account. Please try again, or email us.");
+    forgetLogin();
     await sb.auth.signOut(); close(); say("Your account and saved data have been deleted");
   });
 
@@ -212,6 +248,7 @@
       b.setAttribute("aria-label", user ? `${name}, signed in - open your account` : "Log in or sign up");
     });
     document.documentElement.classList.toggle("signed-in", !!user);
+    if (user?.email) rememberLogin(user.email, user.user_metadata?.name);   // for "Continue as …" next time
   }
   const ICON = document.querySelector("[data-account] .acct-ico")?.innerHTML || "";
 
