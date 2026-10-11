@@ -170,10 +170,16 @@
   }
   const ICON = document.querySelector("[data-account] .acct-ico")?.innerHTML || "";
 
+  window.ssAuthHeader = async () => {
+    const t = (await sb.auth.getSession()).data.session?.access_token;
+    return t ? { Authorization: `Bearer ${t}` } : {};
+  };
+  window.ssOpenAccount = view => open(view);
   sb.auth.onAuthStateChange((event, session) => {
     const was = user?.id;
     user = session?.user || null;
     paint();
+    if (user?.id !== was) window.dispatchEvent(new Event("ss:auth"));
     if (event === "PASSWORD_RECOVERY") { open("reset"); return; }
     if (user && user.id !== was) pull();
     if (event === "SIGNED_IN" && /type=signup/.test(location.hash)) say("Email confirmed - you're logged in");

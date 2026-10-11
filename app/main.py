@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import house, pages, reviews, sources
+from app import house, pages, reviews, sources, tokens
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -116,6 +116,7 @@ def analyse_query(deezer_id: int) -> dict:
 
 @app.get("/api/match")
 async def match(
+    request: Request,
     url: str = Query(..., description="YouTube / SoundCloud / Beatport / Deezer link, or 'Artist - Title'"),
     max_age_days: int | None = None,
     strict_key: bool = False,
@@ -140,6 +141,10 @@ async def match(
         deezer_id = hit["id"]
 
     q = await run_in_threadpool(analyse_query, deezer_id)
+    # Each new track searched uses a token, once we know the search works (the same track again today is free)
+    tk = await run_in_threadpool(tokens.check, request, int(deezer_id), True)
+    if tk and not tk.get("allowed"):
+        raise HTTPException(402, {"code": "no_tokens", "stage": tk.get("stage"), "signed_in": tk.get("signed_in")})
     results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
                                   strict_key=strict_key, bpm_range=bpm_range, style=style or None, limit=limit)
     query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm")}
@@ -151,7 +156,13 @@ async def match(
         results = []
     like = artists.like_vector(index.embed(q["embedding"]), exclude=main_artist(q["artist"]), k=6) if results else []
     similar_artists = [{"name": a["name"], "slug": pages.slugify(a["name"])} for a in like]
-    return {"source": src, "query": query, "results": results, "similar_artists": similar_artists}
+    return {"source": src, "query": query, "results": results, "similar_artists": similar_artists, "tokens": tk}
+
+
+@app.get("/api/tokens")
+async def tokens_left(request: Request):
+    """How many free searches this visitor has left (doesn't use one)."""
+    return await run_in_threadpool(tokens.check, request, None, False) or {"metered": False}
 
 
 @app.post("/api/prefetch/{deezer_id}")

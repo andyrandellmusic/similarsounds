@@ -344,6 +344,14 @@
   .acct-state { font-size: 11px; color: var(--accent); font-weight: 600; }
   .acct-state:empty { display: none; }
   .signed-in .acct-ico { background: var(--accent); color: var(--accent-ink); }
+  .tokens-left { margin: 12px 0 0; font-size: 13px; color: var(--muted); }
+  .tokens-left b { color: var(--accent); }
+  .tokens-left.out b { color: var(--warn); }
+  .tokens-left a { color: var(--text); }
+  .plan { border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.06); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
+  .plan-price { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .plan-price span { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 2px; }
+  .plan ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
   .acct-only { display: none !important; }
   .accounts-on .acct-only { display: inline-flex !important; }
   .accounts-on .menu .acct-only { display: grid !important; }
@@ -589,6 +597,7 @@
     <label class="chk fld"><input type="checkbox" id="strict"> Harmonic matches only</label>
   </div>
   </details>
+  <p class="tokens-left" id="tokens-left" hidden></p>
   <button type="button" class="marquee" id="promo-set" aria-label="Try for free now: Set builder">
     <span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span><span class="mq-track" aria-hidden="true"><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span><span class="mq-item"><span class="mq-try">Try for free now</span><b class="mq-sb">Set builder</b></span></span>
   </button>
@@ -684,6 +693,25 @@
         <button type="button" class="primary danger" id="acct-delete-yes">Yes, delete my account</button>
         <p class="acct-msg" role="alert"></p>
         <p class="acct-links"><a href="#" data-go="account">Keep my account</a></p>
+      </div>
+    </div>
+  </div>
+  <div class="acct-wrap" id="paywall" hidden>
+    <div class="acct-box" role="dialog" aria-modal="true" aria-labelledby="pw-title">
+      <button type="button" class="acct-x" data-pw-close aria-label="Close">×</button>
+      <div data-pw="anon">
+        <h2 id="pw-title">You've used your 3 free searches</h2>
+        <p class="acct-sub">Create a free account to get 2 more searches. It only takes a minute.</p>
+        <button type="button" class="primary" data-account-signup>Create a free account</button>
+        <p class="acct-links"><a href="#" data-account-login>Already have an account? Log in</a></p>
+      </div>
+      <div data-pw="account" hidden>
+        <h2>Your free searches have run out</h2>
+        <p class="acct-sub" data-i18n="pwGet">Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
+        <div class="plan"><div class="plan-price">£4.99<span>/month</span></div>
+          <ul><li>Unlimited searches and "Similar" finds</li><li>Build and share as many sets as you like</li><li>Cancel anytime</li></ul></div>
+        <button type="button" class="primary" disabled>Subscriptions coming soon</button>
+        <p class="acct-fine">We're putting the finishing touches on subscriptions. Your saved set is safe in your account in the meantime.</p>
       </div>
     </div>
   </div>
@@ -827,10 +855,12 @@ async function run(exactUrl, fromHistory = false) {
   announce("Searching…");
   try {
     let r, data;
-    try { r = await fetch(`/api/match?${params}`); data = await r.json(); }
+    try { r = await fetch(`/api/match?${params}`, { headers: await tokenHeaders() }); data = await r.json(); }
     catch { const e = new Error("offline"); e.kind = "offline"; throw e; }
+    if (r.status === 402) { const e = new Error("no tokens"); e.kind = "tokens"; e.info = data.detail || {}; throw e; }
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
+    showTokens(data.tokens);
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
     if (exactUrl) { $("#url").value = label; picked = { text: label, url: exactUrl }; }
@@ -850,6 +880,17 @@ function showProblem(err, attempted) {
   const examples = examplesCache.length ? `<div class="start-label" style="margin-top:18px">Or try a fresh release</div>
     <div class="try">${examplesHtml(examplesCache)}</div>` : "";
   let title, body, actions = "";
+  if (err.kind === "tokens") {
+    openPaywall(err.info.stage);
+    title = err.info.stage === "account" ? "Your free searches have run out" : "You've used your 3 free searches";
+    body = err.info.stage === "account"
+      ? `<p>Unlimited searches are coming soon with SimilarSounds Unlimited: £4.99 a month, cancel anytime.</p>`
+      : `<p>Create a free account to get 2 more searches.</p>`;
+    actions = err.info.stage === "account" ? "" : `<button type="button" class="icon" data-account-signup>Create a free account</button>`;
+    $("#out").innerHTML = `<section class="problem" role="alert"><div class="problem-title">${title}</div>${body}${actions}</section>`;
+    announce(title);
+    return;
+  }
   if (err.kind === "notfound") {
     title = typed ? `We couldn't find "${esc(typed)}"` : "We couldn't find that track";
     body = `<ul class="tips">
@@ -1127,6 +1168,50 @@ document.addEventListener("click", e => {
   scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
   input.focus({ preventScroll: true }); sgLastQ = null; fetchSuggest(); updateClear();
 });
+
+/* ================= Search tokens: 3 free per device, 2 more with a free account ================= */
+function deviceId() {
+  try {
+    let id = localStorage.getItem("ss_device");
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem("ss_device", id); }
+    return id;
+  } catch { return ""; }
+}
+async function tokenHeaders() {
+  const h = { "X-Device-Id": deviceId() };
+  try { Object.assign(h, await (window.ssAuthHeader?.() || {})); } catch {}
+  return h;
+}
+function showTokens(t) {
+  const el = $("#tokens-left");
+  if (!t || t.metered === false) { el.hidden = true; return; }
+  el.hidden = false;
+  el.classList.toggle("out", !t.subscribed && t.left === 0);
+  if (t.subscribed) el.innerHTML = `<span>Unlimited searches</span>`;
+  else if (t.left > 0) el.innerHTML = `<span>${esc(t.left === 1 ? "1 free search left" : `${t.left} free searches left`)}</span>`;
+  else el.innerHTML = t.stage === "anon"
+    ? `<span>No free searches left.</span> <a href="#" data-account-signup>Create a free account for 2 more</a>`
+    : `<span>No free searches left.</span>`;
+}
+async function refreshTokens() {
+  try { showTokens(await (await fetch("/api/tokens", { headers: await tokenHeaders() })).json()); } catch {}
+}
+let paywallOpener = null;
+function openPaywall(stage) {
+  paywallOpener = document.activeElement;
+  document.querySelectorAll("#paywall [data-pw]").forEach(v => v.hidden = v.dataset.pw !== (stage === "account" ? "account" : "anon"));
+  $("#paywall").hidden = false;
+  setTimeout(() => $("#paywall .primary:not([disabled]), #paywall .acct-x")?.focus(), 30);
+}
+function closePaywall() { $("#paywall").hidden = true; paywallOpener?.focus?.(); }
+document.addEventListener("click", e => {
+  if (e.target.id === "paywall" || e.target.closest("[data-pw-close]")) { closePaywall(); return; }
+  const su = e.target.closest("[data-account-signup], [data-account-login]");
+  if (su) { e.preventDefault(); closePaywall(); window.ssOpenAccount?.(su.matches("[data-account-login]") ? "login" : "signup"); }
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#paywall").hidden) closePaywall(); });
+window.addEventListener("ss:auth", refreshTokens);
+refreshTokens();
 
 /* ================= Review pop-up: shown once, at a random moment after 60 plays ================= */
 const REVIEW_AFTER = 60;
@@ -1793,7 +1878,7 @@ renderSet();
 openFromUrl(true);
 openSharedSet();
 </script>
-<script src="/static/account.js?v=3" defer></script>
-<script src="/static/i18n.js?v=18"></script>
+<script src="/static/account.js?v=4" defer></script>
+<script src="/static/i18n.js?v=19"></script>
 </body>
 </html>
