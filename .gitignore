@@ -5,3 +5,8 @@ __pycache__/
 data/seed.log
 .DS_Store
 data/reviews.csv
+eval/cache/
+eval/results/*.npy
+eval/results/*.onnx
+eval/results/*.npz
+eval/results/*.log

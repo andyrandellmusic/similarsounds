@@ -46,9 +46,9 @@ def rank(index, query: dict, *, exclude_id=None, max_age_days=None, strict_key=F
     if not index.rows:
         return [], None
 
-    q_emb = index.embed(query["embedding"])
-    cos = index.emb @ q_emb
-    sim = (cos + 1) / 2                     # 0..1
+    M, q_vec, space = index.query_vec(query)
+    cos = M @ q_vec
+    sim = index.match(cos, space)           # 0..1
 
     # Guess the query's sub-genre from its nearest neighbours
     nearest = np.argsort(-cos)[:15]

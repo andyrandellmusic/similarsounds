@@ -12,6 +12,8 @@ from pathlib import Path
 import numpy as np
 
 DB_PATH = Path(__file__).resolve().parent.parent / "data" / "catalogue.db"
+CLAP_PATH = DB_PATH.parent / "clap.npz"
+CLAP_WEIGHT = 0.85
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS tracks (
@@ -93,6 +95,8 @@ class Index:
             self.emb_std = emb.std(axis=0) + 1e-6
             z = (emb - self.emb_mean) / self.emb_std
             self.emb = z / (np.linalg.norm(z, axis=1, keepdims=True) + 1e-9)
+            self._load_clap()
+            self.scale = {name: self._cos_scale(M) for name, M in (("emb", self.emb), ("sound", self.sound))}
 
             self.energy_feats = np.array(
                 [energy_vector(json.loads(r["energy_raw"])) for r in rows], dtype="float32")
@@ -115,6 +119,51 @@ class Index:
         pct = np.stack([np.searchsorted(ref[:, j], feats[:, j], side="right") / n for j in range(ref.shape[1])], axis=1)
         combined = pct @ np.array([0.45, 0.35, 0.20])
         return np.clip(np.round(1 + combined * 9), 1, 10)
+
+    def _load_clap(self):
+        """CLAP sound fingerprints (computed offline, data/clap.npz). Matching uses a blend:
+        85% CLAP (how it sounds overall) + 15% our own groove features. Tracks added since the
+        last CLAP run fall back to the groove features alone until the next daily update."""
+        n = len(self.rows)
+        self.has_clap = np.zeros(n, dtype=bool)
+        self.sound = self.emb
+        if not CLAP_PATH.exists():
+            return
+        z = np.load(CLAP_PATH)
+        C = np.zeros((n, z["emb"].shape[1]), dtype="float32")
+        for did, e in zip(z["ids"].tolist(), z["emb"]):
+            i = self.ids.get(did)
+            if i is not None:
+                C[i] = e
+                self.has_clap[i] = True
+        if not self.has_clap.any():
+            return
+        mu, sd = C[self.has_clap].mean(0), C[self.has_clap].std(0) + 1e-6
+        Cz = np.where(self.has_clap[:, None], (C - mu) / sd, 0)
+        Cz /= np.linalg.norm(Cz, axis=1, keepdims=True) + 1e-9
+        self.sound = np.hstack([np.sqrt(CLAP_WEIGHT) * Cz, np.sqrt(1 - CLAP_WEIGHT) * self.emb]).astype("float32")
+
+    @staticmethod
+    def _cos_scale(M: np.ndarray) -> tuple[float, float]:
+        """Typical and near-identical similarity between two catalogue tracks (from random pairs)."""
+        rng = np.random.default_rng(0)
+        a, b = rng.integers(0, len(M), 4000), rng.integers(0, len(M), 4000)
+        cos = np.einsum("ij,ij->i", M[a], M[b])
+        return float(np.median(cos)), float(np.quantile(cos, 0.999))
+
+    def match(self, cos: np.ndarray, space: str) -> np.ndarray:
+        """Turn raw similarity into a 0-1 match score on the same scale whichever fingerprint is used:
+        a typical pair of house tracks scores 0.5, the closest 0.1% of pairs about 0.95."""
+        mid, top = self.scale[space]
+        return np.clip(0.5 + 0.45 * (cos - mid) / (top - mid + 1e-9), 0.01, 0.99)
+
+    def query_vec(self, query: dict) -> tuple[np.ndarray, np.ndarray, str]:
+        """The matrix and query vector to compare with: the CLAP blend when the track is in the
+        catalogue and has CLAP, otherwise our own sound features."""
+        row = query.get("row")
+        if row is not None and self.has_clap[row]:
+            return self.sound, self.sound[row], "sound"
+        return self.emb, self.embed(query["embedding"]), "emb"
 
     def describe(self, raw: dict, embedding: list[float], n: int = 3) -> list[str]:
         """Up to n words for how a track sounds compared with the rest of the catalogue."""

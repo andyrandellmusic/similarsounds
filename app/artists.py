@@ -30,24 +30,29 @@ class Artists:
         if not self.names:
             self.centroids = np.zeros((0, 1), dtype="float32")
             return
-        c = np.stack([self.index.emb[groups[n]].mean(axis=0) for n in self.names])
-        self.centroids = c / (np.linalg.norm(c, axis=1, keepdims=True) + 1e-9)
+        def cents(M):
+            c = np.stack([M[groups[n]].mean(axis=0) for n in self.names])
+            return c / (np.linalg.norm(c, axis=1, keepdims=True) + 1e-9)
+        self.spaces = {"emb": (self.index.emb, cents(self.index.emb)),
+                       "sound": (self.index.sound, cents(self.index.sound))}
+        self.centroids = self.spaces["sound"][1]
         self.pos = {n: i for i, n in enumerate(self.names)}
 
     def find(self, name: str) -> str | None:
         return self.by_key.get(main_artist(name).lower())
 
-    def like_vector(self, vec: np.ndarray, exclude: str | None = None, k: int = 8) -> list[dict]:
+    def like_vector(self, vec: np.ndarray, exclude: str | None = None, k: int = 8, space: str = "sound") -> list[dict]:
         if not len(self.names):
             return []
-        sims = self.centroids @ vec
+        M, cents = self.spaces[space]
+        sims = cents @ vec
         out = []
         for i in np.argsort(-sims):
             n = self.names[i]
             if exclude and n.lower() == exclude.lower():
                 continue
             rows = self.rows_of[n]
-            top = max(rows, key=lambda j: float(self.index.emb[j] @ vec))
+            top = max(rows, key=lambda j: float(M[j] @ vec))
             out.append({"name": n, "similarity": round(float((sims[i] + 1) / 2) * 100),
                         "tracks": len(rows), "example": self.index.rows[top]})
             if len(out) == k:

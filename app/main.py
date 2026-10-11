@@ -86,7 +86,7 @@ def analyse_query(deezer_id: int) -> dict:
                 "embedding": json.loads(r["embedding"]), "energy_raw": json.loads(r["energy_raw"]),
                 "title": r["title"], "artist": r["artist"],
                 "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],
-                "deezer_id": deezer_id, "in_catalogue": True,
+                "deezer_id": deezer_id, "in_catalogue": True, "row": index.ids[deezer_id],
                 # Everything in the catalogue was collected as house
                 "house_check": {"is_house": True, "confidence": 1.0, "reason": None}}
     if deezer_id in _query_cache:
@@ -147,14 +147,15 @@ async def match(
         raise HTTPException(402, {"code": "no_tokens", "stage": tk.get("stage"), "signed_in": tk.get("signed_in")})
     results, guessed_style = rank(index, q, exclude_id=deezer_id, max_age_days=max_age_days,
                                   strict_key=strict_key, bpm_range=bpm_range, style=style or None, limit=limit)
-    query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm")}
+    query = {k: v for k, v in q.items() if k not in ("embedding", "energy_raw", "rhythm", "row")}
     query["style"] = guessed_style if q["house_check"]["is_house"] else None
     query["energy"] = int(query["energy"])
     query["sound"] = index.describe(q["energy_raw"], q["embedding"])
     # Not house: hold results back unless the visitor chooses to see them anyway
     if not q["house_check"]["is_house"] and not allow_non_house:
         results = []
-    like = artists.like_vector(index.embed(q["embedding"]), exclude=main_artist(q["artist"]), k=6) if results else []
+    _, qv, space = index.query_vec(q)
+    like = artists.like_vector(qv, exclude=main_artist(q["artist"]), k=6, space=space) if results else []
     similar_artists = [{"name": a["name"], "slug": pages.slugify(a["name"])} for a in like]
     return {"source": src, "query": query, "results": results, "similar_artists": similar_artists, "tokens": tk}
 

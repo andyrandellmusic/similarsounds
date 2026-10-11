@@ -22,10 +22,24 @@ jobs:
       - run: uv run python -m scripts.seed --per-style 40
       - name: Remove anything added today that isn't house
         run: uv run python -m scripts.clean_catalogue --since "$STARTED" --apply
+      - name: Cache the CLAP model (free, CC0 licence)
+        uses: actions/cache@v4
+        with:
+          path: ~/clap
+          key: laion-clap-music-v1
+      - name: Download the CLAP model if not cached
+        run: |
+          mkdir -p ~/clap
+          [ -f ~/clap/music.pt ] || curl -sL -o ~/clap/music.pt "https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt"
+      - name: Add CLAP sound fingerprints for new tracks
+        run: >
+          uv run --no-project --python 3.10 --with laion-clap --with "torch<2.6" --with torchvision
+          --with "transformers<4.45" --with librosa --with httpx --with soundfile --with "numpy<2" --with "setuptools<70"
+          python -m scripts.clap_update --ckpt ~/clap/music.pt
       - name: Commit updated catalogue
         run: |
           git config user.name "similarsounds-bot"
           git config user.email "similarsounds-bot@users.noreply.github.com"
-          git add data/catalogue.db
+          git add data/catalogue.db data/clap.npz
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           git push
