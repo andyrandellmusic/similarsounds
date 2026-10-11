@@ -32,14 +32,35 @@
   let opener = null;
   function open(view) {
     opener = document.activeElement;
-    show(view || (user ? "account" : "login"));
+    view = view || (user ? "account" : "login");
+    show(view);
     dlg.hidden = false;
     setTimeout(() => box.querySelector("input:not([hidden]), button.primary")?.focus(), 30);
+    if (view === "login") offerSaved();
+  }
+  /* ---------- saved logins (iPhone/Mac Keychain, Chrome, password managers)
+   * The forms use the standard autocomplete names, so Keychain and password managers offer to save
+   * the login and fill it in with one tap. Where the browser supports it (Chrome, Edge, Android),
+   * a saved login is also offered as soon as "Log in" opens: one click logs you straight in. */
+  const credOK = "PasswordCredential" in window && navigator.credentials;
+  async function offerSaved() {
+    if (!credOK) return;
+    try {
+      const c = await navigator.credentials.get({ password: true, mediation: "optional" });
+      if (!c || !c.password || dlg.hidden || user) return;
+      const f = $("#f-login"); f.email.value = c.id; f.password.value = c.password;
+      f.requestSubmit();
+    } catch {}
+  }
+  async function saveLogin(email, password, name) {
+    if (!credOK || !email || !password) return;
+    try { await navigator.credentials.store(new PasswordCredential({ id: email, password, name: name || email })); } catch {}
   }
   function close() { dlg.hidden = true; opener?.focus?.(); }
   function show(view) {
     box.querySelectorAll("[data-view]").forEach(v => v.hidden = v.dataset.view !== view);
     box.querySelectorAll(".acct-msg").forEach(m => { m.textContent = ""; m.className = "acct-msg"; });
+    if (view === "reset") $("#f-reset").email.value = user?.email || "";   // so Keychain updates the right login
     if (view === "account") { $("#acct-email").textContent = user?.email || ""; $("#f-name").name.value = user?.user_metadata?.name || ""; ownerStats(); }
   }
   // Private visitor numbers: only the owner account is allowed to read them (checked in Supabase)
@@ -96,6 +117,7 @@
     const { error } = await sb.auth.signInWithPassword({ email: f.email.value.trim(), password: f.password.value });
     busy(f, false);
     if (error) return msg("login", friendly(error));
+    saveLogin(f.email.value.trim(), f.password.value);
     f.reset(); close(); say("Signed in - your set is saved to your account");
   });
   $("#f-signup").addEventListener("submit", async e => {
@@ -106,6 +128,7 @@
       options: { emailRedirectTo: location.origin + "/", data: { name: f.name.value.trim().slice(0, 50) } } });
     busy(f, false);
     if (error) return msg("signup", friendly(error));
+    saveLogin(f.email.value.trim(), f.password.value, f.name.value.trim());
     if (data.session) { f.reset(); close(); say("Account created - you're logged in"); return; }
     // Supabase hides whether the email already has an account; both cases end in an email
     f.reset(); msg("signup", "Nearly done! We've sent you an email - click the link in it to confirm your account.", true);
@@ -124,6 +147,7 @@
     const { error } = await sb.auth.updateUser({ password: f.password.value });
     busy(f, false);
     if (error) return msg("reset", friendly(error));
+    saveLogin(user?.email, f.password.value);
     f.reset(); close(); say("Password changed - you're logged in");
   });
   $("#f-name").addEventListener("submit", async e => {
@@ -136,6 +160,7 @@
   });
   $("#acct-logout").addEventListener("click", async () => {
     await sb.auth.signOut(); close(); say("Logged out. Your set stays on this device.");
+    try { await navigator.credentials?.preventSilentAccess?.(); } catch {}   // next time, ask before using a saved login
   });
   $("#acct-delete").addEventListener("click", () => show("delete"));
   $("#acct-delete-yes").addEventListener("click", async () => {
