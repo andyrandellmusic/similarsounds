@@ -221,6 +221,14 @@
   .howto summary { cursor: pointer; width: fit-content; }
   .howto summary:hover { color: var(--text); }
   /* "How to read these results" and "Key wheel": bigger, with a green arrow so they're noticed */
+  /* every small arrow on the site is green */
+  .ga::after { content: "→"; margin-left: .3em; color: var(--accent); }
+  .ga-out::after { content: "↗"; margin-left: .3em; color: var(--accent); }
+  .ga-open::after { content: "›"; margin-left: .3em; color: var(--accent); font-weight: 800; }
+  .g-arr { font-style: normal; color: var(--accent); }
+  select:not([data-lang-select]) { appearance: none; -webkit-appearance: none; padding-right: 26px;
+    background-image: linear-gradient(45deg, transparent 50%, var(--accent) 50%), linear-gradient(135deg, var(--accent) 50%, transparent 50%);
+    background-position: right 13px center, right 8px center; background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; }
   .howto summary, .keywheel summary { list-style: none; display: inline-flex; align-items: center; gap: 8px; width: fit-content;
     font-size: 15px; font-weight: 600; color: var(--text); padding: 4px 0; }
   .howto summary::-webkit-details-marker, .keywheel summary::-webkit-details-marker { display: none; }
@@ -285,7 +293,7 @@
   .faq details:last-child { border-bottom: 1px solid var(--line); }
   .faq summary { cursor: pointer; list-style: none; padding: 14px 28px 14px 0; font-weight: 600; position: relative; }
   .faq summary::-webkit-details-marker { display: none; }
-  .faq summary::after { content: "+"; position: absolute; right: 4px; top: 12px; color: var(--muted); font-size: 18px; }
+  .faq summary::after { content: "+"; position: absolute; right: 4px; top: 10px; color: var(--accent); font-size: 22px; font-weight: 600; }
   .faq details[open] summary::after { content: "−"; }
   .faq p { margin: 0 0 14px; color: var(--muted); }
   .rate { margin-top: 48px; max-width: 760px; padding: 20px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 16px; }
@@ -491,7 +499,7 @@
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
     .filters-sum { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; list-style: none; font-weight: 600; font-size: 14px; }
     .filters-sum::-webkit-details-marker { display: none; }
-    .filters-sum::after { content: "▾"; color: var(--muted); }
+    .filters-sum::after { content: "▾"; color: var(--accent); font-size: 1.15em; }
     .filters-wrap[open] .filters-sum::after { content: "▴"; }
     .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
@@ -700,7 +708,7 @@
   </aside>
   <div class="set-fab" id="set-fab" hidden>
     <button type="button" class="fab-open" id="fab-open" aria-controls="set-panel">
-      <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go">Open ›</span>
+      <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go ga-open">Open</span>
     </button>
     <button type="button" class="fab-clear" id="fab-clear" aria-label="Clear your whole set">Clear</button>
   </div>
@@ -1020,7 +1028,7 @@ function render({ source, query, results, similar_artists = [] }) {
         <img src="/static/brands/soundcloud/logo_white.png" width="120" height="15" alt="SoundCloud"></a>
     </div>` : "";
   const bcLink = source.source === "bandcamp" && /^https:\/\/[a-z0-9-]+\.bandcamp\.com\/track\//i.test(source.url || "") ? source.url : "";
-  const bcAttribution = bcLink ? `<div class="sc-attr"><a href="${esc(bcLink)}" target="_blank" rel="noopener">Listen on Bandcamp ↗</a></div>` : "";
+  const bcAttribution = bcLink ? `<div class="sc-attr"><a href="${esc(bcLink)}" target="_blank" rel="noopener" class="ga-out">Listen on Bandcamp</a></div>` : "";
   const from = { youtube: "From YouTube", soundcloud: "From SoundCloud", beatport: "From Beatport", bandcamp: "From Bandcamp", deezer: "Your track", text: "Your track" }[source.source] || "Your track";
   const qAge = query.release_date ? Math.max(0, Math.floor((Date.now() - Date.parse(query.release_date)) / 864e5)) : null;
   let html = shared + `<section class="query">
@@ -1045,7 +1053,7 @@ function render({ source, query, results, similar_artists = [] }) {
         </div>
         <div class="actions">
           ${addButton(query)}
-          <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(query)}">Beatport ↗</a>
+          <a class="icon ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(query)}">Beatport</a>
         </div>
       </div>${attribution}${ytAttribution}${bcAttribution}${embed}
     </section>`;
@@ -1214,8 +1222,8 @@ function renderList() {
       </div>
       <div class="actions">
         ${addButton(t)}
-        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="hide-sm">Find similar →</span><span class="show-sm">Similar →</span></button>
-        <a class="icon" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport ↗</a>
+        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="hide-sm ga">Find similar</span><span class="show-sm ga">Similar</span></button>
+        <a class="icon ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
       </div>
     </div>`).join("");
 }
@@ -1247,8 +1255,8 @@ document.addEventListener("click", e => {
   row.insertAdjacentHTML("beforeend", `<div class="player">
     ${playerOrGate("deezer", deezerPlayer)}
     <div class="more">Also on
-      <a target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud ↗</a>
-      <a target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube ↗</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube</a>
     </div></div>`);
 });
 
@@ -1843,7 +1851,7 @@ function energyFlow() {
   const y = e => h - padY - (e - lo) * (h - 2 * padY) / Math.max(1, hi - lo);
   const pts = set.map((t, i) => `${x(i).toFixed(1)},${y(t.energy).toFixed(1)}`).join(" ");
   const dots = set.map((t, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(t.energy).toFixed(1)}" r="4" fill="${camelotColor(t.camelot)}" stroke="#14141b" stroke-width="2"><title>${i + 1}. ${esc(t.title)}: energy ${t.energy}</title></circle>`).join("");
-  return `<div class="flow-label">Energy flow <span>${es[0]} → ${es[es.length - 1]}</span></div>
+  return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${es[es.length - 1]}</span></div>
     <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy across the set, from ${es[0]} to ${es[es.length - 1]}">
       <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${dots}
     </svg>`;
@@ -1906,7 +1914,7 @@ function renderSet() {
             <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
             <span class="chip">${esc(t.bpm)} BPM</span>${energyBar(t.energy)}
           </div>
-          <button type="button" class="next-btn" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}">Find what mixes next →</button>
+          <button type="button" class="next-btn" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>
         </div>
         <div class="item-btns">
           <button type="button" class="mini" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
@@ -2065,6 +2073,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=6" defer></script>
-<script src="/static/i18n.js?v=26"></script>
+<script src="/static/i18n.js?v=27"></script>
 </body>
 </html>

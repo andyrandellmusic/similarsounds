@@ -106,7 +106,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=2">
+<link rel="stylesheet" href="/static/pages.css?v=3">
 {jsonld}
 </head>
 <body>
@@ -188,8 +188,8 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
   <p class="summary">{escape(summary(q, results))}</p>
   <h2>{len(results)} closest matches</h2>
   <ol class="list">{"".join(rows)}</ol>
-  <p class="more"><a class="btn ghost" href="/?t={r['deezer_id']}">Open in SimilarSounds: filters, previews and more matches ›</a></p>
-  <p class="more"><a class="btn ghost" href="{artist_path(main_artist(r['artist']))}">Artists that sound like {escape(main_artist(r['artist']))} ›</a></p>
+  <p class="more"><a class="btn ghost" href="/?t={r['deezer_id']}">Open in SimilarSounds: filters, previews and more matches <i class="g-arr">›</i></a></p>
+  <p class="more"><a class="btn ghost" href="{artist_path(main_artist(r['artist']))}">Artists that sound like {escape(main_artist(r['artist']))} <i class="g-arr">›</i></a></p>
   <h2>Related pages</h2>
   <ul class="related">{related}</ul>
   <p class="note">Matched on sound, key, BPM and energy from 30-second previews on {today.strftime('%-d %B %Y')}. Rankings update as new releases are added.</p>"""

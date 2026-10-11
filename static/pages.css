@@ -63,3 +63,4 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
   .ref img { width: 72px; height: 72px; }
   .row .n { display: none; }
 }
+.g-arr { font-style: normal; color: var(--accent); font-weight: 800; }
