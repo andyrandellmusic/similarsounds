@@ -308,6 +308,7 @@
   @keyframes rv-pop { from { opacity: 0; transform: scale(.94); } }
   @media (prefers-reduced-motion: reduce) { .review-wrap, .review-box { animation: none; } }
 
+  @media (max-width: 640px) { .suggest { max-height: 62vh; } }
   .filters-sum { display: none; }
   .set-fab { display: none; }
   @media (max-width: 640px) {
@@ -1086,8 +1087,12 @@ box.addEventListener("click", e => {
   const el = e.target.closest(".sg-item");
   if (el) choose(Number(el.dataset.i));
 });
-document.addEventListener("pointerdown", e => { if (!e.target.closest(".search-wrap")) closeSuggest(); }, true);
-input.addEventListener("blur", () => setTimeout(() => { if (document.activeElement !== input) closeSuggest(); }, 150));
+// The list stays open when the keyboard closes or the page is tapped/scrolled, so it can be browsed;
+// it closes when a track is chosen, Find is pressed, the box is cleared, or Escape is pressed.
+// Recent searches (shown in an empty box) still close when you leave the box.
+const recentOpen = () => !box.hidden && !input.value.trim();
+document.addEventListener("pointerdown", e => { if (recentOpen() && !e.target.closest(".search-wrap")) closeSuggest(); }, true);
+input.addEventListener("blur", () => setTimeout(() => { if (recentOpen() && document.activeElement !== input) closeSuggest(); }, 150));
 box.addEventListener("click", e => {
   if (!e.target.closest("#sg-clear")) return;
   try { localStorage.removeItem("ss_recent"); } catch {}
