@@ -354,6 +354,16 @@ def robots():
     return pages.ROBOTS
 
 
+@app.get("/llms.txt", response_class=PlainTextResponse)
+def llms():
+    return pages.LLMS
+
+
+@app.get(f"/{pages.INDEXNOW_KEY}.txt", response_class=PlainTextResponse, include_in_schema=False)
+def indexnow_key():
+    return pages.INDEXNOW_KEY
+
+
 @app.get("/stats", include_in_schema=False)
 def stats_page():
     """Private dashboard: visitors and reviews. The page is public but the numbers only load for

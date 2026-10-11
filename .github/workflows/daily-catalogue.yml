@@ -43,3 +43,6 @@ jobs:
           git add data/catalogue.db data/clap.npz data/artist_follow.json
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           git push
+      - name: Tell Bing / ChatGPT search about today's new track pages (IndexNow)
+        continue-on-error: true
+        run: sleep 300 && uv run python -m scripts.indexnow --since "$STARTED"

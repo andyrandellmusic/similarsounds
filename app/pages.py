@@ -298,4 +298,44 @@ def sitemap(index, artists=None) -> str:
     return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
 
 
-ROBOTS = f"User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: {SITE}/sitemap.xml\n"
+# AI search and assistant crawlers are welcome too (ChatGPT, Claude, Perplexity, Google's AI, Bing/Copilot)
+ROBOTS = (
+    "User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /stats\n\n"
+    + "".join(f"User-agent: {b}\nAllow: /\nDisallow: /api/\nDisallow: /stats\n\n" for b in
+              ["OAI-SearchBot", "ChatGPT-User", "GPTBot", "ClaudeBot", "Claude-SearchBot", "Claude-User",
+               "PerplexityBot", "Perplexity-User", "Google-Extended", "Bingbot", "Applebot", "Applebot-Extended"])
+    + f"Sitemap: {SITE}/sitemap.xml\n"
+)
+
+LLMS = f"""# SimilarSounds
+
+> Free tool for house music DJs: paste any track and get brand-new house releases that sound like it and
+> mix with it, matched on sound, musical key (Camelot), BPM and energy, newest releases first.
+
+SimilarSounds ({SITE}) covers house music only: House, Deep House, Tech House, Minimal / Deep Tech and
+Funky / Disco House. Around 6,600 releases, updated daily. Every match is marked green (mixes well),
+amber (workable) or red (will clash). It also has a free set builder that checks every transition and can
+order a set for the smoothest mixes. Free to use; a free account adds more searches.
+
+## Use it
+- [Find house tracks that mix with any track]({SITE}/): paste a YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or type an artist
+- [Browse similar-track pages by genre and BPM]({SITE}/similar-to)
+- [Artists that sound like…]({SITE}/artists-like)
+
+## Guides
+- [The Camelot wheel explained: how to mix in key]({SITE}/guides/camelot-wheel)
+- [How to find songs that mix well together]({SITE}/guides/songs-that-mix-together)
+- [House music BPM guide]({SITE}/guides/house-music-bpm)
+- [Deep house vs tech house vs minimal]({SITE}/guides/house-music-styles)
+- [How to build a DJ set that flows]({SITE}/guides/dj-set-energy)
+- [How to find house tracks similar to a song]({SITE}/guides/find-similar-songs)
+
+## Genres
+- [Deep House]({SITE}/similar-to/genre/deep-house)
+- [Tech House]({SITE}/similar-to/genre/tech-house)
+- [Minimal / Deep Tech]({SITE}/similar-to/genre/minimal-deep-tech)
+- [Funky / Disco House]({SITE}/similar-to/genre/funky-disco-house)
+- [House]({SITE}/similar-to/genre/house)
+"""
+
+INDEXNOW_KEY = "79c46b4c89c7be3d8ddd6e1941d2af93"   # public by design: proves the site's IndexNow submissions
