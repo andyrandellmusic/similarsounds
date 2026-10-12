@@ -106,7 +106,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=4">
+<link rel="stylesheet" href="/static/pages.css?v=5">
 {jsonld}
 </head>
 <body>
@@ -119,7 +119,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 {body}
   </main>
   <footer>
-    <nav aria-label="Browse"><a href="/">Home</a><a href="/guides">DJ guides</a><a href="/similar-to">All similar-track pages</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy</a><a href="/cookies">Cookies</a><a href="/terms">Terms</a></nav>
+    <nav aria-label="Browse"><a href="/">Home</a><a href="/guides">DJ guides</a><a href="/similar-to">All similar-track pages</a><a href="/database">Database</a><a href="/vs">Compare</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy</a><a href="/cookies">Cookies</a><a href="/terms">Terms</a></nav>
     <p>Previews and track details by Deezer. Key, BPM and energy are estimates from 30-second previews. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
   </footer>
 </div>
@@ -294,6 +294,8 @@ def sitemap(index, artists=None) -> str:
         urls += [f"{SITE}/artists-like"] + [SITE + artist_path(n) for n in artists.names]
     from app import guides
     urls += guides.sitemap_urls()
+    from app import info_pages
+    urls += info_pages.sitemap_urls()
     body = "".join(f"<url><loc>{escape(u)}</loc><lastmod>{today}</lastmod></url>" for u in urls)
     return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
 
@@ -321,6 +323,8 @@ order a set for the smoothest mixes. Free to use; a free account adds more searc
 - [Find house tracks that mix with any track]({SITE}/): paste a YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or type an artist
 - [Browse similar-track pages by genre and BPM]({SITE}/similar-to)
 - [Artists that sound like…]({SITE}/artists-like)
+- [What's in the database]({SITE}/database)
+- [Comparisons: SimilarSounds vs DigDeeper, Tunebat, Mixed In Key]({SITE}/vs)
 
 ## Guides
 - [The Camelot wheel explained: how to mix in key]({SITE}/guides/camelot-wheel)

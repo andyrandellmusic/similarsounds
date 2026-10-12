@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, pages, reviews, sources, tokens
+from app import guides, house, info_pages, pages, reviews, sources, tokens
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -329,6 +329,24 @@ def artists_like(slug: str):
     if not name:
         raise HTTPException(404, "We don't have that artist yet")
     return pages.artist_page(artists, name)
+
+
+@app.get("/database", response_class=HTMLResponse)
+def database():
+    return info_pages.database_page(index)
+
+
+@app.get("/vs", response_class=HTMLResponse)
+def vs_hub():
+    return info_pages.vs_hub()
+
+
+@app.get("/vs/{slug}", response_class=HTMLResponse)
+def vs(slug: str):
+    html = info_pages.vs_page(slug)
+    if html is None:
+        return RedirectResponse("/vs", status_code=301)
+    return html
 
 
 @app.get("/guides", response_class=HTMLResponse)

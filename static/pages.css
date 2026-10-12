@@ -88,3 +88,27 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
 .guide-card:hover { border-color: rgba(198,255,61,.6); }
 .guide-card b { font-size: 16px; }
 .guide-card span { color: var(--muted); font-size: 14px; }
+
+/* Database + comparisons */
+.stat-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0 8px; }
+.stat-grid div { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px; display: grid; gap: 2px; }
+.stat-grid b { font-size: 26px; letter-spacing: -0.02em; }
+.stat-grid span { color: var(--muted); font-size: 13px; }
+@media (max-width: 640px) { .stat-grid { grid-template-columns: repeat(2, 1fr); } .stat-grid b { font-size: 22px; } }
+.tbl table.db td a, .vs a { color: var(--accent); }
+.db .num, .db th.num { text-align: right; }
+.db .bar-cell { width: 35%; }
+.db .bar { display: block; height: 8px; border-radius: 4px; background: var(--accent); min-width: 2px; }
+.kchips { display: flex; flex-wrap: wrap; gap: 6px; }
+.kchip { color: #0b0b0f; font: 700 12px "JetBrains Mono", monospace; border-radius: 6px; padding: 4px 7px; }
+.kchip b { font-weight: 500; opacity: .75; margin-left: 2px; }
+.labels { list-style: none; padding: 0; columns: 2; gap: 24px; margin: 8px 0; }
+.labels li { padding: 4px 0; border-bottom: 1px solid var(--line); break-inside: avoid; display: flex; justify-content: space-between; gap: 8px; }
+.labels span { color: var(--muted); font: 600 12px "JetBrains Mono", monospace; }
+.muted { color: var(--muted); font-size: 13px; }
+.vs td:first-child { white-space: normal; color: #d6d6e0; }
+.vs td { white-space: normal; vertical-align: top; }
+.vs .y { color: var(--good); font-weight: 800; font-size: 16px; }
+.vs .n { color: var(--bad); font-weight: 800; font-size: 16px; }
+.vs .p { color: var(--ok); font-weight: 800; font-size: 16px; }
+.vs th:nth-child(2), .vs td:nth-child(2) { background: rgba(198,255,61,.06); }
