@@ -46,6 +46,7 @@
   .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
   .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
   .tok-pill[hidden] { display: none; }
+  .tok-pill .tok-l:empty { display: none; }
   .tok-pill svg, .lang-mini svg { width: 17px; height: 17px; flex: none; }
   .tok-pill svg { color: var(--accent); }
   .tok-pill b { font: 700 14px "JetBrains Mono", monospace; color: var(--accent); }
@@ -1638,7 +1639,7 @@ function showTokens(t) {
   }
   const used = Math.max(0, total - t.left);
   el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : `${used}/${total}`;
-  el.querySelector(".tok-l").textContent = t.subscribed ? "Unlimited" : "used";
+  el.querySelector(".tok-l").textContent = "";          // just the numbers (e.g. 1/3), no words
   el.title = t.subscribed ? "Unlimited searches"
     : `${used} of ${total} free searches used · ${t.left === 1 ? "1 search" : `${t.left} searches`} left`;
   el.setAttribute("aria-label", el.title);
