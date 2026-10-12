@@ -257,6 +257,8 @@
   /* The card nearest the middle of the screen while scrolling fades up to full lime */
   .query .row.centered, #list .row.centered { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
+  .row.played { position: relative; }
+  .row.played::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 5px; border-radius: 0 4px 4px 0; background: #ff4d5e; box-shadow: 0 0 8px rgba(255,77,94,.55); z-index: 1; }
   .row:hover, .row.playing { box-shadow: 0 0 0 1px rgba(198,255,61,.35), 0 6px 24px rgba(0,0,0,.35); }
   .cover { position: relative; width: 64px; height: 64px; padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: var(--panel-2); }
   .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -1019,6 +1021,7 @@ async function run(exactUrl, fromHistory = false) {
     if (r.status === 402) { const e = new Error("no tokens"); e.kind = "tokens"; e.info = data.detail || {}; throw e; }
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
+    markPlayed();
     showScrollHint();
     showTokens(data.tokens);
     rememberSearch(data.query);
@@ -1299,6 +1302,7 @@ function renderList() {
         <a class="icon ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
       </div>
     </div>`).join("");
+  markPlayed();
 }
 
 // "Find similar": start a new search from any result (button or title)
@@ -1323,6 +1327,7 @@ document.addEventListener("click", e => {
   const t = trackCache[b.dataset.id] || {};
   row.classList.add("playing");
   countPlay();
+  markPlayed(b.dataset.id);
   const deezerPlayer = `<iframe title="Preview" allow="encrypted-media; clipboard-write"
       src="https://widget.deezer.com/widget/dark/track/${b.dataset.id}?autoplay=true&tracklist=false"></iframe>`;
   row.insertAdjacentHTML("beforeend", `<div class="player">
@@ -1455,6 +1460,12 @@ const store = { get: k => { try { return localStorage.getItem(k); } catch { retu
                 set: (k, v) => { try { localStorage.setItem(k, v); } catch {} } };
 let reviewTimer = null, reviewFocus = null;
 function plays() { return Number(store.get("ss_plays")) || 0; }
+/* Tracks already played this visit get a small red tab on the left, even when they turn up again in a new search */
+const playedIds = new Set((() => { try { return JSON.parse(sessionStorage.getItem("ss_played") || "[]"); } catch { return []; } })());
+function markPlayed(id) {
+  if (id) { playedIds.add(String(id)); try { sessionStorage.setItem("ss_played", JSON.stringify([...playedIds].slice(-500))); } catch {} }
+  document.querySelectorAll(".row[data-id]").forEach(r => r.classList.toggle("played", playedIds.has(String(r.dataset.id))));
+}
 function reviewDue() { return !store.get("ss_reviewed") && plays() >= (Number(store.get("ss_review_at")) || REVIEW_AFTER); }
 function countPlay() { store.set("ss_plays", plays() + 1); scheduleReview(); }
 function scheduleReview() {
