@@ -526,20 +526,18 @@
     .filters-wrap[open] .filters-sum::after { content: "▴"; }
     .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
-    .set-fab:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 15; align-items: stretch;
-      background: var(--text); color: var(--bg); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.5); overflow: hidden; }
-    /* slides out of the way while scrolling down (so it never covers the buttons of the track under it), back on scroll up */
+    /* "Your set": a small tab on the right edge of the screen (tap to open). Hidden while the set is open. */
+    .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 46%; z-index: 15; }
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
-    html.fab-away .set-fab { transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none; }
-    .fab-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit;
-      padding: 13px 12px 13px 16px; font-weight: 700; text-align: left; }
-    .fab-clear { flex: none; background: none; border: 0; border-left: 1px solid #d6d6de; color: #8a2a1f; font-weight: 700; font-size: 14px; padding: 0 16px; }
-    .fab-clear:active { background: #e6e6ec; }
-    .fab-go { white-space: nowrap; }
-    .fab-main b { background: var(--accent); color: var(--accent-ink); border-radius: 99px; padding: 1px 8px; margin-left: 4px; }
-    .fab-sub { flex: 1; font-weight: 500; font-size: 13px; color: #4b4b5a; }
-    .fab-sub.bad { color: #c0392b; }
-    body:has(.set-fab:not([hidden])) .wrap { padding-bottom: 100px; }
+    html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    body:has(.set-panel.open) .set-fab { display: none !important; }
+    .fab-open { display: grid; justify-items: center; gap: 2px; width: 48px; padding: 9px 0 8px; border: 1px solid rgba(198,255,61,.5); border-right: 0;
+      border-radius: 14px 0 0 14px; background: rgba(20,20,27,.94); color: var(--accent); box-shadow: -6px 6px 22px rgba(0,0,0,.45);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: pointer; }
+    .fab-open svg { width: 22px; height: 22px; }
+    .fab-open b { min-width: 22px; padding: 1px 6px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 12px Inter, sans-serif; text-align: center; }
+    .fab-lbl { font: 700 9.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+    .fab-open.bad b { background: #ff7a7a; }
     .toast { bottom: 84px; }
   }
   .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
@@ -597,7 +595,7 @@
   .scroll-hint[hidden] { display: none; }
   @keyframes hint-bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -7px); } }
   @media (prefers-reduced-motion: reduce) { .scroll-hint { animation: none; } }
-  @media (max-width: 640px) { body:has(.set-fab:not([hidden])) .scroll-hint { bottom: 92px; } }
+
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; opacity: 0; transition: all .2s; z-index: 30; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateX(-50%); }
 
@@ -747,10 +745,10 @@
     </div>
   </aside>
   <div class="set-fab" id="set-fab" hidden>
-    <button type="button" class="fab-open" id="fab-open" aria-controls="set-panel">
-      <span class="fab-main">Your set <b id="fab-count">0</b></span><span class="fab-sub" id="fab-sub"></span><span class="fab-go ga-open">Open</span>
+    <button type="button" class="fab-open" id="fab-open" aria-controls="set-panel" aria-label="Open your set">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h11M4 12h11M4 18h7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><circle cx="18.5" cy="16.5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M21 16.5V7.5l-2.5.8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <b id="fab-count">0</b><span class="fab-lbl">Set</span><span class="fab-sub" id="fab-sub" hidden></span>
     </button>
-    <button type="button" class="fab-clear" id="fab-clear" aria-label="Clear your whole set">Clear</button>
   </div>
   <div class="acct-wrap" id="acct" hidden>
     <div class="acct-box" id="acct-box" role="dialog" aria-modal="true" aria-labelledby="acct-title">
@@ -2039,6 +2037,8 @@ function renderSet() {
   const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
   $("#fab-sub").textContent = set.length < 2 ? "" : clashes ? `${clashes} clash${clashes > 1 ? "es" : ""}` : "no clashes";
   $("#fab-sub").className = "fab-sub" + (clashes ? " bad" : "");
+  $("#fab-open").classList.toggle("bad", !!clashes);
+  $("#fab-open").setAttribute("aria-label", `Open your set: ${set.length} track${set.length === 1 ? "" : "s"}${clashes ? `, ${clashes} clash${clashes > 1 ? "es" : ""}` : ""}`);
   $("#set-empty").style.display = set.length ? "none" : "";
   $("#set-flow").innerHTML = energyFlow();
   const links = set.slice(1).map((t, i) => transition(set[i], t));
@@ -2148,7 +2148,7 @@ function openSet(open) {
 $("#set-open").onclick = () => openSet(true);
 document.addEventListener("click", e => { if (e.target.closest("#promo-set")) openSet(true); });
 $("#fab-open").onclick = () => openSet(true);
-$("#fab-clear").onclick = () => clearSet();
+
 $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
 document.addEventListener("keydown", e => {
