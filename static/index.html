@@ -2271,9 +2271,12 @@ function startDrag(item, el, pointerId, x, y) {
   Object.assign(ghost.style, { left: "0px", top: "0px", width: r.width + "px", height: r.height + "px",
                                transform: `translate3d(${r.left}px, ${r.top}px, 0)` });
   document.body.appendChild(ghost);
-  drag = { item, ghost, ox: x - r.left, oy: y - r.top };
+  drag = { item, ghost, ox: x - r.left, oy: y - r.top, h: r.height };
   item.classList.add("drag-slot");
-  $("#set-list").classList.add("is-dragging");
+  const list = $("#set-list");
+  list.classList.add("is-dragging");
+  // the list closes up when dragging starts; measure from there so only your movement moves the slot
+  drag.shift = list.getBoundingClientRect().top + item.offsetTop - list.offsetTop + item.offsetHeight / 2 - (r.top + r.height / 2);
   try { el.setPointerCapture(pointerId); } catch {}
   navigator.vibrate?.(12);
   requestAnimationFrame(() => ghost.classList.add("lifted"));
@@ -2297,19 +2300,27 @@ addEventListener("pointermove", e => {
   }
   if (!drag) return;
   drag.ghost.style.transform = `translate3d(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px, 0)`;
-  // where would it land? before the first track whose middle is below the finger
-  const list = $("#set-list"), others = [...list.querySelectorAll(".set-item")].filter(el => el !== drag.item);
-  const before = others.find(el => { const r = el.querySelector(".set-card").getBoundingClientRect(); return e.clientY < r.top + r.height / 2; }) || null;
-  if (before !== drag.item.nextElementSibling && !(before === null && list.lastElementChild === drag.item)) {
-    const tops = new Map(others.map(el => [el, el.getBoundingClientRect().top]));
-    before ? list.insertBefore(drag.item, before) : list.appendChild(drag.item);
-    if (!reduceMotion()) others.forEach(el => {      // slide the others into their new places
-      const d = tops.get(el) - el.getBoundingClientRect().top;
-      if (!d) return;
-      el.style.transition = "none"; el.style.transform = `translateY(${d}px)`;
-      requestAnimationFrame(() => { el.style.transition = "transform .18s ease"; el.style.transform = ""; });
-    });
+  // where would it land? A neighbour moves out of the way once the dragged card is about halfway over it:
+  // the slot steps down when the card's middle passes the halfway point between the slot and the next
+  // track (and the same going up). Uses layout positions, so tracks still sliding don't confuse it.
+  const list = $("#set-list"), lr = list.getBoundingClientRect();
+  const mid = el => lr.top + el.offsetTop - list.offsetTop + el.offsetHeight / 2;
+  const gMid = e.clientY - drag.oy + drag.h / 2 + drag.shift;
+  const before = new Map([...list.querySelectorAll(".set-item")].map(el => [el, el.getBoundingClientRect().top]));
+  let moved = false;
+  for (let guard = 0; guard < 60; guard++) {
+    const next = drag.item.nextElementSibling, prev = drag.item.previousElementSibling;
+    if (next && gMid > (mid(drag.item) + mid(next)) / 2) { list.insertBefore(next, drag.item); moved = true; continue; }
+    if (prev && gMid < (mid(prev) + mid(drag.item)) / 2) { list.insertBefore(drag.item, prev); moved = true; continue; }
+    break;
   }
+  if (moved && !reduceMotion()) before.forEach((top, el) => {      // slide the others into their new places
+    if (el === drag.item) return;
+    const d = top - el.getBoundingClientRect().top;
+    if (!d) return;
+    el.style.transition = "none"; el.style.transform = `translateY(${d}px)`;
+    requestAnimationFrame(() => { el.style.transition = "transform .13s ease-out"; el.style.transform = ""; });
+  });
   // auto-scroll near the edges (on phones the whole panel scrolls; on bigger screens just the list)
   const sb = document.querySelector(".set-body"), scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
   const box = scroller.getBoundingClientRect();
