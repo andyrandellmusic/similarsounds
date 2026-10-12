@@ -639,6 +639,10 @@
   .next-btn:hover { text-decoration: underline; }
   .more-btn { display: flex; margin: 14px auto 0; height: 44px; padding: 0 20px; }
   .set-card .chip { font-size: 11px; padding: 4px 6px; }
+  .set-hint { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
+  .set-card { cursor: grab; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
+  .set-card button, .set-card a { cursor: pointer; }
+  .set-item.dragging .set-card { transform: scale(1.03); cursor: grabbing; transition: transform .12s; }
   .grip { cursor: grab; color: var(--muted); font-size: 18px; line-height: 1; text-align: center; touch-action: none; padding: 6px 0; }
   .num { font: 700 11px "JetBrains Mono", monospace; color: var(--muted); }
   .item-btns { display: flex; flex-direction: column; gap: 2px; }
@@ -795,6 +799,7 @@
       </button>
     </div>
     <div class="set-body">
+      <p class="set-hint" id="set-hint" hidden>Tip: hold a track, then drag it to move it.</p>
       <ol class="set-list" id="set-list"></ol>
       <div class="set-empty" id="set-empty">
         <div class="empty-title">Your set is empty</div>
@@ -2200,6 +2205,7 @@ function renderSet() {
       ? ` · ${links.length - rough - workable} smooth, ${workable} workable, ${rough} clashing` : "")
     : "Nothing here yet.";
   const roles = setRoles(set);
+  $("#set-hint").hidden = set.length < 2;
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span></div>
@@ -2251,16 +2257,39 @@ $("#set-list").addEventListener("click", e => {
 
 /* Drag to reorder (pointer events: works with mouse and touch) */
 let drag = null;
-$("#set-list").addEventListener("pointerdown", e => {
-  const grip = e.target.closest(".grip");
-  if (!grip) return;
-  e.preventDefault();
-  const item = grip.closest(".set-item");
-  drag = { item, startY: e.clientY };
+/* Drag to reorder: grab the ⠿ grip, or the card itself (mouse: click and drag; touch: press and hold, then drag).
+   A quick swipe on touch still scrolls the panel. */
+let pendingDrag = null;
+function startDrag(item, el, pointerId) {
+  pendingDrag = null;
+  drag = { item };
   item.classList.add("dragging");
   $("#set-list").classList.add("is-dragging");
-  grip.setPointerCapture(e.pointerId);
+  try { el.setPointerCapture(pointerId); } catch {}
+  navigator.vibrate?.(12);
+}
+$("#set-list").addEventListener("pointerdown", e => {
+  const item = e.target.closest(".set-item");
+  if (!item || e.target.closest("button, a, input, .gap-box, .link")) {
+    if (!e.target.closest(".grip")) return;
+  }
+  const grip = e.target.closest(".grip");
+  if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId); return; }
+  if (!e.target.closest(".set-card")) return;
+  const card = e.target.closest(".set-card");
+  pendingDrag = { item, card, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
+  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId), 280);
 });
+addEventListener("pointermove", e => {
+  if (!pendingDrag || drag) return;
+  const moved = Math.hypot(e.clientX - pendingDrag.x, e.clientY - pendingDrag.y);
+  if (pendingDrag.mouse && moved > 5) startDrag(pendingDrag.item, pendingDrag.card, pendingDrag.id);
+  else if (!pendingDrag.mouse && moved > 8) { clearTimeout(pendingDrag.timer); pendingDrag = null; }   // they're scrolling
+});
+["pointerup", "pointercancel"].forEach(t => addEventListener(t, () => { if (pendingDrag) { clearTimeout(pendingDrag.timer); pendingDrag = null; } }));
+// while dragging on a phone, the finger moves the track, not the page
+document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });
+$("#set-list").addEventListener("contextmenu", e => { if (drag || pendingDrag) e.preventDefault(); });
 $("#set-list").addEventListener("pointermove", e => {
   if (!drag) return;
   const list = $("#set-list");
@@ -2463,6 +2492,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=42"></script>
+<script src="/static/i18n.js?v=43"></script>
 </body>
 </html>
