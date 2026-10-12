@@ -215,6 +215,8 @@
   .la { background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 999px; padding: 6px 12px; font-weight: 600; font-size: 13px; cursor: pointer; }
   .la:hover { border-color: var(--accent); }
   @media (max-width: 640px) { .la { min-height: 40px; } }
+  .sum-more { display: none; }
+  @media (max-width: 640px) { .sum-more { display: inline-block; } }
   .summary { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; max-width: 760px; }
   .head-tools { display: inline-flex; gap: 10px; align-items: center; }
   .sort { color: var(--muted); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
@@ -521,6 +523,18 @@
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
     .top-tools .acct-btn { padding: 4px; min-height: 40px; min-width: 40px; border-radius: 999px; }
+    /* results: less above the first match */
+    .summary-wrap { margin: 0 0 12px; }
+    .summary-wrap .summary { margin: 0; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .summary-wrap.open .summary { display: block; }
+    .sum-more { background: none; border: 0; padding: 4px 0; color: var(--accent); font: 700 13px Inter, sans-serif; cursor: pointer; }
+    .summary-wrap.open .sum-more { display: none; }
+    .like-artists { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-right: -16px; padding-right: 16px; -webkit-overflow-scrolling: touch; }
+    .like-artists::-webkit-scrollbar { display: none; }
+    .like-artists .la-label { flex: none; max-width: 92px; line-height: 1.25; }
+    .like-artists .la { flex: none; }
+    .howto, .keywheel { display: inline-block; vertical-align: top; margin-right: 14px; }
+    .howto[open], .keywheel[open] { display: block; margin-right: 0; }
     html.has-results #how { display: none; }   /* the 3-step intro tucks away once you've searched */
     .menu-btn { width: 40px; height: 40px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
@@ -1048,6 +1062,7 @@ async function run(exactUrl, fromHistory = false) {
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
     document.documentElement.classList.add("has-results");
+    document.querySelectorAll(".summary-wrap").forEach(w => { const p = w.querySelector(".summary"); if (p.scrollHeight <= p.clientHeight + 2) w.classList.add("open"); });
     markPlayed();
     // bring your track and its matches into view (phones especially: they used to start 1.4 screens down)
     requestAnimationFrame(() => {
@@ -1275,7 +1290,8 @@ function summaryHtml(q, rs) {
   if (styles.length) out.push(`Mostly ${styles.join(" and ")}.`);
   const labels = tally("label").filter(e => e[1] >= 2).slice(0, 3).map(e => e[0]);
   if (labels.length) out.push(labels.length === 1 ? `A label that keeps coming up: ${labels[0]}.` : `Labels that keep coming up: ${labels.join(", ")}.`);
-  return `<p class="summary">${out.map(x => `<span>${esc(x)}</span>`).join(" ")}</p>`;
+  return `<div class="summary-wrap"><p class="summary" id="summary">${out.map(x => `<span>${esc(x)}</span>`).join(" ")}</p>`
+    + `<button type="button" class="sum-more" aria-controls="summary" aria-expanded="false">More</button></div>`;
 }
 const signed = (n, unit) => n === 0 ? `same ${unit}` : `${n > 0 ? "+" : "−"}${Math.abs(n)} ${unit}`;
 
@@ -1932,6 +1948,10 @@ $("#scroll-hint").addEventListener("click", () => {
   hideScrollHint();
   ($(".results-head") || $("#list"))?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
 });
+document.addEventListener("click", e => {
+  const b = e.target.closest(".sum-more"); if (!b) return;
+  b.parentElement.classList.add("open"); b.setAttribute("aria-expanded", "true");
+});
 let toastTimer;
 function toast(text) {
   const el = $("#toast");
@@ -2268,6 +2288,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=35"></script>
+<script src="/static/i18n.js?v=36"></script>
 </body>
 </html>

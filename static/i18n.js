@@ -309,6 +309,7 @@
     "Yes": ["Sí", "Oui", "Ja", "Sì", "Sim", "Ja"],
     "No": ["No", "Non", "Nein", "No", "Não", "Nee"],
     "Artist, track or link…": ["Artista, tema o enlace…", "Artiste, titre ou lien…", "Künstler, Track oder Link…", "Artista, brano o link…", "Artista, faixa ou link…", "Artiest, track of link…"],
+    "More": ["Más", "Plus", "Mehr", "Altro", "Mais", "Meer"],
     "You have used all your credits": ["Has usado todos tus créditos", "Vous avez utilisé tous vos crédits", "Du hast alle deine Credits verbraucht", "Hai usato tutti i tuoi crediti", "Você usou todos os seus créditos", "Je hebt al je credits gebruikt"],
     "Your 2 free searches refresh in": ["Tus 2 búsquedas gratis se renuevan en", "Vos 2 recherches gratuites se renouvellent dans", "Deine 2 kostenlosen Suchen werden erneuert in", "Le tue 2 ricerche gratuite si rinnovano tra", "Suas 2 buscas grátis renovam em", "Je 2 gratis zoekopdrachten worden vernieuwd over"],
     "Your free searches have refreshed. Close this and search away!": ["Tus búsquedas gratis se han renovado. ¡Cierra esto y a buscar!", "Vos recherches gratuites sont renouvelées. Fermez ceci et cherchez !", "Deine kostenlosen Suchen sind erneuert. Schließen und loslegen!", "Le ricerche gratuite si sono rinnovate. Chiudi e cerca!", "Suas buscas grátis foram renovadas. Feche isto e busque à vontade!", "Je gratis zoekopdrachten zijn vernieuwd. Sluit dit en zoek maar raak!"],
