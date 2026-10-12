@@ -2318,7 +2318,7 @@ function renderSet() {
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span></div>
-        ${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}">Fix this gap: find a track to put in between</button><div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}` : ""}
+        <button type="button" class="gap-btn" data-gap="${i}">Fix this gap: find a track to put in between</button><div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
       <div class="set-card">
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
         <button type="button" class="cover set-play" data-setplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)} by ${esc(t.artist)}">
