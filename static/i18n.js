@@ -310,6 +310,10 @@
     "No": ["No", "Non", "Nein", "No", "Não", "Nee"],
     "Artist, track or link…": ["Artista, tema o enlace…", "Artiste, titre ou lien…", "Künstler, Track oder Link…", "Artista, brano o link…", "Artista, faixa ou link…", "Artiest, track of link…"],
     "More": ["Más", "Plus", "Mehr", "Altro", "Mais", "Meer"],
+    "Include older releases": ["Incluir lanzamientos antiguos", "Inclure les sorties plus anciennes", "Ältere Releases einbeziehen", "Includi uscite più vecchie", "Incluir lançamentos antigos", "Oudere releases meenemen"],
+    "Widen BPM to ±10": ["Ampliar BPM a ±10", "Élargir le BPM à ±10", "BPM auf ±10 erweitern", "Allarga BPM a ±10", "Ampliar BPM para ±10", "BPM verruimen naar ±10"],
+    "Any sub-genre": ["Cualquier subgénero", "Tous sous-genres", "Jedes Subgenre", "Qualsiasi sottogenere", "Qualquer subgênero", "Elk subgenre"],
+    "Include all keys": ["Incluir todas las tonalidades", "Inclure toutes les tonalités", "Alle Tonarten einbeziehen", "Includi tutte le tonalità", "Incluir todos os tons", "Alle toonsoorten meenemen"],
     "You have used all your credits": ["Has usado todos tus créditos", "Vous avez utilisé tous vos crédits", "Du hast alle deine Credits verbraucht", "Hai usato tutti i tuoi crediti", "Você usou todos os seus créditos", "Je hebt al je credits gebruikt"],
     "Your 2 free searches refresh in": ["Tus 2 búsquedas gratis se renuevan en", "Vos 2 recherches gratuites se renouvellent dans", "Deine 2 kostenlosen Suchen werden erneuert in", "Le tue 2 ricerche gratuite si rinnovano tra", "Suas 2 buscas grátis renovam em", "Je 2 gratis zoekopdrachten worden vernieuwd over"],
     "Your free searches have refreshed. Close this and search away!": ["Tus búsquedas gratis se han renovado. ¡Cierra esto y a buscar!", "Vos recherches gratuites sont renouvelées. Fermez ceci et cherchez !", "Deine kostenlosen Suchen sind erneuert. Schließen und loslegen!", "Le ricerche gratuite si sono rinnovate. Chiudi e cerca!", "Suas buscas grátis foram renovadas. Feche isto e busque à vontade!", "Je gratis zoekopdrachten zijn vernieuwd. Sluit dit en zoek maar raak!"],
@@ -364,6 +368,7 @@
 
   // ---------- patterns for text that contains numbers or names ($1, $2 … = captured parts)
   const P = [
+    [/^That's every match with your filters \((\d+)\)\. Want more\?$/, ["Son todas las coincidencias con tus filtros ($1). ¿Quieres más?", "Ce sont toutes les correspondances avec vos filtres ($1). Vous en voulez plus ?", "Das sind alle Treffer mit deinen Filtern ($1). Mehr?", "Sono tutti i risultati con i tuoi filtri ($1). Ne vuoi altri?", "São todas as correspondências com seus filtros ($1). Quer mais?", "Dat zijn alle matches met je filters ($1). Meer?"]],
     [/^1 track$/, ["1 tema", "1 titre", "1 Track", "1 brano", "1 faixa", "1 track"]],
     [/^(\d+) tracks? · (\d+) smooth, (\d+) workable, (\d+) clashing$/, ["$1 temas · $2 suaves, $3 aceptables, $4 chocan", "$1 titres · $2 fluides, $3 jouables, $4 en clash", "$1 Tracks · $2 geschmeidig, $3 machbar, $4 kollidierend", "$1 brani · $2 fluidi, $3 accettabili, $4 in conflitto", "$1 faixas · $2 suaves, $3 aceitáveis, $4 em choque", "$1 tracks · $2 soepel, $3 werkbaar, $4 botsend"]],
     [/^(\d) stars$/, ["$1 estrellas", "$1 étoiles", "$1 Sterne", "$1 stelle", "$1 estrelas", "$1 sterren"]],
