@@ -97,8 +97,11 @@
   .menu small { color: var(--muted); font-size: 12px; }
   .logo .mark { display: inline-block; height: 0.86em; width: 1.31em; margin-right: 0.07em; vertical-align: -0.065em; overflow: visible; }
   .stats { color: var(--muted); font-size: 13px; }
-  h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 48px 0 14px; font-weight: 700; max-width: 760px; }
+  h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 24px 0 14px; font-weight: 700; max-width: 760px; }
   h1 em { font-style: normal; color: var(--accent); }
+  /* a thin line between the logo row and the headline: brand green on the left, fading out before the menu side */
+  .brand-divider { height: 1px; margin-top: 26px; background: linear-gradient(90deg, rgba(198,255,61,.7), rgba(198,255,61,.18) 45%, transparent 72%); }
+  .brand-divider::before { content: ""; display: block; width: 44px; height: 3px; margin-top: -1px; border-radius: 2px; background: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
 
   form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
@@ -853,6 +856,7 @@
     </div>
     </div>
   </div>
+  <div class="brand-divider" aria-hidden="true"></div>
   <h1>Paste a track.<br><span data-i18n="hero2">Get <em>the latest</em> house music, with the perfect mix.</span></h1>
   <ol class="steps" id="how">
     <li><b>1</b><span><strong>Pick a track</strong> Type an artist or paste a YouTube, SoundCloud or Beatport link.</span></li>
