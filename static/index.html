@@ -181,8 +181,6 @@
   .problem p { color: var(--muted); margin: 0 0 12px; }
   .tips { color: var(--muted); margin: 6px 0 4px; padding-left: 18px; display: grid; gap: 4px; }
   .tips b { color: var(--text); }
-  .kbd { align-self: center; font: 600 12px "JetBrains Mono", monospace; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; margin-right: 2px; }
-  form.search:focus-within .kbd { visibility: hidden; }   /* keeps its space, so the × doesn't jump when pressed */
   .notice { margin-top: 20px; padding: 18px; border-radius: 14px; background: var(--panel); border: 1px solid #5a4a22; }
   .notice-title { font-weight: 700; color: #ffcf5c; }
   .notice p { color: var(--muted); margin: 6px 0 14px; }
@@ -787,7 +785,6 @@
     .actions { grid-column: 2; }
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
-    .kbd { display: none; }
     .steps { grid-template-columns: 1fr; gap: 8px; margin-bottom: 18px; }
     .steps li { font-size: 12.5px; align-items: center; }
     .steps strong { display: inline; font-size: 13px; margin: 0 4px 0 0; }
@@ -863,7 +860,6 @@
       <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required aria-keyshortcuts="/"
              role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="suggest">
       <button type="button" class="clear" id="clear" aria-label="Clear search and start again" hidden>×</button>
-      <kbd class="kbd" aria-hidden="true" title="Press / to search">/</kbd>
       <button class="go" id="go">Find</button>
     </form>
     <div class="suggest" id="suggest" role="listbox" hidden></div>
