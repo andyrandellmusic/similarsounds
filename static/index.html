@@ -507,7 +507,7 @@
     .rrow .energy i { width: 3px; }
     .rrow { grid-template-rows: auto 1fr; }
     .rrow .side { grid-row: 1 / span 2; }
-    .rrow .actions { grid-column: 2; align-self: end; display: grid; grid-template-columns: auto 1fr 1fr; gap: 6px; }
+    .rrow .actions { grid-column: 2; align-self: end; display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .rrow .actions .icon { justify-content: center; padding: 0 8px; font-size: 12.5px; }
     .rrow .why { margin-top: 6px; align-items: flex-start; }
     .rrow .why > span:last-child { white-space: normal; overflow: visible; line-height: 1.35; }
@@ -679,7 +679,7 @@
     .rrow .chips { flex-wrap: wrap; }
   }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
 <body>
   <button type="button" class="marquee" id="promo-set" aria-label="Try for free now: Set builder">
@@ -776,7 +776,7 @@
       <ol class="set-list" id="set-list"></ol>
       <div class="set-empty" id="set-empty">
         <div class="empty-title">Your set is empty</div>
-        <p data-i18n="emptySet">Search for a track, then tap <b>+ Set</b> on the ones you like and drag them into order.</p>
+        <p data-i18n="emptySet">Search for a track, then tap <b>Add to set</b> on the ones you like and drag them into order.</p>
         <button type="button" class="add-tracks" id="add-tracks">+ Add tracks</button>
         <p class="empty-key" data-i18n="colourKey">Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</p>
       </div>
@@ -934,7 +934,7 @@
       <details><summary>Why only house music?</summary><p>Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set.</p></details>
       <details><summary>How accurate are the key and BPM?</summary><p>They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix.</p></details>
       <details><summary>Can I download the tracks?</summary><p>No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist.</p></details>
-      <details><summary>How do I build a set?</summary><p>Tap + Set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link.</p></details>
+      <details><summary>How do I build a set?</summary><p>Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link.</p></details>
   </section>
   <section class="rate" id="rate" aria-labelledby="rate-title">
     <h2 id="rate-title">Rate SimilarSounds</h2>
@@ -1198,7 +1198,6 @@ function render({ source, query, results, similar_artists = [] }) {
         </div>
         <div class="actions">
           ${addButton(query)}
-          <a class="icon ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(query)}">Beatport</a>
         </div>
       </div>${attribution}${ytAttribution}${bcAttribution}${embed}
     </section>`;
@@ -1387,8 +1386,7 @@ function renderList() {
       </div>
       <div class="actions">
         ${addButton(t)}
-        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="hide-sm ga">Find similar</span><span class="show-sm ga">Similar</span></button>
-        <a class="icon ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
+        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="ga">Find similar tracks</span></button>
       </div>
     </div>`).join("");
   markPlayed();
@@ -1422,6 +1420,7 @@ document.addEventListener("click", e => {
   row.insertAdjacentHTML("beforeend", `<div class="player">
     ${playerOrGate("deezer", deezerPlayer)}
     <div class="more">Also on
+      <a class="ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
       <a class="ga-out" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud</a>
       <a class="ga-out" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube</a>
     </div></div>`);
@@ -1940,7 +1939,7 @@ const inSet = id => set.some(t => t.deezer_id === id);
 
 function addButton(t) {
   const added = inSet(t.deezer_id);
-  return `<button type="button" class="icon add${added ? " added" : ""}" data-add="${t.deezer_id}">${added ? "✓ In set" : "+ Set"}</button>`;
+  return `<button type="button" class="icon add${added ? " added" : ""}" data-add="${t.deezer_id}">${added ? "✓ In set" : "Add to set"}</button>`;
 }
 
 // Delegated, so buttons in freshly rendered results work too
@@ -1966,7 +1965,7 @@ function refreshAddButtons() {
   document.querySelectorAll("[data-add]").forEach(b => {
     const added = inSet(Number(b.dataset.add));
     b.classList.toggle("added", added);
-    b.textContent = added ? "✓ In set" : "+ Set";
+    b.textContent = added ? "✓ In set" : "Add to set";
   });
 }
 
@@ -2333,6 +2332,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=38"></script>
+<script src="/static/i18n.js?v=39"></script>
 </body>
 </html>

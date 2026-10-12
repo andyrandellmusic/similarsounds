@@ -209,7 +209,7 @@ GUIDES = [
 <h2>Build it with the set builder</h2>
 <p>The <a href="/">SimilarSounds set builder</a> is free and does the checking for you:</p>
 <ol class="steps">
-  <li>Search a track and tap <b>+ Set</b> on the matches you like.</li>
+  <li>Search a track and tap <b>Add to set</b> on the matches you like.</li>
   <li>Open <b>Your set</b>. Every transition is coloured <b>green</b> (smooth), <b>amber</b> (workable) or <b>red</b> (clashes).</li>
   <li>Drag tracks into order, or press <b>Smart order</b> to have it arranged for the smoothest mixes.</li>
   <li>Stuck for the next track? Press <b>Find what mixes next</b> on the last one.</li>
@@ -249,7 +249,7 @@ GUIDES = [
 <p>Artists often name their influences in interviews, on their profiles and in the samples they use. Following those back can lead you to older records with the same feel.</p>
 
 <h2>Keep a shortlist</h2>
-<p>Whatever method you use, save the tracks you like in one place. In SimilarSounds, tap <b>+ Set</b> and they're saved on your device (or in your free account), with the transitions between them already checked. Then read <a href="/guides/dj-set-energy">how to build a set that flows</a>.</p>
+<p>Whatever method you use, save the tracks you like in one place. In SimilarSounds, tap <b>Add to set</b> and they're saved on your device (or in your free account), with the transitions between them already checked. Then read <a href="/guides/dj-set-energy">how to build a set that flows</a>.</p>
 """,
         "faq": [
             ("How can I find songs similar to a song I like?", "Use a similar-tracks tool like SimilarSounds, then dig through the same label, the remixer's other work and DJ sets that play the track."),
