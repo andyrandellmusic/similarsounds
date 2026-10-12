@@ -438,6 +438,11 @@
     font: 700 12px Inter, sans-serif; cursor: pointer; }
   .gap-box { margin: 8px 0 4px 18px; padding: 10px; border: 1px dashed var(--line); border-radius: 10px; display: grid; gap: 8px; }
   .gap-box > p { margin: 0; color: var(--muted); font-size: 12px; }
+  /* tiny loading bar while "Fix this gap" searches */
+  .mini-load { height: 3px; border-radius: 3px; background: rgba(198,255,61,.15); overflow: hidden; position: relative; }
+  .mini-load i { position: absolute; top: 0; bottom: 0; left: -40%; width: 40%; border-radius: 3px; background: var(--accent); animation: mini-load 1s ease-in-out infinite; }
+  @keyframes mini-load { from { left: -40%; } to { left: 100%; } }
+  @media (prefers-reduced-motion: reduce) { .mini-load i { animation: none; left: 0; width: 100%; opacity: .5; } }
   .gap-item { display: grid; grid-template-columns: 36px 1fr auto; gap: 8px; align-items: center; }
   .gap-item img { width: 36px; height: 36px; border-radius: 6px; }
   .gap-item .t { font-weight: 600; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -2527,7 +2532,8 @@ document.addEventListener("click", async e => {
   const box = document.querySelector(`[data-gapbox="${i}"]`);
   if (!a || !b || !box) return;
   if (!box.hidden) { box.hidden = true; return; }
-  box.hidden = false; box.innerHTML = "<p>Looking for tracks that mix with both…</p>";
+  box.hidden = false;
+  box.innerHTML = `<p>Looking for tracks that mix with both…</p><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
   try {
     const d = await (await fetch(`/api/bridge?a=${a.deezer_id}&b=${b.deezer_id}&exclude=${set.map(t => t.deezer_id).join(",")}`)).json();
     if (!d.results?.length) { box.innerHTML = "<p>No track in the catalogue bridges these two yet. Try moving one of them instead.</p>"; return; }
