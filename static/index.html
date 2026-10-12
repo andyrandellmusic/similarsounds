@@ -381,6 +381,10 @@
   .flow .fl-n { font: 600 9px "JetBrains Mono", monospace; fill: var(--muted); }
   .flow .fl-grid { stroke: rgba(255,255,255,.06); stroke-dasharray: 3 4; }
   .flow .fl-base { stroke: var(--line); }
+  .flow .fl-e.pk { fill: #ffb070; }
+  .flow .fl-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: fl-grow .55s cubic-bezier(.2, .9, .3, 1.15) both; }
+  @keyframes fl-grow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .flow .fl-bar { animation: none; } }
   .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); display: flex; justify-content: space-between; }
   .flow-label span { letter-spacing: 0; font: 700 11px "JetBrains Mono", monospace; color: var(--text); }
   .icon.smart { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -2060,23 +2064,32 @@ function transition(a, b) {
 
 function energyFlow() {
   if (set.length < 2) return "";
-  // Column graph: one bar per track on a fixed 1-10 energy scale; the peak track is orange,
-  // intro and end track are bright green, the rest a softer green
-  const n = set.length, w = 400, h = 124, top = 16, base = h - 16, gap = n > 24 ? 2 : 4;
+  // Column graph: one bar per track on a fixed 1-10 energy scale. Gradient bars with a soft shine;
+  // the peak track glows orange, intro and end track bright green; bars grow in one after another.
+  const n = set.length, w = 400, h = 124, top = 18, base = h - 16, gap = n > 24 ? 2 : 4;
   const bw = (w - gap * (n - 1)) / n, roles = setRoles(set);
   const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
+  const defs = `<defs>
+    <linearGradient id="flg-end" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4ff8a"/><stop offset=".55" stop-color="#c6ff3d"/><stop offset="1" stop-color="#5f8a12"/></linearGradient>
+    <linearGradient id="flg-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9e85a" stop-opacity=".95"/><stop offset="1" stop-color="#3d5a10" stop-opacity=".85"/></linearGradient>
+    <linearGradient id="flg-peak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc06a"/><stop offset=".5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#d9442a"/></linearGradient>
+    <linearGradient id="flg-shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
+    <filter id="flg-glow" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+  </defs>`;
   const bars = set.map((t, i) => {
     const e = es[i], x = i * (bw + gap), bh = (base - top) * e / 10, y = base - bh;
-    const r = roles[i], fill = r === "Peak track" ? "#ff8a3d" : (i === 0 || i === n - 1) ? "var(--accent)" : "rgba(198,255,61,.55)";
-    const small = bw < 14;
-    return `<g><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${Math.min(4, bw / 3).toFixed(1)}" fill="${fill}"/>
-      ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" class="fl-e">${e}</text>`}
+    const r = roles[i], peak = r === "Peak track", end = i === 0 || i === n - 1;
+    const fill = peak ? "url(#flg-peak)" : end ? "url(#flg-end)" : "url(#flg-mid)";
+    const rx = Math.min(5, bw / 3).toFixed(1), small = bw < 14;
+    return `<g class="fl-bar" style="animation-delay:${(i * 0.05).toFixed(2)}s"><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${rx}" fill="${fill}"${peak ? ' filter="url(#flg-glow)"' : ""}/>
+      <rect x="${(x + 1.5).toFixed(1)}" y="${(y + 1.5).toFixed(1)}" width="${Math.max(0, bw * 0.42).toFixed(1)}" height="${Math.max(0, bh - 3).toFixed(1)}" rx="${rx}" fill="url(#flg-shine)"/>
+      ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle" class="fl-e${peak ? " pk" : ""}">${e}</text>`}
       ${small && i % 2 ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${h - 3}" text-anchor="middle" class="fl-n">${i + 1}</text>`}</g>`;
   }).join("");
   const grid = [5, 10].map(v => { const y = base - (base - top) * v / 10; return `<line x1="0" x2="${w}" y1="${y}" y2="${y}" class="fl-grid"/>`; }).join("");
   return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${Math.max(...es)} peak <i class="g-arr">→</i> ${es[n - 1]}</span></div>
-    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${grid}
+    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${defs}${grid}
       <line x1="0" x2="${w}" y1="${base}" y2="${base}" class="fl-base"/>${bars}</svg>`;
 }
 
