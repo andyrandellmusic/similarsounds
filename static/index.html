@@ -549,6 +549,11 @@
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
     html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
     body:has(.set-panel.open) .set-fab { display: none !important; }
+    /* while browsing it shrinks to a slim strip with just the count, so it doesn't sit on the tracks' buttons */
+    html:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
+    html:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
+    html:not(.fab-top) .set-fab:not(.pop) .fab-open b { min-width: 0; padding: 2px 3px; font-size: 10px; border-radius: 6px; }
+    #how { padding-right: 40px; }
     /* adding a track: the tab bounces out and stays a couple of seconds, even mid-scroll */
     html.fab-away .set-fab.pop { transform: none; opacity: 1; pointer-events: auto; }
     .set-fab.pop .fab-open { animation: fab-pop .7s cubic-bezier(.25, 1.7, .5, 1); }
@@ -2054,6 +2059,7 @@ function smartOrder(tracks) {
   return best;
 }
 
+document.documentElement.classList.toggle("fab-top", scrollY < 120);
 let popTimer;
 function popSetTab() {
   const f = $("#set-fab");
@@ -2066,6 +2072,7 @@ function popSetTab() {
   let lastY = scrollY;
   addEventListener("scroll", () => {
     const y = scrollY, nearEnd = y + innerHeight > document.documentElement.scrollHeight - 40;
+    document.documentElement.classList.toggle("fab-top", y < 120);
     if (y < 120 || y < lastY - 6) document.documentElement.classList.remove("fab-away");
     else if (y > lastY + 6 && !nearEnd) document.documentElement.classList.add("fab-away");
     lastY = y;
