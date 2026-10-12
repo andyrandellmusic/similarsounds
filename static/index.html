@@ -126,6 +126,7 @@
   .start { margin-top: 30px; }
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
+  .howvid .start-label { color: var(--accent); }
   .howvid video { display: block; width: 100%; aspect-ratio: 16 / 9; border-radius: 14px; border: 1px solid var(--line); background: #000; }
   .start-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 10px; }
   .try { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; min-height: 76px; }
@@ -2555,6 +2556,9 @@ function clearSet() {
   set = []; saveSet(); renderSet(); refreshAddButtons();
   announce("Set cleared");   // they already confirmed, so no pop-up
 }
+/* "How it works" video: when it finishes, go back to the cover picture, ready to play again
+   ('ended' doesn't bubble, so listen in the capture phase - the video is re-created on new searches) */
+document.addEventListener("ended", e => { if (e.target.closest?.("#how-video")) e.target.load(); }, true);
 /* ---------- Import a tracklist into the set */
 function openImport() {
   const empty = !set.length;
