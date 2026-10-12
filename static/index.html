@@ -382,8 +382,9 @@
   .flow .fl-grid { stroke: rgba(255,255,255,.06); stroke-dasharray: 3 4; }
   .flow .fl-base { stroke: var(--line); }
   .flow .fl-e.pk { fill: #ffb070; }
-  .flow .fl-r { font: 800 8.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; fill: rgba(11,11,15,.78); pointer-events: none; }
-  .flow .fl-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: fl-grow .55s cubic-bezier(.2, .9, .3, 1.15) both; }
+  .flow .fl-r { font: 800 8.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; fill: #0b0b0f; pointer-events: none; }
+  .flow rect { shape-rendering: geometricPrecision; }
+  .flow .fl-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: fl-grow .35s ease-out both; }
   @keyframes fl-grow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { .flow .fl-bar { animation: none; } }
   .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); display: flex; justify-content: space-between; }
@@ -642,7 +643,12 @@
   .set-hint { margin: 0 0 8px; color: var(--muted); font-size: 12px; }
   .set-card { cursor: grab; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .set-card button, .set-card a { cursor: pointer; }
-  .set-item.dragging .set-card { transform: scale(1.03); cursor: grabbing; transition: transform .12s; }
+  .drag-ghost { position: fixed; z-index: 70; margin: 0; pointer-events: none; box-sizing: border-box; cursor: grabbing;
+    border-color: var(--accent) !important; transition: transform .14s ease, box-shadow .14s ease; }
+  .drag-ghost.lifted { transform: scale(1.04) rotate(-1.2deg); box-shadow: 0 18px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(198,255,61,.5); }
+  .drag-ghost.landing { transition: left .16s ease, top .16s ease, transform .16s ease, box-shadow .16s ease; }
+  .set-item.drag-slot .set-card { background: rgba(198,255,61,.05); border: 1.5px dashed rgba(198,255,61,.55); box-shadow: none; }
+  .set-item.drag-slot .set-card > * { visibility: hidden; }
   .grip { cursor: grab; color: var(--muted); font-size: 18px; line-height: 1; text-align: center; touch-action: none; padding: 6px 0; }
   .num { font: 700 11px "JetBrains Mono", monospace; color: var(--muted); }
   .item-btns { display: flex; flex-direction: column; gap: 2px; }
@@ -651,7 +657,8 @@
   .mini:disabled { color: var(--muted); opacity: .35; cursor: default; }
   .mini:disabled:hover { background: none; }
   .set-item.dragging .set-card { border-color: var(--accent); box-shadow: 0 8px 30px rgba(0,0,0,.5); position: relative; z-index: 2; }
-  .set-list.is-dragging .link { visibility: hidden; }
+  .set-list.is-dragging .link, .set-list.is-dragging .gap-btn, .set-list.is-dragging .gap-box { display: none; }   /* a tight list while you drag */
+  .set-list.is-dragging .set-item { margin-bottom: 8px; }
 
   .link { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px 14px; padding: 6px 0 6px 14px; border-left: 3px solid var(--c); font-size: 12px; color: var(--muted); }
   .link .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
@@ -2084,18 +2091,12 @@ function roleText(role, x, y, bw, bh, word) {
 }
 function energyFlow() {
   if (set.length < 2) return "";
-  // Column graph: one bar per track on a fixed 1-10 energy scale. Gradient bars with a soft shine;
-  // the peak track glows orange, intro and end track bright green; bars grow in one after another.
+  // Column graph: one flat bar per track on a fixed 1-10 energy scale; the peak track is orange,
+  // intro and end track bright green; bars grow in one after another.
   const n = set.length, w = 400, h = 124, top = 18, base = h - 16, gap = n > 24 ? 2 : 4;
   const bw = (w - gap * (n - 1)) / n, roles = setRoles(set);
   const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
-  const defs = `<defs>
-    <linearGradient id="flg-end" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4ff8a"/><stop offset=".55" stop-color="#c6ff3d"/><stop offset="1" stop-color="#5f8a12"/></linearGradient>
-    <linearGradient id="flg-mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#b9e85a" stop-opacity=".95"/><stop offset="1" stop-color="#3d5a10" stop-opacity=".85"/></linearGradient>
-    <linearGradient id="flg-peak" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffc06a"/><stop offset=".5" stop-color="#ff8a3d"/><stop offset="1" stop-color="#d9442a"/></linearGradient>
-    <linearGradient id="flg-shine" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#fff" stop-opacity=".28"/><stop offset=".45" stop-color="#fff" stop-opacity=".06"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></linearGradient>
-    <filter id="flg-glow" x="-60%" y="-30%" width="220%" height="160%"><feGaussianBlur stdDeviation="3.5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
-  </defs>`;
+
   // one word per role, the longest that fits every bar with that role (so all "Warm-up" bars match)
   const words = {};
   for (const r of new Set(roles)) {
@@ -2105,18 +2106,17 @@ function energyFlow() {
   const bars = set.map((t, i) => {
     const e = es[i], x = i * (bw + gap), bh = (base - top) * e / 10, y = base - bh;
     const r = roles[i], peak = r === "Peak track", end = i === 0 || i === n - 1;
-    const fill = peak ? "url(#flg-peak)" : end ? "url(#flg-end)" : "url(#flg-mid)";
-    const rx = Math.min(5, bw / 3).toFixed(1), small = bw < 14;
+    const fill = peak ? "#ff8a3d" : end ? "#c6ff3d" : "#7fa83a";       // flat, solid colours
+    const rx = Math.min(2, bw / 6).toFixed(1), small = bw < 14;
     return `<g class="fl-bar" style="animation-delay:${(i * 0.05).toFixed(2)}s"><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${rx}" fill="${fill}"${peak ? ' filter="url(#flg-glow)"' : ""}/>
-      <rect x="${(x + 1.5).toFixed(1)}" y="${(y + 1.5).toFixed(1)}" width="${Math.max(0, bw * 0.42).toFixed(1)}" height="${Math.max(0, bh - 3).toFixed(1)}" rx="${rx}" fill="url(#flg-shine)"/>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${rx}" fill="${fill}"/>
       ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle" class="fl-e${peak ? " pk" : ""}">${e}</text>`}
       ${roleText(r, x, y, bw, bh, words[r])}
       ${small && i % 2 ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${h - 3}" text-anchor="middle" class="fl-n">${i + 1}</text>`}</g>`;
   }).join("");
   const grid = [5, 10].map(v => { const y = base - (base - top) * v / 10; return `<line x1="0" x2="${w}" y1="${y}" y2="${y}" class="fl-grid"/>`; }).join("");
   return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${Math.max(...es)} peak <i class="g-arr">→</i> ${es[n - 1]}</span></div>
-    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${defs}${grid}
+    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${grid}
       <line x1="0" x2="${w}" y1="${base}" y2="${base}" class="fl-base"/>${bars}</svg>`;
 }
 
@@ -2257,66 +2257,87 @@ $("#set-list").addEventListener("click", e => {
 
 /* Drag to reorder (pointer events: works with mouse and touch) */
 let drag = null;
-/* Drag to reorder: grab the ⠿ grip, or the card itself (mouse: click and drag; touch: press and hold, then drag).
-   A quick swipe on touch still scrolls the panel. */
+/* Drag to reorder. Grab the ⠿ grip or the card (mouse: click and drag; phone: press and hold, then drag).
+   The card lifts and follows your finger, a dashed slot shows where it will land, the other tracks slide
+   out of the way, and on release the card glides into its slot. A quick swipe on a phone still scrolls. */
 let pendingDrag = null;
-function startDrag(item, el, pointerId) {
+const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
+function startDrag(item, el, pointerId, x, y) {
   pendingDrag = null;
-  drag = { item };
-  item.classList.add("dragging");
+  const card = item.querySelector(".set-card"), r = card.getBoundingClientRect();
+  const ghost = card.cloneNode(true);
+  ghost.classList.add("drag-ghost");
+  Object.assign(ghost.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  document.body.appendChild(ghost);
+  drag = { item, ghost, dy: y - r.top };
+  item.classList.add("drag-slot");
   $("#set-list").classList.add("is-dragging");
   try { el.setPointerCapture(pointerId); } catch {}
   navigator.vibrate?.(12);
+  requestAnimationFrame(() => ghost.classList.add("lifted"));
 }
 $("#set-list").addEventListener("pointerdown", e => {
   const item = e.target.closest(".set-item");
-  if (!item || e.target.closest("button, a, input, .gap-box, .link")) {
-    if (!e.target.closest(".grip")) return;
-  }
+  if (!item) return;
   const grip = e.target.closest(".grip");
-  if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId); return; }
-  if (!e.target.closest(".set-card")) return;
+  if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId, e.clientX, e.clientY); return; }
+  if (e.target.closest("button, a, input, .gap-box, .link") || !e.target.closest(".set-card")) return;
   const card = e.target.closest(".set-card");
   pendingDrag = { item, card, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
-  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId), 280);
+  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
 });
 addEventListener("pointermove", e => {
-  if (!pendingDrag || drag) return;
-  const moved = Math.hypot(e.clientX - pendingDrag.x, e.clientY - pendingDrag.y);
-  if (pendingDrag.mouse && moved > 5) startDrag(pendingDrag.item, pendingDrag.card, pendingDrag.id);
-  else if (!pendingDrag.mouse && moved > 8) { clearTimeout(pendingDrag.timer); pendingDrag = null; }   // they're scrolling
+  if (pendingDrag && !drag) {
+    const moved = Math.hypot(e.clientX - pendingDrag.x, e.clientY - pendingDrag.y);
+    if (pendingDrag.mouse && moved > 5) startDrag(pendingDrag.item, pendingDrag.card, pendingDrag.id, pendingDrag.x, pendingDrag.y);
+    else if (!pendingDrag.mouse && moved > 8) { clearTimeout(pendingDrag.timer); pendingDrag = null; }   // they're scrolling
+    if (!drag) return;
+  }
+  if (!drag) return;
+  drag.ghost.style.top = (e.clientY - drag.dy) + "px";
+  // where would it land? before the first track whose middle is below the finger
+  const list = $("#set-list"), others = [...list.querySelectorAll(".set-item")].filter(el => el !== drag.item);
+  const before = others.find(el => { const r = el.querySelector(".set-card").getBoundingClientRect(); return e.clientY < r.top + r.height / 2; }) || null;
+  if (before !== drag.item.nextElementSibling && !(before === null && list.lastElementChild === drag.item)) {
+    const tops = new Map(others.map(el => [el, el.getBoundingClientRect().top]));
+    before ? list.insertBefore(drag.item, before) : list.appendChild(drag.item);
+    if (!reduceMotion()) others.forEach(el => {      // slide the others into their new places
+      const d = tops.get(el) - el.getBoundingClientRect().top;
+      if (!d) return;
+      el.style.transition = "none"; el.style.transform = `translateY(${d}px)`;
+      requestAnimationFrame(() => { el.style.transition = "transform .18s ease"; el.style.transform = ""; });
+    });
+  }
+  // auto-scroll near the edges (on phones the whole panel scrolls; on bigger screens just the list)
+  const sb = document.querySelector(".set-body"), scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
+  const box = scroller.getBoundingClientRect();
+  if (e.clientY < Math.max(box.top, 0) + 40) scroller.scrollTop -= 12;
+  if (e.clientY > Math.min(box.bottom, innerHeight) - 40) scroller.scrollTop += 12;
 });
 ["pointerup", "pointercancel"].forEach(t => addEventListener(t, () => { if (pendingDrag) { clearTimeout(pendingDrag.timer); pendingDrag = null; } }));
-// while dragging on a phone, the finger moves the track, not the page
-document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });
+document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });   // the finger moves the track, not the page
 $("#set-list").addEventListener("contextmenu", e => { if (drag || pendingDrag) e.preventDefault(); });
-$("#set-list").addEventListener("pointermove", e => {
-  if (!drag) return;
-  const list = $("#set-list");
-  const others = [...list.querySelectorAll(".set-item:not(.dragging)")];
-  const after = others.find(el => {
-    const r = el.querySelector(".set-card").getBoundingClientRect();
-    return e.clientY < r.top + r.height / 2;
-  });
-  if (after) { if (after !== drag.item.nextElementSibling) list.insertBefore(drag.item, after); }
-  else if (list.lastElementChild !== drag.item) list.appendChild(drag.item);
-  // Auto-scroll the panel near its edges
-  // (on phones the whole panel scrolls; on bigger screens just the list)
-  const sb = document.querySelector(".set-body"), scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
-  const body = scroller.getBoundingClientRect();
-  if (e.clientY < Math.max(body.top, 0) + 40) scroller.scrollTop -= 12;
-  if (e.clientY > Math.min(body.bottom, innerHeight) - 40) scroller.scrollTop += 12;
-});
 function endDrag() {
   if (!drag) return;
-  const order = [...$("#set-list").querySelectorAll(".set-item")].map(el => Number(el.dataset.id));
-  set = order.map(id => set.find(t => t.deezer_id === id));
+  const { item, ghost } = drag;
   drag = null;
-  $("#set-list").classList.remove("is-dragging");
-  saveSet(); renderSet();
+  const finish = () => {
+    ghost.remove();
+    item.classList.remove("drag-slot");
+    $("#set-list").querySelectorAll(".set-item").forEach(el => { el.style.transition = ""; el.style.transform = ""; });
+    const order = [...$("#set-list").querySelectorAll(".set-item")].map(el => Number(el.dataset.id));
+    set = order.map(id => set.find(t => t.deezer_id === id));
+    $("#set-list").classList.remove("is-dragging");
+    saveSet(); renderSet();
+  };
+  if (reduceMotion()) return finish();
+  const r = item.querySelector(".set-card").getBoundingClientRect();      // glide into the slot
+  ghost.classList.remove("lifted"); ghost.classList.add("landing");
+  Object.assign(ghost.style, { left: r.left + "px", top: r.top + "px" });
+  setTimeout(finish, 170);
 }
-$("#set-list").addEventListener("pointerup", endDrag);
-$("#set-list").addEventListener("pointercancel", endDrag);
+addEventListener("pointerup", endDrag);
+addEventListener("pointercancel", endDrag);
 
 let setOpener = null;
 function openSet(open) {
