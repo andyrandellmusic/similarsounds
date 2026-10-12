@@ -219,6 +219,8 @@
   @media (max-width: 640px) { .sum-more { display: inline-block; } }
   .more-hints { margin: 18px 0 8px; padding: 14px; border: 1px dashed var(--line); border-radius: 12px; text-align: center; }
   .more-hints p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
+  .more-hints.empty { border-style: solid; background: var(--panel); }
+  .more-hints.empty p { color: var(--text); font-weight: 600; }
   .more-hints div { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
   .summary { color: var(--muted); font-size: 14px; line-height: 1.6; margin: 0 0 12px; max-width: 760px; }
   .head-tools { display: inline-flex; gap: 10px; align-items: center; }
@@ -1238,18 +1240,20 @@ function render({ source, query, results, similar_artists = [] }) {
         <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
       </div></details>` : ""}
     ${results.length ? `<details class="keywheel" id="keywheel"><summary>Key wheel <span id="kw-state"></span></summary><div class="kw-body" id="kw-body"></div></details>` : ""}`;
-  if (!results.length) html += `<div class="msg">No matches with these filters - try a wider release window or BPM range.</div>`;
+
   html += `<div class="list" id="list"></div>`;
   if (results.length >= resultLimit && resultLimit < 90)
     html += `<button type="button" class="icon more-btn" id="show-more">Show 30 more matches</button>`;
-  else if (results.length) {
-    // fewer matches than asked for: the filters are the limit, so offer to widen them
+  else {
+    // fewer matches than asked for (or none): the filters are the limit, so offer to widen them
     const tips = [];
     if (age) tips.push(`<button type="button" class="icon" data-widen="age">Include older releases</button>`);
     if ($("#bpm").value !== "10") tips.push(`<button type="button" class="icon" data-widen="bpm">Widen BPM to ±10</button>`);
     if ($("#style").value) tips.push(`<button type="button" class="icon" data-widen="style">Any sub-genre</button>`);
     if ($("#strict").checked) tips.push(`<button type="button" class="icon" data-widen="strict">Include all keys</button>`);
-    if (tips.length) html += `<div class="more-hints"><p>That's every match with your filters (${results.length}). Want more?</p><div>${tips.join("")}</div></div>`;
+    const lead = results.length ? `That's every match with your filters (${results.length}). Want more?` : "No matches with these filters. Try widening them:";
+    if (tips.length) html += `<div class="more-hints${results.length ? "" : " empty"}"><p>${lead}</p><div>${tips.join("")}</div></div>`;
+    else if (!results.length) html += `<div class="msg">No matches found for this track yet. New releases arrive every day, so try again soon.</div>`;
   }
   $("#out").innerHTML = html;
   document.querySelectorAll("[data-widen]").forEach(b => b.onclick = () => {
@@ -2329,6 +2333,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=37"></script>
+<script src="/static/i18n.js?v=38"></script>
 </body>
 </html>
