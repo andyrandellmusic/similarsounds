@@ -249,9 +249,14 @@
     border-width: 6px 0 6px 10px; border-color: transparent transparent transparent var(--accent); transition: transform .15s; }
   .howto[open] summary::before, .keywheel[open] summary::before { transform: rotate(90deg); }
   .howto summary:hover, .keywheel summary:hover { color: var(--accent); }
-  .howto-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 12px; }
-  .howto-grid > div { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
-  .howto-grid p { margin: 2px 0 0; flex-basis: 100%; }
+  .howto-grid { display: grid; grid-template-columns: 1fr; margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px; }
+  @media (min-width: 760px) { .howto-grid { grid-template-columns: 1fr 1fr; column-gap: 28px; } .howto-grid > div:nth-child(2) { border-top: 0; } }
+  /* each explanation on its own row: the picture in a column on the left, the words on the right */
+  .howto-grid > div { display: grid; grid-template-columns: 96px 1fr; align-items: center; gap: 14px; padding: 14px 0; border-top: 1px solid var(--line); }
+  .howto-grid > div:first-child { border-top: 0; }
+  .hi-ico { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 30px; padding: 6px; border-radius: 10px; background: var(--panel-2); }
+  .hi-ico .energy .e-lbl { display: none; }
+  .howto-grid p { margin: 0; line-height: 1.45; }
   .howto-grid b { color: var(--text); display: block; }
   .group-head { display: flex; align-items: center; gap: 8px; margin: 18px 2px 2px; font-weight: 800; font-size: 13px; letter-spacing: .02em; }
   .group-head:first-child { margin-top: 4px; }
@@ -1288,10 +1293,10 @@ function render({ source, query, results, similar_artists = [] }) {
     </div>
     <div class="howto-body" id="howto-body" hidden>
       <div class="howto-grid">
-        <div><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
-        <div><span class="chip cam" style="background:${camelotColor("8A")}">8A</span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
-        <div>${energyBar(6)}<p><b>Track energy</b> How hard the track hits, from 1 (deep and chilled) to 10 (peak-time).</p></div>
-        <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
+        <div><span class="hi-ico"><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
+        <div><span class="hi-ico"><span class="chip cam" style="background:${camelotColor("8A")}">8A</span></span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
+        <div><span class="hi-ico">${energyBar(6)}</span><p><b>Track energy</b> How hard the track hits, from 1 (deep and chilled) to 10 (peak-time).</p></div>
+        <div><span class="hi-ico"><span class="chip match">84% match</span></span><p><b>Sound match</b> How close it sounds to your track.</p></div>
       </div>
     </div>
     <div class="kw-body" id="kw-body" hidden></div>` : ""}`;
