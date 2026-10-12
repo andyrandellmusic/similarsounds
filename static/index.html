@@ -521,6 +521,7 @@
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
     .top-tools .acct-btn { padding: 4px; min-height: 40px; border-radius: 999px; }
+    html.has-results #how { display: none; }   /* the 3-step intro tucks away once you've searched */
     .menu-btn { width: 40px; height: 40px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
     .filters-sum { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 14px; cursor: pointer; list-style: none; font-weight: 600; font-size: 14px; }
@@ -1046,7 +1047,14 @@ async function run(exactUrl, fromHistory = false) {
     if (r.status === 402) { const e = new Error("no tokens"); e.kind = "tokens"; e.info = data.detail || {}; throw e; }
     if (!r.ok) { const e = new Error(data.detail || "Something went wrong"); e.kind = r.status === 404 ? "notfound" : r.status === 400 ? "badlink" : "server"; throw e; }
     render(data);
+    document.documentElement.classList.add("has-results");
     markPlayed();
+    // bring your track and its matches into view (phones especially: they used to start 1.4 screens down)
+    requestAnimationFrame(() => {
+      const q = document.querySelector("#out .query");
+      if (q && q.getBoundingClientRect().top > 120)
+        scrollTo({ top: q.getBoundingClientRect().top + scrollY - 12, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+    });
     showScrollHint();
     showTokens(data.tokens);
     rememberSearch(data.query);
@@ -1584,12 +1592,14 @@ function recentSearches() {
 function newSearch(pushHistory = true) {
   $("#url").value = ""; picked = { text: null, url: null }; lastResults = []; sharedArrival = false;
   $("#out").innerHTML = startHTML;
+  document.documentElement.classList.remove("has-results");
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
   if (pushHistory && location.search) history.pushState(null, "", location.pathname);
   document.title = "Find House Music That Mixes With Your Track | SimilarSounds";
   updateClear(); closeSuggest();
   $("#url").focus();
 }
+if (matchMedia("(max-width: 640px)").matches) $("#url").placeholder = "Artist, track or link…";
 function updateClear() { $("#clear").hidden = !$("#url").value; }
 document.addEventListener("click", e => {
   if (e.target.closest("#clear, #new-search")) newSearch();
@@ -2258,6 +2268,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=34"></script>
+<script src="/static/i18n.js?v=35"></script>
 </body>
 </html>
