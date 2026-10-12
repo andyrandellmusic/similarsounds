@@ -2206,10 +2206,10 @@ function smartOrder(tracks) {
 document.documentElement.classList.toggle("fab-top", scrollY < 120);
 { // back-to-top button
   const btn = $("#to-top");
-  // shows once you've scrolled a third of the way down the page
+  // shows early: after 15% of the page (or one screen, whichever comes first), never in the first 250px
   const update = () => {
     const max = document.documentElement.scrollHeight - innerHeight;
-    btn.classList.toggle("show", max > 0 && scrollY > max / 3);
+    btn.classList.toggle("show", max > 0 && scrollY > Math.max(250, Math.min(max * 0.15, innerHeight)));
   };
   addEventListener("scroll", update, { passive: true }); update();
   const goTop = e => {
