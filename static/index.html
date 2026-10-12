@@ -644,9 +644,9 @@
   .set-card { cursor: grab; -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .set-card button, .set-card a { cursor: pointer; }
   .drag-ghost { position: fixed; z-index: 70; margin: 0; pointer-events: none; box-sizing: border-box; cursor: grabbing;
-    border-color: var(--accent) !important; transition: transform .14s ease, box-shadow .14s ease; }
-  .drag-ghost.lifted { transform: scale(1.04) rotate(-1.2deg); box-shadow: 0 18px 40px rgba(0,0,0,.6), 0 0 0 1px rgba(198,255,61,.5); }
-  .drag-ghost.landing { transition: left .16s ease, top .16s ease, transform .16s ease, box-shadow .16s ease; }
+    border-color: var(--accent) !important; will-change: transform; transition: box-shadow .12s ease, opacity .12s ease; }
+  .drag-ghost.lifted { box-shadow: 0 16px 36px rgba(0,0,0,.6), 0 0 0 1px rgba(198,255,61,.5); opacity: .96; }
+  .drag-ghost.landing { transition: transform .16s ease, box-shadow .16s ease; box-shadow: none; }
   .set-item.drag-slot .set-card { background: rgba(198,255,61,.05); border: 1.5px dashed rgba(198,255,61,.55); box-shadow: none; }
   .set-item.drag-slot .set-card > * { visibility: hidden; }
   .grip { cursor: grab; color: var(--muted); font-size: 18px; line-height: 1; text-align: center; touch-action: none; padding: 6px 0; }
@@ -2267,9 +2267,11 @@ function startDrag(item, el, pointerId, x, y) {
   const card = item.querySelector(".set-card"), r = card.getBoundingClientRect();
   const ghost = card.cloneNode(true);
   ghost.classList.add("drag-ghost");
-  Object.assign(ghost.style, { left: r.left + "px", top: r.top + "px", width: r.width + "px", height: r.height + "px" });
+  // glued to the finger / cursor at the exact point you grabbed it, moving freely in both directions
+  Object.assign(ghost.style, { left: "0px", top: "0px", width: r.width + "px", height: r.height + "px",
+                               transform: `translate3d(${r.left}px, ${r.top}px, 0)` });
   document.body.appendChild(ghost);
-  drag = { item, ghost, dy: y - r.top };
+  drag = { item, ghost, ox: x - r.left, oy: y - r.top };
   item.classList.add("drag-slot");
   $("#set-list").classList.add("is-dragging");
   try { el.setPointerCapture(pointerId); } catch {}
@@ -2294,7 +2296,7 @@ addEventListener("pointermove", e => {
     if (!drag) return;
   }
   if (!drag) return;
-  drag.ghost.style.top = (e.clientY - drag.dy) + "px";
+  drag.ghost.style.transform = `translate3d(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px, 0)`;
   // where would it land? before the first track whose middle is below the finger
   const list = $("#set-list"), others = [...list.querySelectorAll(".set-item")].filter(el => el !== drag.item);
   const before = others.find(el => { const r = el.querySelector(".set-card").getBoundingClientRect(); return e.clientY < r.top + r.height / 2; }) || null;
@@ -2332,8 +2334,8 @@ function endDrag() {
   };
   if (reduceMotion()) return finish();
   const r = item.querySelector(".set-card").getBoundingClientRect();      // glide into the slot
-  ghost.classList.remove("lifted"); ghost.classList.add("landing");
-  Object.assign(ghost.style, { left: r.left + "px", top: r.top + "px" });
+  ghost.classList.add("landing");
+  ghost.style.transform = `translate3d(${r.left}px, ${r.top}px, 0)`;
   setTimeout(finish, 170);
 }
 addEventListener("pointerup", endDrag);
