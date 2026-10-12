@@ -2313,9 +2313,15 @@ function startDrag(item, el, pointerId, x, y) {
   document.body.appendChild(ghost);
   drag = { item, ghost, ox: x - r.left, oy: y - r.top, h: r.height };
   item.classList.add("drag-slot");
-  const list = $("#set-list");
+  // The list closes up when dragging starts (the transition lines hide). Keep the slot exactly under the
+  // finger: pad the bottom so the panel can't jump, then scroll by however far the slot moved.
+  const list = $("#set-list"), sb = document.querySelector(".set-body");
+  const scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
+  const h0 = list.offsetHeight;
   list.classList.add("is-dragging");
-  // the list closes up when dragging starts; measure from there so only your movement moves the slot
+  list.style.paddingBottom = Math.max(0, h0 - list.offsetHeight) + "px";
+  scroller.scrollTop += card.getBoundingClientRect().top - r.top;
+  drag.scroller = scroller;
   drag.shift = list.getBoundingClientRect().top + item.offsetTop - list.offsetTop + item.offsetHeight / 2 - (r.top + r.height / 2);
   try { el.setPointerCapture(pointerId); } catch {}
   navigator.vibrate?.(12);
@@ -2381,6 +2387,7 @@ function endDrag() {
     const order = [...$("#set-list").querySelectorAll(".set-item")].map(el => Number(el.dataset.id));
     set = order.map(id => set.find(t => t.deezer_id === id));
     $("#set-list").classList.remove("is-dragging");
+    $("#set-list").style.paddingBottom = "";
     saveSet(); renderSet();
   };
   if (reduceMotion()) return finish();
