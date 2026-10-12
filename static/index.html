@@ -631,16 +631,18 @@
     #how { padding-right: 40px; }
     .toast { bottom: 84px; }
   }
-  .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
+  .set-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }   /* all four tools on one line */
+  .set-tools .icon { flex: 1 1 auto; justify-content: center; height: 32px; padding: 0 8px; font-size: 12px; }
+  @media (max-width: 480px) { .set-tools { gap: 4px; } .set-tools .icon { height: 36px; padding: 0 4px; font-size: 11px; } }
   .set-tools[hidden], .share-set[hidden] { display: none; }
   .share-set { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; text-align: left; background: rgba(198,255,61,.07);
-               border: 1px solid #3b4a16; color: var(--text); border-radius: 12px; padding: 11px 14px; }
+               border: 1px solid #3b4a16; color: var(--text); border-radius: 10px; padding: 7px 12px; }
   .share-set:hover:not(:disabled) { border-color: var(--accent); }
   .share-set:disabled { opacity: .45; cursor: not-allowed; }
-  .share-set svg { width: 22px; height: 22px; color: var(--accent); flex: none; }
+  .share-set svg { width: 16px; height: 16px; color: var(--accent); flex: none; }
   .share-set span { display: grid; gap: 1px; }
-  .share-set b { font-size: 14px; }
-  .share-set small { color: var(--muted); font-size: 12px; }
+  .share-set b { font-size: 13px; }
+  .share-set small { display: none; }                 /* one slim line, so the tracks get the room */
   .set-body { flex: 1; overflow-y: auto; padding: 12px 14px 24px; }
   .set-empty { color: var(--muted); text-align: center; padding: 36px 16px; }
   .empty-title { color: var(--text); font-weight: 800; font-size: 17px; margin-bottom: 6px; }
@@ -2175,7 +2177,7 @@ function energyFlow() {
   if (set.length < 2) return "";
   // Column graph: one flat bar per track on a fixed 1-10 energy scale; the peak track is orange,
   // intro and end track bright green; bars grow in one after another.
-  const n = set.length, w = 400, h = 124, top = 18, base = h - 16, gap = n > 24 ? 2 : 4;
+  const n = set.length, w = 400, h = 92, top = 16, base = h - 14, gap = n > 24 ? 2 : 4;
   const bw = (w - gap * (n - 1)) / n, roles = setRoles(set);
   const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
 
