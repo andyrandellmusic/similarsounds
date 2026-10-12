@@ -568,7 +568,30 @@
   }
 
   .filters-sum { display: none; }
+  /* "Your set" tab on the right edge, on phones and computers alike */
   .set-fab { display: none; }
+  /* "Your set": a small tab on the right edge of the screen (tap to open). Hidden while the set is open. */
+  .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 21%; z-index: 15; }
+  .set-fab { transition: transform .22s ease, opacity .22s ease; }
+  html.has-results.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }   /* home page: always full size */
+  body:has(.set-panel.open) .set-fab { display: none !important; }
+  /* while browsing it shrinks to a slim strip with just the count, so it doesn't sit on the tracks' buttons */
+  html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
+  html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
+  html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open b { min-width: 0; padding: 2px 3px; font-size: 10px; border-radius: 6px; }
+  /* adding a track: the tab bounces out and stays a couple of seconds, even mid-scroll */
+  html.fab-away .set-fab.pop { transform: none; opacity: 1; pointer-events: auto; }
+  .set-fab.pop .fab-open { animation: fab-pop .7s cubic-bezier(.25, 1.7, .5, 1); }
+  .set-fab.pop .fab-open b { animation: fab-count .7s ease; }
+  @keyframes fab-pop { 0% { transform: translateX(100%); } 55% { transform: translateX(-10px); } 100% { transform: none; } }
+  @keyframes fab-count { 0%, 40% { transform: scale(1); } 65% { transform: scale(1.35); } 100% { transform: scale(1); } }
+  .fab-open { display: grid; justify-items: center; gap: 2px; width: 48px; padding: 9px 0 8px; border: 1px solid rgba(198,255,61,.5); border-right: 0;
+    border-radius: 14px 0 0 14px; background: rgba(20,20,27,.94); color: var(--accent); box-shadow: -6px 6px 22px rgba(0,0,0,.45);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: pointer; }
+  .fab-open svg { width: 22px; height: 22px; }
+  .fab-open b { min-width: 22px; padding: 1px 6px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 12px Inter, sans-serif; text-align: center; }
+  .fab-lbl { font: 700 9.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  .fab-open.bad b { background: #ff7a7a; }
   @media (max-width: 640px) {
     header { display: none; }
     .brand-row { margin-top: 0; }
@@ -599,33 +622,11 @@
     .filters-wrap[open] .filters-sum::after { content: "▴"; }
     .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
-    /* "Your set": a small tab on the right edge of the screen (tap to open). Hidden while the set is open. */
-    .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 21%; z-index: 15; }
-    .set-fab { transition: transform .22s ease, opacity .22s ease; }
-    html.has-results.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }   /* home page: always full size */
-    body:has(.set-panel.open) .set-fab { display: none !important; }
     /* set builder: the header scrolls away with the list, so the tracks get the whole screen */
     .set-panel { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .set-panel .set-body { flex: none; overflow: visible; }
     .set-panel.open #set-close { position: fixed; top: 10px; right: 10px; z-index: 5; background: rgba(20,20,27,.92); border-radius: 12px; }
-    /* while browsing it shrinks to a slim strip with just the count, so it doesn't sit on the tracks' buttons */
-    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
-    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
-    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open b { min-width: 0; padding: 2px 3px; font-size: 10px; border-radius: 6px; }
     #how { padding-right: 40px; }
-    /* adding a track: the tab bounces out and stays a couple of seconds, even mid-scroll */
-    html.fab-away .set-fab.pop { transform: none; opacity: 1; pointer-events: auto; }
-    .set-fab.pop .fab-open { animation: fab-pop .7s cubic-bezier(.25, 1.7, .5, 1); }
-    .set-fab.pop .fab-open b { animation: fab-count .7s ease; }
-    @keyframes fab-pop { 0% { transform: translateX(100%); } 55% { transform: translateX(-10px); } 100% { transform: none; } }
-    @keyframes fab-count { 0%, 40% { transform: scale(1); } 65% { transform: scale(1.35); } 100% { transform: scale(1); } }
-    .fab-open { display: grid; justify-items: center; gap: 2px; width: 48px; padding: 9px 0 8px; border: 1px solid rgba(198,255,61,.5); border-right: 0;
-      border-radius: 14px 0 0 14px; background: rgba(20,20,27,.94); color: var(--accent); box-shadow: -6px 6px 22px rgba(0,0,0,.45);
-      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: pointer; }
-    .fab-open svg { width: 22px; height: 22px; }
-    .fab-open b { min-width: 22px; padding: 1px 6px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 12px Inter, sans-serif; text-align: center; }
-    .fab-lbl { font: 700 9.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-    .fab-open.bad b { background: #ff7a7a; }
     .toast { bottom: 84px; }
   }
   .set-tools { display: flex; gap: 6px; margin-top: 12px; flex-wrap: wrap; }
