@@ -531,6 +531,12 @@
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
     html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
     body:has(.set-panel.open) .set-fab { display: none !important; }
+    /* adding a track: the tab bounces out and stays a couple of seconds, even mid-scroll */
+    html.fab-away .set-fab.pop { transform: none; opacity: 1; pointer-events: auto; }
+    .set-fab.pop .fab-open { animation: fab-pop .7s cubic-bezier(.25, 1.7, .5, 1); }
+    .set-fab.pop .fab-open b { animation: fab-count .7s ease; }
+    @keyframes fab-pop { 0% { transform: translateX(100%); } 55% { transform: translateX(-10px); } 100% { transform: none; } }
+    @keyframes fab-count { 0%, 40% { transform: scale(1); } 65% { transform: scale(1.35); } 100% { transform: scale(1); } }
     .fab-open { display: grid; justify-items: center; gap: 2px; width: 48px; padding: 9px 0 8px; border: 1px solid rgba(198,255,61,.5); border-right: 0;
       border-radius: 14px 0 0 14px; background: rgba(20,20,27,.94); color: var(--accent); box-shadow: -6px 6px 22px rgba(0,0,0,.45);
       backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); cursor: pointer; }
@@ -1872,6 +1878,7 @@ document.addEventListener("click", e => {
     set.push({ deezer_id: t.deezer_id, title: t.title, artist: t.artist, cover: t.cover,
                key: t.key, camelot: t.camelot, bpm: t.bpm, energy: t.energy });
     announce(`Added to your set (${set.length})`);
+    popSetTab();
   }
   saveSet(); renderSet(); refreshAddButtons();
 });
@@ -1997,6 +2004,13 @@ function smartOrder(tracks) {
   return best;
 }
 
+let popTimer;
+function popSetTab() {
+  const f = $("#set-fab");
+  f.classList.remove("pop"); void f.offsetWidth;   // restart the bounce each time
+  f.classList.add("pop");
+  clearTimeout(popTimer); popTimer = setTimeout(() => f.classList.remove("pop"), 2600);
+}
 // "Your set" bar on phones: hide while scrolling down, show again on scrolling up or near the top / bottom
 {
   let lastY = scrollY;
