@@ -151,6 +151,7 @@
   .msg.err { border-color: #5a2c22; color: var(--warn); }
   .clear { align-self: center; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; width: 40px; height: 40px; border-radius: 8px; }
   .clear:hover { color: var(--text); background: var(--panel-2); }
+  @media (hover: none) { .clear:hover { background: none !important; } }   /* no sticky hover on phones */
   .shared-note { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
                  padding: 10px 12px 10px 16px; border-radius: 12px; border: 1px dashed #3b4a16; background: rgba(198,255,61,.05); color: var(--muted); font-size: 14px; }
   .shared-note b { color: var(--text); }
@@ -181,7 +182,7 @@
   .tips { color: var(--muted); margin: 6px 0 4px; padding-left: 18px; display: grid; gap: 4px; }
   .tips b { color: var(--text); }
   .kbd { align-self: center; font: 600 12px "JetBrains Mono", monospace; color: var(--muted); border: 1px solid var(--line); border-radius: 6px; padding: 3px 7px; margin-right: 2px; }
-  form.search:focus-within .kbd { display: none; }
+  form.search:focus-within .kbd { visibility: hidden; }   /* keeps its space, so the × doesn't jump when pressed */
   .notice { margin-top: 20px; padding: 18px; border-radius: 14px; background: var(--panel); border: 1px solid #5a4a22; }
   .notice-title { font-weight: 700; color: #ffcf5c; }
   .notice p { color: var(--muted); margin: 6px 0 14px; }
@@ -1838,8 +1839,15 @@ function newSearch(pushHistory = true) {
 }
 if (matchMedia("(max-width: 640px)").matches) $("#url").placeholder = "Artist, track or link…";
 function updateClear() { $("#clear").hidden = !$("#url").value; }
+// The × clears on the first tap: act as soon as the finger lifts (iPhones otherwise spend the first tap on hover)
+let clearedAt = 0;
+document.addEventListener("pointerdown", e => { if (e.target.closest("#clear")) e.preventDefault(); }, true);   // don't move focus
+document.addEventListener("pointerup", e => {
+  if (!e.target.closest("#clear") || e.button > 0) return;
+  clearedAt = Date.now(); newSearch();
+});
 document.addEventListener("click", e => {
-  if (e.target.closest("#clear, #new-search")) newSearch();
+  if (e.target.closest("#new-search") || (e.target.closest("#clear") && Date.now() - clearedAt > 600)) newSearch();
 });
 
 function openFromUrl(fromHistory) {
