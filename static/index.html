@@ -81,13 +81,12 @@
   .logo:hover .mark { animation-play-state: paused; }
 
   .menu-wrap { position: relative; flex: none; }
-  /* language button tucked under the menu button (out of the flow, so the row height doesn't change) */
+  /* language button between the account box and the menu, the same square shape as the menu button */
   .menu-col { position: relative; flex: none; display: flex; }
-  .menu-col > .lang-mini { position: absolute; top: calc(100% + 8px); right: 0; z-index: 3;
-    width: 48px; height: 48px; padding: 0; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px; }
-  .menu-col > .lang-mini .lang-code { font-size: 10.5px; line-height: 1; }
-  @media (max-width: 640px) { .menu-col > .lang-mini { width: 40px; height: 40px; gap: 0; } }
-  @media (max-width: 360px) { .menu-col > .lang-mini { width: 36px; height: 36px; } }
+  .top-tools > .lang-mini { flex: none; width: 48px; height: 48px; padding: 0; border-radius: 12px; flex-direction: column; justify-content: center; gap: 2px; }
+  .top-tools > .lang-mini .lang-code { font-size: 10.5px; line-height: 1; }
+  @media (max-width: 640px) { .top-tools > .lang-mini { width: 40px; height: 40px; gap: 0; } }
+  @media (max-width: 360px) { .top-tools > .lang-mini { width: 36px; height: 36px; } }
   .menu-btn { width: 48px; height: 48px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); display: grid; place-content: center; gap: 5px; padding: 0; }
   .menu-btn span { display: block; width: 20px; height: 2px; border-radius: 2px; background: var(--text); transition: transform .2s, opacity .2s; }
   .menu-btn:hover { border-color: #4a4a5c; }
@@ -101,7 +100,7 @@
   .menu small { color: var(--muted); font-size: 12px; }
   .logo .mark { display: inline-block; height: 0.86em; width: 1.31em; margin-right: 0.07em; vertical-align: -0.065em; overflow: visible; }
   .stats { color: var(--muted); font-size: 13px; }
-  h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 24px 0 14px; font-weight: 700; max-width: 760px; }
+  h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 42px 0 14px; font-weight: 700; max-width: 760px; }
   h1 em { font-style: normal; color: var(--accent); }
   /* a thin line between the logo row and the headline: brand green on the left, fading out before the menu side */
   .brand-divider { height: 2px; margin-top: 26px; border-radius: 2px;
@@ -665,7 +664,7 @@
     .brand-row { margin-top: 0; }
     .wrap { padding-top: 16px; }
     .brand-row { gap: 10px 8px; flex-wrap: wrap; }
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 172px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 214px) / 8.45), 24px); }
     .top-tools { gap: 6px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
@@ -820,7 +819,7 @@
     .filters { gap: 10px 14px; }
   }
   @media (max-width: 360px) {
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 152px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 192px) / 8.45), 24px); }
     .top-tools { gap: 4px; }
     .tok-pill, .lang-mini { height: 36px; padding: 0 7px; }
     .top-tools .acct-btn { min-height: 36px; padding: 3px; }
@@ -843,6 +842,7 @@
         <button type="button" class="tok-pill" id="tok-pill" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 6v12" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/></svg><b class="tok-n" data-no-i18n></b><span class="tok-l"></span></button>
         <button type="button" class="acct-btn acct-only" data-account aria-haspopup="dialog"><span class="acct-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="acct-txt"><b class="acct-name">Log in / Sign up</b><small class="acct-state"></small></span></button>
       </div>
+      <label class="lang-mini" title="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span class="lang-code" data-no-i18n>EN</span><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
     <div class="menu-col">
     <div class="menu-wrap">
       <button type="button" class="menu-btn" id="menu-btn" aria-label="Menu" aria-expanded="false" aria-controls="menu">
@@ -856,7 +856,6 @@
         <button type="button" data-menu="share"><b>Share SimilarSounds</b><small>Copy the site link</small></button>
       </nav>
     </div>
-      <label class="lang-mini" title="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span class="lang-code" data-no-i18n>EN</span><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
     </div>
     </div>
   </div>
