@@ -552,6 +552,10 @@
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
     html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
     body:has(.set-panel.open) .set-fab { display: none !important; }
+    /* set builder: the header scrolls away with the list, so the tracks get the whole screen */
+    .set-panel { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+    .set-panel .set-body { flex: none; overflow: visible; }
+    .set-panel.open #set-close { position: fixed; top: 10px; right: 10px; z-index: 5; background: rgba(20,20,27,.92); border-radius: 12px; }
     /* while browsing it shrinks to a slim strip with just the count, so it doesn't sit on the tracks' buttons */
     html:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
     html:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
@@ -2210,9 +2214,11 @@ $("#set-list").addEventListener("pointermove", e => {
   if (after) { if (after !== drag.item.nextElementSibling) list.insertBefore(drag.item, after); }
   else if (list.lastElementChild !== drag.item) list.appendChild(drag.item);
   // Auto-scroll the panel near its edges
-  const body = document.querySelector(".set-body").getBoundingClientRect();
-  if (e.clientY < body.top + 40) document.querySelector(".set-body").scrollTop -= 12;
-  if (e.clientY > body.bottom - 40) document.querySelector(".set-body").scrollTop += 12;
+  // (on phones the whole panel scrolls; on bigger screens just the list)
+  const sb = document.querySelector(".set-body"), scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
+  const body = scroller.getBoundingClientRect();
+  if (e.clientY < Math.max(body.top, 0) + 40) scroller.scrollTop -= 12;
+  if (e.clientY > Math.min(body.bottom, innerHeight) - 40) scroller.scrollTop += 12;
 });
 function endDrag() {
   if (!drag) return;
@@ -2312,7 +2318,8 @@ $("#add-tracks").onclick = () => {
 };
 $("#set-copy").onclick = async () => {
   if (!set.length) return toast("Your set is empty");
-  const text = set.map((t, i) => `${i + 1}. ${t.artist} - ${t.title} (${t.camelot}, ${t.bpm} BPM, energy ${t.energy})`).join("\n");
+  const roles = setRoles(set);
+  const text = set.map((t, i) => `${i + 1}. ${roles[i]} — ${t.artist} - ${t.title} (${t.camelot}, ${t.bpm} BPM, energy ${t.energy})`).join("\n");
   try { await navigator.clipboard.writeText(text); toast("Tracklist copied"); }
   catch { toast("Couldn't copy - your browser blocked it"); }
 };
