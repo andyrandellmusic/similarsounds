@@ -124,7 +124,7 @@
 
   .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
   .msg.err { border-color: #5a2c22; color: var(--warn); }
-  .clear { align-self: center; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; width: 36px; height: 36px; border-radius: 8px; }
+  .clear { align-self: center; background: none; border: 0; color: var(--muted); font-size: 22px; line-height: 1; width: 40px; height: 40px; border-radius: 8px; }
   .clear:hover { color: var(--text); background: var(--panel-2); }
   .shared-note { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px;
                  padding: 10px 12px 10px 16px; border-radius: 12px; border: 1px dashed #3b4a16; background: rgba(198,255,61,.05); color: var(--muted); font-size: 14px; }
@@ -149,7 +149,7 @@
   .legal-links a { color: var(--text); text-decoration: none; font-weight: 600; }
   .legal-links a:hover { color: var(--accent); }
   footer p { margin: 0 0 6px; }
-  footer .copy { color: #6e6e80; }
+  footer .copy { color: #9a9aac; }
   .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
   .problem-title { font-weight: 800; font-size: 17px; margin-bottom: 6px; }
   .problem p { color: var(--muted); margin: 0 0 12px; }
@@ -477,7 +477,7 @@
   .vote-btn:hover { color: var(--text); border-color: var(--line); }
   .vote-btn.on { color: var(--accent); background: rgba(198,255,61,.12); border-color: rgba(198,255,61,.4); }
   .vote-btn.on.down { color: var(--warn); background: rgba(255,138,92,.12); border-color: rgba(255,138,92,.4); }
-  @media (max-width: 640px) { .vote-btn { width: 34px; height: 34px; } .rrow .meta { padding-right: 70px; } }
+  @media (max-width: 640px) { .vote-btn { width: 40px; height: 40px; padding: 9px; } .vote { top: 4px; right: 4px; gap: 0; } .rrow .meta { padding-right: 78px; } }
   /* Result rows: key, match % and artwork stacked down the left */
   .rrow { grid-template-columns: 64px 1fr auto; align-items: start; }
   .rrow .side { display: grid; gap: 6px; align-self: stretch; grid-template-rows: auto auto 1fr; }
@@ -520,7 +520,7 @@
     .top-tools { gap: 6px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
-    .top-tools .acct-btn { padding: 4px; min-height: 40px; border-radius: 999px; }
+    .top-tools .acct-btn { padding: 4px; min-height: 40px; min-width: 40px; border-radius: 999px; }
     html.has-results #how { display: none; }   /* the 3-step intro tucks away once you've searched */
     .menu-btn { width: 40px; height: 40px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
