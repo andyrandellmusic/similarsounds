@@ -637,8 +637,26 @@
   .set-empty .empty-key { margin-top: 22px; font-size: 13px; }
   .set-list { list-style: none; margin: 0; padding: 0; }
   .set-item { user-select: none; }
-  .set-card { display: grid; grid-template-columns: 22px 40px 1fr auto; gap: 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
-  .set-card img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+  /* compact track cards: cover doubles as a play button; three short lines of info */
+  .set-card { display: grid; grid-template-columns: 18px 52px 1fr auto; gap: 8px 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 8px; }
+  .set-card .set-play { width: 52px; height: 52px; border-radius: 8px; }
+  .set-card img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; display: block; }
+  .set-card .set-play .play-ico { opacity: .9; }            /* always show the play button on set covers */
+  .set-list.is-dragging .set-player { display: none; }
+  .sc-meta { min-width: 0; display: grid; gap: 2px; }
+  .set-card .sc-meta .t { font-size: 13.5px; line-height: 1.2; }
+  .set-card .sc-meta .a { font-size: 11.5px; line-height: 1.25; }
+  .set-card .sc-meta .role { display: inline; margin: 0; font-size: 9.5px; }
+  .sc-line { display: flex; align-items: center; gap: 5px; margin-top: 3px; min-width: 0; }
+  .sc-line .chip { font-size: 10.5px; padding: 3px 5px; flex: none; }
+  .sc-line .e-chip { color: var(--accent); }
+  .next-ico { flex: none; width: 26px; height: 22px; border-radius: 6px; border: 1px solid rgba(198,255,61,.45); background: none; color: var(--accent); font: 800 13px Inter, sans-serif; line-height: 1; cursor: pointer; padding: 0; }
+  .last-next { display: block; margin: 6px 0 0 4px; }
+  .gap-box[hidden] { display: none; }
+  .item-btns { display: grid !important; grid-template-columns: auto auto; grid-template-areas: "up rm" "down rm"; gap: 2px; }
+  .item-btns .up { grid-area: up; } .item-btns .down { grid-area: down; } .item-btns .rm { grid-area: rm; align-self: center; }
+  .set-player { margin: 6px 0 0; }
+  .set-player iframe { width: 100%; height: 92px; border: 0; border-radius: 10px; display: block; }
   .role { font: 800 10px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
   .role-intro, .role-end { color: var(--accent); }
   .role-peak { color: #ff8a3d; }
@@ -701,7 +719,7 @@
     input[type=checkbox] { width: 20px; height: 20px; }
     label.chk { min-height: 44px; }
     .howto summary, .keywheel summary { padding: 10px 0; }   /* same height, so the two line up */
-    .mini { min-width: 40px; min-height: 36px; font-size: 15px; }
+    .mini { min-width: 34px; min-height: 30px; font-size: 14px; }
     .close { min-width: 44px; min-height: 44px; }
     .qrow { grid-template-columns: 72px 1fr; }
     .qrow .cover { width: 72px; height: 72px; }
@@ -2231,23 +2249,26 @@ function renderSet() {
         ${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}">Fix this gap: find a track to put in between</button><div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}` : ""}
       <div class="set-card">
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
-        <img src="${esc(t.cover)}" alt="">
-        <div style="min-width:0">
-          <div class="role role-${roles[i].split(" ")[0].toLowerCase()}">${roles[i]}</div>
+        <button type="button" class="cover set-play" data-setplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)} by ${esc(t.artist)}">
+          <img src="${esc(t.cover)}" alt=""><span class="play-ico" aria-hidden="true"></span>
+        </button>
+        <div class="sc-meta">
           <div class="t">${esc(t.title)}</div>
-          <div class="a">${esc(t.artist)}</div>
-          <div class="chips">
+          <div class="a"><span class="role role-${roles[i].split(" ")[0].toLowerCase()}">${roles[i]}</span> · ${esc(t.artist)}</div>
+          <div class="sc-line">
             <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
-            <span class="chip">${esc(t.bpm)} BPM</span>${energyBar(t.energy)}
+            <span class="chip">${esc(t.bpm)} BPM</span>
+            <span class="chip e-chip" title="Track energy ${esc(t.energy)} of 10">⚡ ${esc(t.energy)}</span>
+            <button type="button" class="next-ico" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">→</button>
           </div>
-          <button type="button" class="next-btn" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>
         </div>
         <div class="item-btns">
-          <button type="button" class="mini" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
-          <button type="button" class="mini" data-remove aria-label="Remove">✕</button>
-          <button type="button" class="mini" data-move="1" aria-label="Move down" ${i === set.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="mini up" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
+          <button type="button" class="mini rm" data-remove aria-label="Remove">✕</button>
+          <button type="button" class="mini down" data-move="1" aria-label="Move down" ${i === set.length - 1 ? "disabled" : ""}>▼</button>
         </div>
       </div>
+      ${i === set.length - 1 ? `<button type="button" class="next-btn last-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>` : ""}
     </li>`).join("");
 }
 
@@ -2477,6 +2498,21 @@ $("#imp-btns").addEventListener("click", async e => {
   $("#imp-btns").querySelectorAll("button").forEach(x => x.disabled = false);
 });
 
+/* ---------- Play a preview straight from the set builder (tap the cover) */
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-setplay]"); if (!b) return;
+  const li = b.closest(".set-item"), card = b.closest(".set-card"), wasOpen = card.classList.contains("playing");
+  document.querySelectorAll("#set-list .set-card.playing").forEach(c => { c.classList.remove("playing"); c.parentElement.querySelector(".set-player")?.remove(); });
+  if (wasOpen) return;
+  card.classList.add("playing");
+  countPlay(); markPlayed(b.dataset.setplay);
+  const t = set.find(x => String(x.deezer_id) === b.dataset.setplay) || {};
+  card.insertAdjacentHTML("afterend", `<div class="set-player">${playerOrGate("deezer", `<iframe title="Preview" allow="encrypted-media; clipboard-write" src="https://widget.deezer.com/widget/dark/track/${b.dataset.setplay}?autoplay=true&tracklist=false"></iframe>`)}
+    <div class="more">Also on <a class="ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube</a></div></div>`);
+});
+
 /* ---------- "Fix this gap": tracks that mix with both the track before and the track after */
 document.addEventListener("click", async e => {
   const g = e.target.closest("[data-gap]"); if (!g) return;
@@ -2545,6 +2581,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=43"></script>
+<script src="/static/i18n.js?v=44"></script>
 </body>
 </html>
