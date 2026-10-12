@@ -625,15 +625,6 @@
   .link.good { --c: var(--good); } .link.ok { --c: var(--ok); } .link.bad { --c: var(--bad); }
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 19; opacity: 0; pointer-events: none; transition: opacity .25s; }
   .scrim.open { opacity: 1; pointer-events: auto; }
-  /* "Scroll down" hint after a search: small green bouncing pill, bottom middle */
-  .scroll-hint { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 16; border: 0; border-radius: 999px;
-    background: var(--accent); color: var(--accent-ink); font: 800 13px Inter, sans-serif; padding: 9px 16px; cursor: pointer;
-    box-shadow: 0 6px 20px rgba(0,0,0,.45); animation: hint-bounce 1.4s ease-in-out infinite; }
-  .scroll-hint span { display: inline-block; margin-left: 4px; }
-  .scroll-hint[hidden] { display: none; }
-  @keyframes hint-bounce { 0%, 100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, -7px); } }
-  @media (prefers-reduced-motion: reduce) { .scroll-hint { animation: none; } }
-
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; opacity: 0; transition: all .2s; z-index: 30; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateX(-50%); }
 
@@ -921,7 +912,6 @@
       <div class="review-thanks" id="review-thanks" hidden role="status">Thank you!</div>
     </div>
   </div>
-  <button type="button" class="scroll-hint" id="scroll-hint" hidden>Scroll down <span aria-hidden="true">↓</span></button>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="sr-only" id="live" aria-live="polite"></div>
 
@@ -1091,7 +1081,6 @@ async function run(exactUrl, fromHistory = false) {
       if (q && q.getBoundingClientRect().top > 120)
         scrollTo({ top: q.getBoundingClientRect().top + scrollY - 12, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
     });
-    showScrollHint();
     showTokens(data.tokens);
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
@@ -1969,24 +1958,6 @@ function refreshAddButtons() {
   });
 }
 
-/* After a search: "Scroll down" pill until the visitor scrolls, taps it, or 12 seconds pass */
-let hintTimer;
-function hideScrollHint() { $("#scroll-hint").hidden = true; clearTimeout(hintTimer); removeEventListener("scroll", onHintScroll); }
-function onHintScroll() { if (scrollY > hintStart + 80) hideScrollHint(); }
-let hintStart = 0;
-function showScrollHint() {
-  const list = $("#list"); if (!list || !list.children.length) return;
-  setTimeout(() => {
-    if (list.getBoundingClientRect().top < innerHeight * 0.6) return;   // matches already in view
-    hintStart = scrollY; $("#scroll-hint").hidden = false;
-    clearTimeout(hintTimer); hintTimer = setTimeout(hideScrollHint, 12000);
-    addEventListener("scroll", onHintScroll, { passive: true });
-  }, 600);
-}
-$("#scroll-hint").addEventListener("click", () => {
-  hideScrollHint();
-  ($(".results-head") || $("#list"))?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" });
-});
 document.addEventListener("click", e => {
   const b = e.target.closest(".sum-more"); if (!b) return;
   b.parentElement.classList.add("open"); b.setAttribute("aria-expanded", "true");
