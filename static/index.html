@@ -945,7 +945,14 @@
 const $ = s => document.querySelector(s);
 const startHTML = document.getElementById("out").innerHTML;
 // Opened from a shared results link (e.g. ?t=393116082)? Say so, so the filled-in box isn't a surprise.
-let sharedArrival = /[?&]t=\d+/.test(location.search);
+// "You're viewing a shared search" only for links from someone else: not when you refresh or reopen
+// one of your own recent searches
+let sharedArrival = (() => {
+  const m = location.search.match(/[?&]t=(\d+)/);
+  if (!m) return false;
+  try { if (JSON.parse(localStorage.getItem("ss_recent") || "[]").some(r => String(r.id) === m[1])) return false; } catch {}
+  return !(document.referrer && new URL(document.referrer).host === location.host);
+})();
 const announce = text => { const el = document.getElementById("live"); if (el) el.textContent = text; };
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
