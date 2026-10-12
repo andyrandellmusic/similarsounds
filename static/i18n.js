@@ -336,6 +336,7 @@
     "+ Add another track": ["+ Añadir otro tema", "+ Ajouter un morceau", "+ Weiteren Track hinzufügen", "+ Aggiungi un altro brano", "+ Adicionar outra faixa", "+ Nog een nummer toevoegen"],
     "Remove this track": ["Quitar este tema", "Retirer ce morceau", "Diesen Track entfernen", "Rimuovi questo brano", "Remover esta faixa", "Dit nummer verwijderen"],
     "Add at least one track first.": ["Añade al menos un tema primero.", "Ajoute d'abord au moins un morceau.", "Füge zuerst mindestens einen Track hinzu.", "Aggiungi prima almeno un brano.", "Adicione pelo menos uma faixa primeiro.", "Voeg eerst minstens één nummer toe."],
+    "Sort by": ["Ordenar por", "Trier par", "Sortieren nach", "Ordina per", "Ordenar por", "Sorteren op"],
     "Add to my set": ["Añadir a mi set", "Ajouter à mon set", "Zu meinem Set hinzufügen", "Aggiungi al mio set", "Adicionar ao meu set", "Aan mijn set toevoegen"],
     "Replace my set": ["Reemplazar mi set", "Remplacer mon set", "Mein Set ersetzen", "Sostituisci il mio set", "Substituir meu set", "Mijn set vervangen"],
     "Fix this gap: find a track to put in between": ["Arregla este hueco: busca un tema para poner en medio", "Combler ce trou : trouver un titre à placer entre les deux", "Lücke füllen: einen Track dazwischen finden", "Sistema questo passaggio: trova un brano da mettere in mezzo", "Corrigir esta lacuna: achar uma faixa para pôr no meio", "Gat dichten: zoek een track voor ertussen"],
