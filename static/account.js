@@ -101,6 +101,19 @@
     if (u?.email) setJ(PK, { email: u.email, name: u.user_metadata?.name || "" });
     close(); say(`Signed in - welcome back${u?.user_metadata?.name ? ", " + u.user_metadata.name : ""}`);
   }
+  /* ---------- "Continue with Google": one tap, no password. Shown only once Google sign-in is
+   * switched on in Supabase (Authentication > Sign In / Providers > Google). */
+  fetch(`${cfg.supabase_url}/auth/v1/settings`, { headers: { apikey: cfg.supabase_anon_key } })
+    .then(r => r.json()).then(st => {
+      if (!st?.external?.google) return;
+      box.querySelectorAll("[data-google], [data-google-or]").forEach(el => el.hidden = false);
+    }).catch(() => {});
+  box.addEventListener("click", async e => {
+    const g = e.target.closest("[data-google]"); if (!g) return;
+    g.disabled = true;
+    const { error } = await sb.auth.signInWithOAuth({ provider: "google", options: { redirectTo: location.origin + location.pathname + location.search } });
+    if (error) { g.disabled = false; say("Couldn't connect to Google. Please try again."); }
+  });
   $("#quick-go").addEventListener("click", () => pkSignIn($("#quick-go"), "quick"));
   $("#pk-login").addEventListener("click", () => pkSignIn($("#pk-login"), "form"));
   $("#quick-other").addEventListener("click", e => { e.preventDefault(); paintQuick(true); $("#f-login").password.focus(); });
@@ -320,7 +333,7 @@
   });
 
   /* ---------- header + menu */
-  const nameOf = u => (u?.user_metadata?.name || "").trim() || (u?.email || "").split("@")[0];
+  const nameOf = u => (u?.user_metadata?.name || u?.user_metadata?.full_name || "").trim() || (u?.email || "").split("@")[0];
   function paint() {
     const name = user ? nameOf(user) : "";
     document.querySelectorAll("[data-account]").forEach(b => {
