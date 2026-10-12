@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens
+from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -159,6 +159,60 @@ async def match(
     like = artists.like_vector(qv, exclude=main_artist(q["artist"]), k=6, space=space) if results else []
     similar_artists = [{"name": a["name"], "slug": pages.slugify(a["name"])} for a in like]
     return {"source": src, "query": query, "results": results, "similar_artists": similar_artists, "tokens": tk}
+
+
+def _set_item(q: dict) -> dict:
+    return {"deezer_id": q["deezer_id"], "title": q["title"], "artist": q["artist"], "cover": q["cover"],
+            "key": q["key"], "camelot": q["camelot"], "bpm": q["bpm"], "energy": int(q["energy"])}
+
+
+@app.post("/api/tracklist")
+async def import_tracklist(request: Request):
+    """Paste a set's tracklist: each line is found in the catalogue (free) or looked up and analysed
+    (uses a search credit each, like a normal search). Returns set-builder items in order."""
+    try:
+        text = str((await request.json()).get("text") or "")[:8000]
+    except (ValueError, AttributeError):
+        raise HTTPException(400, "Bad tracklist")
+    lines = tracklist.parse(text)
+    if not lines:
+        raise HTTPException(400, "Couldn't read any tracks. Put one track per line, like 'Artist - Title'.")
+    out, looked_up = [], 0
+    for artist, title in lines:
+        label = f"{artist} - {title}"
+        did = tracklist.find_in_catalogue(index, artist, title)
+        try:
+            if did is None:
+                if looked_up >= 20:
+                    out.append({"line": label, "status": "skipped"}); continue
+                hit = await run_in_threadpool(sources.find_on_deezer, label, "")
+                if not hit:
+                    out.append({"line": label, "status": "not_found"}); continue
+                did = hit["id"]
+                if did not in index.ids:
+                    tk = await run_in_threadpool(tokens.check, request, int(did), True)
+                    if tk and not tk.get("allowed"):
+                        out.append({"line": label, "status": "no_credits"}); continue
+                    looked_up += 1
+            q = await run_in_threadpool(analyse_query, did)
+            out.append({"line": label, "status": "found", "track": _set_item(q)})
+        except HTTPException:
+            out.append({"line": label, "status": "not_found"})
+        except Exception:
+            out.append({"line": label, "status": "not_found"})
+    return {"items": out, "tokens": await run_in_threadpool(tokens.check, request, None, False)}
+
+
+@app.get("/api/bridge")
+async def bridge(a: int, b: int, exclude: str = Query("", max_length=2000)):
+    """Tracks to put between two set tracks so the transition works: they mix with both."""
+    try:
+        qa = await run_in_threadpool(analyse_query, a)
+        qb = await run_in_threadpool(analyse_query, b)
+    except HTTPException:
+        raise HTTPException(404, "Couldn't analyse one of those tracks")
+    skip = {int(x) for x in exclude.split(",") if x.strip().isdigit()} | {a, b}
+    return {"results": tracklist.bridges(index, qa, qb, skip, limit=12)}
 
 
 @app.post("/api/vote")
