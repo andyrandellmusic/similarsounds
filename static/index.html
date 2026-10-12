@@ -2204,15 +2204,10 @@ function smartOrder(tracks) {
 document.documentElement.classList.toggle("fab-top", scrollY < 120);
 { // back-to-top button
   const btn = $("#to-top");
-  // shows when you're well down the page and scrolling back up (or at the very bottom), so it never
-  // sits on a track's buttons while you browse down the list
-  let lastY = scrollY;
+  // shows once you've scrolled a third of the way down the page
   const update = () => {
-    const y = scrollY, far = y > innerHeight * 1.2, atEnd = y + innerHeight > document.documentElement.scrollHeight - 60;
-    if (!far) btn.classList.remove("show");
-    else if (y < lastY - 4 || atEnd) btn.classList.add("show");
-    else if (y > lastY + 4) btn.classList.remove("show");
-    lastY = y;
+    const max = document.documentElement.scrollHeight - innerHeight;
+    btn.classList.toggle("show", max > 0 && scrollY > max / 3);
   };
   addEventListener("scroll", update, { passive: true }); update();
   btn.addEventListener("click", () => {
