@@ -437,6 +437,19 @@
   .acct-only { display: none !important; }
   .accounts-on .acct-only { display: inline-flex !important; }
   .accounts-on .menu .acct-only { display: grid !important; }
+  .imp-head, .imp-row { display: grid; grid-template-columns: 22px 1fr 1fr 26px; gap: 6px; align-items: center; }
+  .imp-head { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 4px 0 6px; }
+  .imp-rows { list-style: none; margin: 0; padding: 0 2px 0 0; display: grid; gap: 6px; max-height: min(46vh, 360px); overflow-y: auto; }
+  .imp-row .n { font: 700 12px "JetBrains Mono", monospace; color: var(--muted); text-align: right; }
+  .imp-row input { width: 100%; min-width: 0; box-sizing: border-box; height: 38px; padding: 0 10px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--panel-2); color: var(--text); font: 14px Inter, sans-serif; }
+  .imp-row input:focus { outline: none; border-color: var(--accent); }
+  @media (max-width: 480px) { .imp-row input { font-size: 16px; padding: 0 8px; } }   /* 16px stops iPhones zooming in */
+  .imp-row .rm { background: none; border: 0; color: var(--accent); font-size: 20px; line-height: 1; padding: 0; height: 38px; cursor: pointer; }
+  .imp-row .rm:disabled { opacity: .25; cursor: default; }
+  .imp-more { margin: 8px 0 10px; background: none; border: 1px dashed rgba(198,255,61,.45); color: var(--accent); border-radius: 9px;
+    height: 36px; width: 100%; font: 700 13px Inter, sans-serif; cursor: pointer; }
+  .imp-more[hidden] { display: none; }
   .import-box textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel-2);
     color: var(--text); font: 14px/1.45 Inter, sans-serif; resize: vertical; margin-bottom: 8px; }
   .imp-missing { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; max-height: 140px; overflow: auto; }
@@ -962,8 +975,10 @@
     <div class="acct-box import-box" role="dialog" aria-modal="true" aria-labelledby="imp-title">
       <button type="button" class="acct-x" id="imp-x" aria-label="Close">×</button>
       <h2 id="imp-title">Import a tracklist</h2>
-      <p class="acct-sub">Paste your set, one track per line as <b>Artist - Title</b>. Numbers, times and labels are fine, e.g. from Rekordbox, 1001Tracklists or a mix description. Up to 40 tracks.</p>
-      <textarea id="imp-text" rows="8" placeholder="1. Rossi. - On Your Mind&#10;2. Josh Baker - Soda&#10;3. Jamback - Positive"></textarea>
+      <p class="acct-sub">Type the artist and title of each track in order. Got a whole tracklist? Paste it into the first box and we'll split it up for you.</p>
+      <div class="imp-head" aria-hidden="true"><span></span><span>Artist</span><span>Title</span><span></span></div>
+      <ol class="imp-rows" id="imp-rows"></ol>
+      <button type="button" class="imp-more" id="imp-more">+ Add another track</button>
       <p class="acct-fine">Tracks already in SimilarSounds are free. Each track we have to look up uses 1 search credit.</p>
       <div class="confirm-btns" id="imp-btns"></div>
       <p class="acct-msg" id="imp-msg" role="status" aria-live="polite"></p>
@@ -2538,20 +2553,84 @@ function openImport() {
     : `<button type="button" class="secondary" data-imp="add">Add to my set</button><button type="button" class="primary" data-imp="replace">Replace my set</button>`;
   $("#imp-msg").textContent = ""; $("#imp-msg").className = "acct-msg"; $("#imp-missing").hidden = true;
   $("#import-dlg").hidden = false;
-  setTimeout(() => $("#imp-text").focus(), 30);
+  if (!$("#imp-rows").children.length) impReset();
+  setTimeout(() => $("#imp-rows input").focus(), 30);
 }
+/* rows of Artist + Title boxes, numbered */
+const IMP_MAX = 40;
+function impRowHTML() {
+  return `<li class="imp-row"><span class="n"></span>
+    <input type="text" class="a" placeholder="Artist" aria-label="Artist" autocomplete="off" autocapitalize="words" enterkeyhint="next">
+    <input type="text" class="t" placeholder="Title" aria-label="Title" autocomplete="off" autocapitalize="words" enterkeyhint="next">
+    <button type="button" class="rm" aria-label="Remove this track">×</button></li>`;
+}
+function impRenumber() {
+  const rows = [...$("#imp-rows").children];
+  rows.forEach((li, i) => { li.querySelector(".n").textContent = i + 1; li.querySelector(".rm").disabled = rows.length === 1; });
+  $("#imp-more").hidden = rows.length >= IMP_MAX;
+}
+function impAdd(n = 1) {
+  const list = $("#imp-rows");
+  for (let i = 0; i < n && list.children.length < IMP_MAX; i++) list.insertAdjacentHTML("beforeend", impRowHTML());
+  impRenumber();
+  return list.lastElementChild;
+}
+function impReset() { $("#imp-rows").innerHTML = ""; impAdd(5); }
+function impRows() {
+  return [...$("#imp-rows").children].map(li => ({ artist: li.querySelector(".a").value.trim(), title: li.querySelector(".t").value.trim() }));
+}
+// "1. Artist - Title [Label]" -> {artist, title}; a line with no dash goes in the artist box to be fixed by hand
+function impSplit(line) {
+  let l = line.trim().replace(/^[\[(]?\d{1,2}:\d{2}(?::\d{2})?[\])]?\s*[-–—]?\s*/, "").replace(/^(?:\d{1,3}[.):-]|#\d+)\s*/, "")
+    .replace(/\s*[\[{][^\]}]*[\]}]\s*$/, "").replace(/\s+[–—]\s+/g, " - ").trim();
+  const i = l.indexOf(" - ");
+  return i > 0 ? { artist: l.slice(0, i).trim(), title: l.slice(i + 3).trim() } : { artist: l, title: "" };
+}
+$("#imp-more").onclick = () => impAdd().querySelector(".a").focus();
+$("#imp-rows").addEventListener("click", e => {
+  const b = e.target.closest(".rm"); if (!b || b.disabled) return;
+  b.closest(".imp-row").remove(); impRenumber();
+});
+$("#imp-rows").addEventListener("keydown", e => {         // Enter jumps to the next box (and adds a row at the end)
+  if (e.key !== "Enter" || !e.target.matches("input")) return;
+  e.preventDefault();
+  const li = e.target.closest(".imp-row");
+  if (e.target.classList.contains("a")) return li.querySelector(".t").focus();
+  (li.nextElementSibling || impAdd())?.querySelector(".a").focus();
+});
+$("#imp-rows").addEventListener("paste", e => {            // a whole pasted tracklist is split into rows
+  const text = (e.clipboardData || window.clipboardData)?.getData("text") || "";
+  const lines = text.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  const one = lines.length === 1 ? impSplit(lines[0]) : null;
+  if (lines.length < 2 && !(one && one.title && e.target.classList.contains("a"))) return;   // normal paste
+  e.preventDefault();
+  let li = e.target.closest(".imp-row");
+  for (const line of lines.slice(0, IMP_MAX)) {
+    if (!li) li = impAdd(); if (!li) break;
+    const { artist, title } = impSplit(line);
+    li.querySelector(".a").value = artist; li.querySelector(".t").value = title;
+    li = li.nextElementSibling;
+  }
+  [...$("#imp-rows").children].reverse().find(r => !r.querySelector(".a").value && !r.querySelector(".t").value && r.nextElementSibling === null && r.previousElementSibling)?.remove();
+  impRenumber();
+});
 function closeImport() { $("#import-dlg").hidden = true; }
 document.addEventListener("click", e => { if (e.target.closest("[data-import]")) openImport(); });
 $("#imp-x").onclick = closeImport;
 $("#import-dlg").addEventListener("click", e => { if (e.target.id === "import-dlg") closeImport(); });
 $("#imp-btns").addEventListener("click", async e => {
   const b = e.target.closest("[data-imp]"); if (!b) return;
-  const text = $("#imp-text").value.trim(), msg = $("#imp-msg");
-  if (!text) { msg.textContent = "Paste your tracklist first."; msg.className = "acct-msg err"; return; }
+  const msg = $("#imp-msg"), rows = impRows().filter(r => r.artist || r.title);
+  if (!rows.length) { msg.textContent = "Add at least one track first."; msg.className = "acct-msg err"; return; }
+  const half = [...$("#imp-rows").children].find(li => !!li.querySelector(".a").value.trim() !== !!li.querySelector(".t").value.trim());
+  if (half) {
+    msg.textContent = `Track ${[...$("#imp-rows").children].indexOf(half) + 1} needs both an artist and a title.`; msg.className = "acct-msg err";
+    half.querySelector(half.querySelector(".a").value.trim() ? ".t" : ".a").focus(); return;
+  }
   $("#imp-btns").querySelectorAll("button").forEach(x => x.disabled = true);
   msg.textContent = "Finding your tracks… (new ones take a few seconds each)"; msg.className = "acct-msg";
   try {
-    const r = await fetch("/api/tracklist", { method: "POST", headers: { "Content-Type": "application/json", ...(await tokenHeaders()) }, body: JSON.stringify({ text }) });
+    const r = await fetch("/api/tracklist", { method: "POST", headers: { "Content-Type": "application/json", ...(await tokenHeaders()) }, body: JSON.stringify({ tracks: rows }) });
     const d = await r.json();
     if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Couldn't import that list");
     const found = d.items.filter(x => x.track).map(x => x.track);
@@ -2565,7 +2644,7 @@ $("#imp-btns").addEventListener("click", async e => {
     const why = { not_found: "not found", no_credits: "no credits left", skipped: "too many new tracks in one go" };
     $("#imp-missing").innerHTML = missing.map(x => `<li>${esc(x.line)} <small>(${why[x.status] || "not found"})</small></li>`).join("");
     $("#imp-missing").hidden = !missing.length;
-    if (!missing.length) setTimeout(closeImport, 900);
+    if (!missing.length) setTimeout(() => { closeImport(); impReset(); }, 900);
   } catch (err) { msg.textContent = err.message || "Couldn't import that list"; msg.className = "acct-msg err"; }
   $("#imp-btns").querySelectorAll("button").forEach(x => x.disabled = false);
 });
@@ -2654,6 +2733,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=46"></script>
+<script src="/static/i18n.js?v=47"></script>
 </body>
 </html>

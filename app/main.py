@@ -171,10 +171,17 @@ async def import_tracklist(request: Request):
     """Paste a set's tracklist: each line is found in the catalogue (free) or looked up and analysed
     (uses a search credit each, like a normal search). Returns set-builder items in order."""
     try:
-        text = str((await request.json()).get("text") or "")[:8000]
+        body = await request.json()
+        text = str(body.get("text") or "")[:8000]
+        rows = body.get("tracks") or []
     except (ValueError, AttributeError):
         raise HTTPException(400, "Bad tracklist")
-    lines = tracklist.parse(text)
+    if isinstance(rows, list) and rows:                 # artist and title typed in separate boxes
+        lines = [(str(r.get("artist") or "").strip()[:200], str(r.get("title") or "").strip()[:200])
+                 for r in rows[:tracklist.MAX_LINES] if isinstance(r, dict)]
+        lines = [(a, t) for a, t in lines if a and t]
+    else:
+        lines = tracklist.parse(text)
     if not lines:
         raise HTTPException(400, "Couldn't read any tracks. Put one track per line, like 'Artist - Title'.")
     out, looked_up = [], 0
