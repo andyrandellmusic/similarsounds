@@ -837,8 +837,8 @@
       <div class="try" id="try"></div>
       <div class="howvid" id="how-video">
         <div class="start-label">How it works</div>
-        <video controls playsinline preload="none" poster="/static/how-it-works.jpg" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
-          <source src="/static/how-it-works.mp4" type="video/mp4">
+        <video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=2" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
+          <source src="/static/how-it-works.mp4?v=2" type="video/mp4">
         </video>
       </div>
     </section>
@@ -1596,9 +1596,20 @@ function showTokens(t) {
   el.hidden = false;
   const out = !t.subscribed && t.left === 0;
   el.classList.toggle("out", out);
-  el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : String(t.left);
-  el.querySelector(".tok-l").textContent = t.subscribed ? "Unlimited" : t.left === 1 ? "free search" : "free searches";
-  el.title = t.subscribed ? "Unlimited searches" : t.left === 1 ? "1 free search left" : `${t.left} free searches left`;
+  // show it as "used / total" (e.g. 1/3). The total is the most this visitor has had at this stage,
+  // so bonus credits and the 24-hour refresh are counted too.
+  let total = t.left;
+  if (!t.subscribed) {
+    let peak = null;
+    try { peak = JSON.parse(localStorage.getItem("ss_tok_peak") || "null"); } catch {}
+    total = Math.max(t.left, t.stage === "anon" ? 3 : 2, peak && peak.stage === t.stage ? peak.n : 0);
+    try { localStorage.setItem("ss_tok_peak", JSON.stringify({ stage: t.stage, n: total })); } catch {}
+  }
+  const used = Math.max(0, total - t.left);
+  el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : `${used}/${total}`;
+  el.querySelector(".tok-l").textContent = t.subscribed ? "Unlimited" : "used";
+  el.title = t.subscribed ? "Unlimited searches"
+    : `${used} of ${total} free searches used · ${t.left === 1 ? "1 search" : `${t.left} searches`} left`;
   el.setAttribute("aria-label", el.title);
 }
 $("#tok-pill").addEventListener("click", () => {
@@ -2641,6 +2652,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=45"></script>
+<script src="/static/i18n.js?v=46"></script>
 </body>
 </html>
