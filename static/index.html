@@ -377,6 +377,10 @@
   .set-summary { color: var(--muted); font-size: 13px; margin-top: 4px; }
   .flow { margin-top: 12px; }
   .flow svg { width: 100%; height: auto; display: block; margin-top: 4px; }
+  .flow .fl-e { font: 700 10px "JetBrains Mono", monospace; fill: var(--text); }
+  .flow .fl-n { font: 600 9px "JetBrains Mono", monospace; fill: var(--muted); }
+  .flow .fl-grid { stroke: rgba(255,255,255,.06); stroke-dasharray: 3 4; }
+  .flow .fl-base { stroke: var(--line); }
   .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); display: flex; justify-content: space-between; }
   .flow-label span { letter-spacing: 0; font: 700 11px "JetBrains Mono", monospace; color: var(--text); }
   .icon.smart { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -2056,17 +2060,24 @@ function transition(a, b) {
 
 function energyFlow() {
   if (set.length < 2) return "";
-  const w = 400, h = 64, padX = 8, padY = 10;
-  const es = set.map(t => t.energy);
-  const lo = Math.max(1, Math.min(...es) - 1), hi = Math.min(10, Math.max(...es) + 1);
-  const x = i => padX + i * (w - 2 * padX) / (set.length - 1);
-  const y = e => h - padY - (e - lo) * (h - 2 * padY) / Math.max(1, hi - lo);
-  const pts = set.map((t, i) => `${x(i).toFixed(1)},${y(t.energy).toFixed(1)}`).join(" ");
-  const dots = set.map((t, i) => `<circle cx="${x(i).toFixed(1)}" cy="${y(t.energy).toFixed(1)}" r="4" fill="${camelotColor(t.camelot)}" stroke="#14141b" stroke-width="2"><title>${i + 1}. ${esc(t.title)}: energy ${t.energy}</title></circle>`).join("");
-  return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${es[es.length - 1]}</span></div>
-    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy across the set, from ${es[0]} to ${es[es.length - 1]}">
-      <polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round"/>${dots}
-    </svg>`;
+  // Column graph: one bar per track on a fixed 1-10 energy scale; the peak track is orange,
+  // intro and end track are bright green, the rest a softer green
+  const n = set.length, w = 400, h = 124, top = 16, base = h - 16, gap = n > 24 ? 2 : 4;
+  const bw = (w - gap * (n - 1)) / n, roles = setRoles(set);
+  const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
+  const bars = set.map((t, i) => {
+    const e = es[i], x = i * (bw + gap), bh = (base - top) * e / 10, y = base - bh;
+    const r = roles[i], fill = r === "Peak track" ? "#ff8a3d" : (i === 0 || i === n - 1) ? "var(--accent)" : "rgba(198,255,61,.55)";
+    const small = bw < 14;
+    return `<g><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
+      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${Math.min(4, bw / 3).toFixed(1)}" fill="${fill}"/>
+      ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 4).toFixed(1)}" text-anchor="middle" class="fl-e">${e}</text>`}
+      ${small && i % 2 ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${h - 3}" text-anchor="middle" class="fl-n">${i + 1}</text>`}</g>`;
+  }).join("");
+  const grid = [5, 10].map(v => { const y = base - (base - top) * v / 10; return `<line x1="0" x2="${w}" y1="${y}" y2="${y}" class="fl-grid"/>`; }).join("");
+  return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${Math.max(...es)} peak <i class="g-arr">→</i> ${es[n - 1]}</span></div>
+    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${grid}
+      <line x1="0" x2="${w}" y1="${base}" y2="${base}" class="fl-base"/>${bars}</svg>`;
 }
 
 /* Smart order: try every starting track, then greedily take the next track that mixes best
