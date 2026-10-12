@@ -4,6 +4,7 @@ Run daily to keep the catalogue fresh:
     uv run python -m scripts.seed --per-style 120
 """
 import argparse
+import multiprocessing
 from pathlib import Path
 import os
 import sys
@@ -191,6 +192,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--artists", type=int, default=0, help="also check this many catalogue artists for new releases")
     ap.add_argument("--labels", type=int, default=0, help="also check this many house labels for new releases")
+    ap.add_argument("--max-new", type=int, default=1500, help="most new tracks to fetch and analyse in one run")
     ap.add_argument("--per-style", type=int, default=100)
     ap.add_argument("--styles", nargs="*", help="limit to these style names")
     args = ap.parse_args()
@@ -216,11 +218,17 @@ def main():
         print(f"  new releases from {args.labels} house labels: {len(c)} candidates")
         todo += c
 
+    # Keep each daily run inside its time limit; whatever's left is picked up the next day
+    if len(todo) > args.max_new:
+        print(f"  {len(todo)} candidates: taking the first {args.max_new} this run", flush=True)
+        todo = todo[:args.max_new]
+    print(f"  fetching {len(todo)} previews…", flush=True)
+
     # 1) download previews (network), 2) analyse them in worker processes (CPU).
     # A track whose audio crashes a worker is skipped and the workers are restarted,
     # so one bad file can't stop the whole daily update.
     fetched = []
-    with ThreadPoolExecutor(6) as io_pool:
+    with ThreadPoolExecutor(3) as io_pool:
         for f in as_completed([io_pool.submit(fetch, tid, style) for tid, style in todo]):
             try:
                 res = f.result()
@@ -238,7 +246,8 @@ def main():
     added, pending = 0, list(range(len(fetched)))
     while pending:
         retry = []
-        with ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1)) as cpu:
+        # "spawn" workers: on Linux the default ("fork" while download threads exist) can freeze the job
+        with ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1), mp_context=multiprocessing.get_context("spawn")) as cpu:
             futs = {cpu.submit(analyse, fetched[k][1]): k for k in pending}
             for f in as_completed(futs):
                 k = futs[f]

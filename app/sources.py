@@ -38,7 +38,12 @@ def deezer_track(track_id: int) -> dict:
 
 
 def fetch_preview(preview_url: str) -> bytes:
-    r = client.get(preview_url)
+    # Deezer's preview servers answer "429 Too Many Requests" when pulled too fast: wait and try again
+    for attempt in range(4):
+        r = client.get(preview_url)
+        if r.status_code != 429:
+            break
+        time.sleep(5 * (attempt + 1))
     r.raise_for_status()
     return r.content
 
