@@ -2326,6 +2326,18 @@ function popSetTab() {
   f.classList.add("pop");
   clearTimeout(popTimer); popTimer = setTimeout(() => f.classList.remove("pop"), 2600);
 }
+// The SET tab sits level with the menu button (measured with the page at the top) and stays at that height
+// on screen while scrolling. Where the menu button is too close to the edge (phones) it sits just below it.
+function placeSetFab() {
+  const f = $("#set-fab"), m = $("#menu-btn");
+  if (!f || !m || f.hidden) return;
+  const mr = m.getBoundingClientRect(), menuTop = mr.top + scrollY, fh = f.offsetHeight || 73, fw = f.offsetWidth || 48;
+  const room = innerWidth - mr.right >= fw + 12;
+  f.style.top = Math.round(room ? menuTop + mr.height / 2 - fh / 2 : menuTop + mr.height + 4) + "px";
+}
+addEventListener("resize", placeSetFab);
+addEventListener("load", placeSetFab);
+document.fonts?.ready.then(placeSetFab);
 // "Your set" bar on phones: hide while scrolling down, show again on scrolling up or near the top / bottom
 {
   let lastY = scrollY;
@@ -2363,6 +2375,7 @@ function renderSet() {
   $("#set-share").hidden = !set.length;
   $("#fab-count").textContent = set.length;
   $("#set-fab").hidden = !set.length;
+  placeSetFab();
   const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
   $("#fab-sub").textContent = set.length < 2 ? "" : clashes ? `${clashes} clash${clashes > 1 ? "es" : ""}` : "no clashes";
   $("#fab-sub").className = "fab-sub" + (clashes ? " bad" : "");
