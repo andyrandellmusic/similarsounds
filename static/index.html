@@ -138,9 +138,9 @@
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
   .howvid .start-label { color: var(--accent); }
-  /* the box trims the top 14/720 of the picture so the site's banner in the recording doesn't peek in */
-  .howvid .vbox { overflow: hidden; aspect-ratio: 1280 / 706; border-radius: 14px; border: 1px solid var(--line); background: #000; }
-  .howvid video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: calc(-14 / 1280 * 100%); background: #000; }
+  /* the box trims the top 32/720 of the picture so the site's banner in the recording doesn't peek in */
+  .howvid .vbox { overflow: hidden; aspect-ratio: 1280 / 688; border-radius: 14px; border: 1px solid var(--line); background: #000; }
+  .howvid video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: calc(-32 / 1280 * 100%); background: #000; }
   .start-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin-bottom: 10px; }
   .try { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; min-height: 76px; }
   .try-item { display: flex; align-items: center; gap: 12px; text-align: left; background: var(--panel); border: 1px solid var(--line); color: var(--text); border-radius: 14px; padding: 10px; min-width: 0; transition: border-color .15s, transform .15s; }
@@ -901,8 +901,8 @@
       <div class="try" id="try"></div>
       <div class="howvid" id="how-video">
         <div class="start-label">How it works</div>
-        <div class="vbox"><video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=4" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
-          <source src="/static/how-it-works.mp4?v=10" type="video/mp4">
+        <div class="vbox"><video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=5" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
+          <source src="/static/how-it-works.mp4?v=11" type="video/mp4">
         </video></div>
       </div>
     </section>
