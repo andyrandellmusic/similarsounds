@@ -527,7 +527,7 @@
     .fs-val { color: var(--muted); font-weight: 500; font-size: 12px; flex: 1; text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
     /* "Your set": a small tab on the right edge of the screen (tap to open). Hidden while the set is open. */
-    .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 46%; z-index: 15; }
+    .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 21%; z-index: 15; }
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
     html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
     body:has(.set-panel.open) .set-fab { display: none !important; }
@@ -1865,13 +1865,13 @@ document.addEventListener("click", e => {
   const id = Number(b.dataset.add);
   if (inSet(id)) {
     set = set.filter(t => t.deezer_id !== id);
-    toast("Removed from your set");
+    announce("Removed from your set");   // no pop-up: the button and the set count show it
   } else {
     const t = trackCache[id];
     if (!t) return;
     set.push({ deezer_id: t.deezer_id, title: t.title, artist: t.artist, cover: t.cover,
                key: t.key, camelot: t.camelot, bpm: t.bpm, energy: t.energy });
-    toast(`Added to your set (${set.length})`);
+    announce(`Added to your set (${set.length})`);
   }
   saveSet(); renderSet(); refreshAddButtons();
 });
