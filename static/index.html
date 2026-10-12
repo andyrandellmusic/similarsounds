@@ -197,7 +197,12 @@
   .keywheel { margin: 0 0 12px; }
   .keywheel summary { cursor: pointer; color: var(--muted); font-size: 13px; }
   .keywheel summary span { color: var(--accent); font-weight: 700; }
-  .kw-body { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 22px; padding: 12px 0 4px; }
+  .guide-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; margin: 0 0 6px; }
+  .guide-row .howto, .guide-row .keywheel { margin: 0; }
+  .howto-body { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+  .howto-body[hidden], .kw-body[hidden] { display: none; }
+  .kw-body { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 8px 0 12px; }
+  .kw-body .kw-side { flex: none; min-width: 0; max-width: 420px; text-align: center; }
   .kw { width: 220px; height: 220px; flex: none; }
   .kw-seg path { stroke: var(--bg); stroke-width: 2; cursor: pointer; transition: opacity .15s; }
   .kw-seg text { font: 700 10px "JetBrains Mono", monospace; fill: #0b0b0f; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
@@ -569,8 +574,7 @@
     .like-artists::-webkit-scrollbar { display: none; }
     .like-artists .la-label { flex: none; max-width: 92px; line-height: 1.25; }
     .like-artists .la { flex: none; }
-    .howto, .keywheel { display: inline-block; vertical-align: top; margin-right: 14px; }
-    .howto[open], .keywheel[open] { display: block; margin-right: 0; }
+
     html.has-results #how { display: none; }   /* the 3-step intro tucks away once you've searched */
     .menu-btn { width: 40px; height: 40px; }
     .filters-wrap { margin-top: 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
@@ -583,16 +587,16 @@
     /* "Your set": a small tab on the right edge of the screen (tap to open). Hidden while the set is open. */
     .set-fab:not([hidden]) { display: block; position: fixed; right: 0; top: 21%; z-index: 15; }
     .set-fab { transition: transform .22s ease, opacity .22s ease; }
-    html.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }
+    html.has-results.fab-away .set-fab { transform: translateX(100%); opacity: 0; pointer-events: none; }   /* home page: always full size */
     body:has(.set-panel.open) .set-fab { display: none !important; }
     /* set builder: the header scrolls away with the list, so the tracks get the whole screen */
     .set-panel { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .set-panel .set-body { flex: none; overflow: visible; }
     .set-panel.open #set-close { position: fixed; top: 10px; right: 10px; z-index: 5; background: rgba(20,20,27,.92); border-radius: 12px; }
     /* while browsing it shrinks to a slim strip with just the count, so it doesn't sit on the tracks' buttons */
-    html:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
-    html:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
-    html:not(.fab-top) .set-fab:not(.pop) .fab-open b { min-width: 0; padding: 2px 3px; font-size: 10px; border-radius: 6px; }
+    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open { width: 17px; padding: 10px 0; gap: 0; border-radius: 10px 0 0 10px; }
+    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open svg, html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-lbl { display: none; }
+    html.has-results:not(.fab-top) .set-fab:not(.pop) .fab-open b { min-width: 0; padding: 2px 3px; font-size: 10px; border-radius: 6px; }
     #how { padding-right: 40px; }
     /* adding a track: the tab bounces out and stays a couple of seconds, even mid-scroll */
     html.fab-away .set-fab.pop { transform: none; opacity: 1; pointer-events: auto; }
@@ -1278,14 +1282,19 @@ function render({ source, query, results, similar_artists = [] }) {
     ${results.length ? summaryHtml(query, lastResults) : ""}
     ${similar_artists.length ? `<div class="like-artists"><span class="la-label">Artists that sound like ${esc(query.artist)}:</span>
       ${similar_artists.map(a => `<button type="button" class="la" data-artist="${esc(a.name)}" title="See tracks by ${esc(a.name)}">${esc(a.name)}</button>`).join("")}</div>` : ""}
-    ${results.length ? `<details class="howto"><summary>How to read these results</summary>
+    ${results.length ? `<div class="guide-row">
+      <details class="howto" id="howto-d"><summary>How to read these results</summary></details>
+      <details class="keywheel" id="keywheel"><summary>Key wheel <span id="kw-state"></span></summary></details>
+    </div>
+    <div class="howto-body" id="howto-body" hidden>
       <div class="howto-grid">
         <div><span class="dot good"></span><span class="dot ok"></span><span class="dot bad"></span><p><b>Mix from your track</b> Green mixes well, amber is workable, red will clash. The line says why.</p></div>
         <div><span class="chip cam" style="background:${camelotColor("8A")}">8A</span><p><b>Key (Camelot)</b> Same number or one step away (7A, 9A, 8B) mixes in key.</p></div>
         <div>${energyBar(6)}<p><b>Track energy</b> How hard the track hits, from 1 (deep and chilled) to 10 (peak-time).</p></div>
         <div><span class="chip match">84% match</span><p><b>Sound match</b> How close it sounds to your track.</p></div>
-      </div></details>` : ""}
-    ${results.length ? `<details class="keywheel" id="keywheel"><summary>Key wheel <span id="kw-state"></span></summary><div class="kw-body" id="kw-body"></div></details>` : ""}`;
+      </div>
+    </div>
+    <div class="kw-body" id="kw-body" hidden></div>` : ""}`;
 
   html += `<div class="list" id="list"></div>`;
   if (results.length >= resultLimit && resultLimit < 90)
@@ -1315,6 +1324,11 @@ function render({ source, query, results, similar_artists = [] }) {
   };
   if (keepScroll !== null) { const y = keepScroll; keepScroll = null; requestAnimationFrame(() => scrollTo(0, y)); }
   keyFilter = null; drawWheel();
+  // the two drop-downs stay side by side; what they open appears full width underneath, centred
+  [["#howto-d", "#howto-body"], ["#keywheel", "#kw-body"]].forEach(([d, b]) => {
+    const det = $(d), body = $(b); if (!det || !body) return;
+    det.addEventListener("toggle", () => { body.hidden = !det.open; });
+  });
   if ($("#sort")) { $("#sort").value = sortBy; $("#sort").onchange = e => { sortBy = e.target.value; renderList(); }; }
   renderList();
 }
