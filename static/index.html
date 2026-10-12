@@ -61,22 +61,18 @@
   .acct-group:has(> .tok-pill[hidden]) { border: 0; background: none; }
   html:not(.accounts-on) .acct-group:has(> .tok-pill[hidden]) { display: none; }
   .acct-group > .tok-pill, .acct-group > .acct-btn { border: 0; background: none; }
-  /* account first, credits on its right; the initial / icon bubble sits after the name */
-  .acct-group > .acct-btn { order: 1; }
-  .acct-group > .tok-pill { order: 2; padding-right: 12px; }
-  .top-tools .acct-btn { flex-direction: row-reverse; padding: 4px 4px 4px 14px; }
-  .accounts-on .acct-group > .tok-pill:not([hidden]) { border-left: 1px solid var(--line); border-radius: 0 999px 999px 0; padding-left: 10px; }
+  .acct-group > .tok-pill:not([hidden]) { padding-right: 10px; }
+  .accounts-on .acct-group > .tok-pill:not([hidden]) + .acct-btn { border-left: 1px solid var(--line); border-radius: 0 999px 999px 0; padding-left: 8px; }
   .acct-group:has(> .tok-pill[hidden]) > .acct-btn { border: 1px solid var(--line); background: var(--panel); }
   .acct-group > .tok-pill:hover, .acct-group > .acct-btn:hover { background: rgba(255,255,255,.04); }
   @media (max-width: 640px) {
-    .acct-group > .tok-pill:not([hidden]) { padding: 0 9px 0 6px; gap: 4px; }
-    .acct-group > .tok-pill b { font-size: 13px; }
-    .accounts-on .acct-group > .acct-btn { padding: 3px 4px 3px 3px; min-width: 0; }
+    .acct-group > .tok-pill:not([hidden]) { padding: 0 5px 0 9px; gap: 4px; }
+    .accounts-on .acct-group > .tok-pill:not([hidden]) + .acct-btn { padding: 3px 3px 3px 4px; min-width: 0; }
   }
   @media (max-width: 360px) {
-    .acct-group > .tok-pill:not([hidden]) { padding: 0 7px 0 4px; gap: 3px; }
+    .acct-group > .tok-pill:not([hidden]) { padding: 0 3px 0 7px; gap: 3px; }
     .acct-group > .tok-pill svg { width: 15px; height: 15px; }
-    .accounts-on .acct-group > .acct-btn { padding: 2px 3px 2px 2px; }
+    .accounts-on .acct-group > .tok-pill:not([hidden]) + .acct-btn { padding: 2px 2px 2px 3px; }
   }
   /* The diamonds make one smooth turn, then rest - every 3 seconds */
   .logo .mark { transform-box: fill-box; transform-origin: 50% 50%; animation: mark-spin 3s cubic-bezier(.65,0,.35,1) infinite; }
@@ -659,7 +655,7 @@
     .brand-row { margin-top: 0; }
     .wrap { padding-top: 16px; }
     .brand-row { gap: 10px 8px; flex-wrap: wrap; }
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 214px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 196px) / 8.45), 24px); }
     .top-tools { gap: 6px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
@@ -815,7 +811,7 @@
     .filters { gap: 10px 14px; }
   }
   @media (max-width: 360px) {
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 192px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 172px) / 8.45), 24px); }
     .top-tools { gap: 4px; }
     .tok-pill, .lang-mini { height: 36px; padding: 0 7px; }
     .top-tools .acct-btn { min-height: 36px; padding: 3px; }
