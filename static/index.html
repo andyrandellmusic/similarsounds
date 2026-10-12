@@ -257,8 +257,10 @@
   /* The card nearest the middle of the screen while scrolling fades up to full lime */
   .query .row.centered, #list .row.centered { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
-  .row.played { position: relative; }
-  .row.played::before { content: ""; position: absolute; left: -1px; top: 12px; bottom: 12px; width: 5px; border-radius: 0 4px 4px 0; background: #ff4d5e; box-shadow: 0 0 8px rgba(255,77,94,.55); z-index: 1; }
+  /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
+  .row.played .cover img { opacity: .5; filter: saturate(.5); }
+  .row.played .cover::after { content: "Played"; position: absolute; left: 0; right: 0; bottom: 0; padding: 3px 0 2px;
+    background: rgba(11,11,15,.72); color: #c9c9d6; font: 700 8.5px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; text-align: center; pointer-events: none; }
   .row:hover, .row.playing { box-shadow: 0 0 0 1px rgba(198,255,61,.35), 0 6px 24px rgba(0,0,0,.35); }
   .cover { position: relative; width: 64px; height: 64px; padding: 0; border: 0; border-radius: 8px; overflow: hidden; background: var(--panel-2); }
   .cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -526,6 +528,9 @@
     .filters-wrap .filters { margin: 0; padding: 4px 14px 14px; }
     .set-fab:not([hidden]) { display: flex; position: fixed; left: 12px; right: 12px; bottom: 12px; z-index: 15; align-items: stretch;
       background: var(--text); color: var(--bg); border-radius: 14px; box-shadow: 0 10px 30px rgba(0,0,0,.5); overflow: hidden; }
+    /* slides out of the way while scrolling down (so it never covers the buttons of the track under it), back on scroll up */
+    .set-fab { transition: transform .22s ease, opacity .22s ease; }
+    html.fab-away .set-fab { transform: translateY(calc(100% + 20px)); opacity: 0; pointer-events: none; }
     .fab-open { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; background: none; border: 0; color: inherit;
       padding: 13px 12px 13px 16px; font-weight: 700; text-align: left; }
     .fab-clear { flex: none; background: none; border: 0; border-left: 1px solid #d6d6de; color: #8a2a1f; font-weight: 700; font-size: 14px; padding: 0 16px; }
@@ -558,6 +563,9 @@
   .set-item { user-select: none; }
   .set-card { display: grid; grid-template-columns: 22px 40px 1fr auto; gap: 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 8px; }
   .set-card img { width: 40px; height: 40px; border-radius: 6px; object-fit: cover; }
+  .role { font: 800 10px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+  .role-intro, .role-end { color: var(--accent); }
+  .role-peak { color: #ff8a3d; }
   .set-card .t { font-weight: 600; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .set-card .a { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .set-card .chips { margin-top: 5px; }
@@ -1991,6 +1999,35 @@ function smartOrder(tracks) {
   return best;
 }
 
+// "Your set" bar on phones: hide while scrolling down, show again on scrolling up or near the top / bottom
+{
+  let lastY = scrollY;
+  addEventListener("scroll", () => {
+    const y = scrollY, nearEnd = y + innerHeight > document.documentElement.scrollHeight - 40;
+    if (y < 120 || y < lastY - 6) document.documentElement.classList.remove("fab-away");
+    else if (y > lastY + 6 && !nearEnd) document.documentElement.classList.add("fab-away");
+    lastY = y;
+  }, { passive: true });
+}
+/* Set roles: what each track does in the set (by position, with the highest-energy middle track as the peak) */
+function setRoles(list) {
+  const n = list.length;
+  if (!n) return [];
+  if (n === 1) return ["Intro track"];
+  const roles = Array(n).fill("");
+  roles[0] = "Intro track"; roles[n - 1] = "End track";
+  if (n === 2) return roles;
+  let peak = 1;
+  for (let i = 1; i < n - 1; i++) if (Number(list[i].energy) >= Number(list[peak].energy)) peak = i;
+  const top = Number(list[peak].energy);
+  for (let i = 1; i < n - 1; i++) {
+    const e = Number(list[i].energy);
+    if (i === peak) roles[i] = "Peak track";
+    else if (i > peak) roles[i] = e >= top - 1 ? "Peak time" : "Cool down";   // after the peak: keep it up, or bring it down
+    else roles[i] = i / (n - 1) < 0.34 && e < top - 1 ? "Warm-up" : "Build";
+  }
+  return roles;
+}
 function renderSet() {
   $("#set-count").textContent = set.length;
   $("#set-share").disabled = !set.length;
@@ -2010,6 +2047,7 @@ function renderSet() {
     ? `${set.length} track${set.length > 1 ? "s" : ""}` + (links.length
       ? ` · ${links.length - rough - workable} smooth, ${workable} workable, ${rough} clashing` : "")
     : "Nothing here yet.";
+  const roles = setRoles(set);
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span></div>` : ""}
@@ -2017,6 +2055,7 @@ function renderSet() {
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
         <img src="${esc(t.cover)}" alt="">
         <div style="min-width:0">
+          <div class="role role-${roles[i].split(" ")[0].toLowerCase()}">${roles[i]}</div>
           <div class="t">${esc(t.title)}</div>
           <div class="a">${esc(t.artist)}</div>
           <div class="chips">
@@ -2182,6 +2221,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=32"></script>
+<script src="/static/i18n.js?v=33"></script>
 </body>
 </html>
