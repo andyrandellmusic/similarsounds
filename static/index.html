@@ -2513,7 +2513,14 @@ function setRoles(list) {
   }
   return roles;
 }
+let freshTimer = null;
+function syncFresh() {            // keep "Fresh for your set" on the front page in step with the set
+  if (!$("#fresh")) return;
+  if (!set.length) { $("#fresh").hidden = true; return; }
+  clearTimeout(freshTimer); freshTimer = setTimeout(loadFresh, 500);
+}
 function renderSet() {
+  syncFresh();
   $("#set-share").disabled = !set.length;
   // nothing to sort, copy, clear or share yet: keep the empty panel focused on "Add tracks"
   document.querySelector(".set-tools").hidden = !set.length;
