@@ -62,7 +62,7 @@ def search(index, text: str, limit: int = 24) -> dict:
         titles.add((a, base))
         per_artist[a] = per_artist.get(a, 0) + 1
         out.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"], "cover": r["cover"],
-                    "style": r["style"], "camelot": r["camelot"], "bpm": r["bpm"],
+                    "style": r["style"], "camelot": r["camelot"], "bpm": r["bpm"], "key": r["key"], "energy": int(r["energy"]),
                     "age_days": (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None})
         if len(out) >= limit:
             break
