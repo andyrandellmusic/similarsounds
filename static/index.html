@@ -103,9 +103,8 @@
   h1 { font-size: clamp(19px, 2.6vw, 26px); line-height: 1.25; letter-spacing: -0.01em; margin: 42px 0 14px; font-weight: 700; max-width: 760px; }
   h1 em { font-style: normal; color: var(--accent); }
   @media (min-width: 720px) { h1 { max-width: none; white-space: nowrap; font-size: clamp(16px, 2.25vw, 26px); } }   /* the headline on one line */
-  /* a thin line between the logo row and the headline: brand green on the left, fading out before the menu side */
-  .brand-divider { height: 2px; margin-top: 26px; border-radius: 2px;
-    background: linear-gradient(90deg, var(--accent) 0%, rgba(198,255,61,.55) 18%, rgba(198,255,61,.18) 45%, rgba(198,255,61,0) 72%); }
+  /* a thin solid brand-green line between the logo row and the headline, edge to edge */
+  .brand-divider { height: 2px; margin-top: 26px; border-radius: 2px; background: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
 
   form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
