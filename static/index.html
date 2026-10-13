@@ -884,6 +884,8 @@
   .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
   @media (hover: hover) { .to-top:hover { background: var(--accent); color: var(--accent-ink); } }
   /* phones: sit above the area where a first tap only brings back Safari's toolbar */
+  /* phones: bigger invisible tap area round the small set-builder buttons, same look */
+  @media (pointer: coarse) { .gap-btn, .hear-sm, .next-ico { position: relative; } .gap-btn::after, .hear-sm::after, .next-ico::after { content: ""; position: absolute; inset: -9px -3px; } }
   @media (pointer: coarse) { .to-top { bottom: calc(76px + env(safe-area-inset-bottom)); right: 14px; } }
   body:has(.set-panel.open) .to-top { display: none; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 10px; font-weight: 600; font-size: 13px; opacity: 0; transition: all .2s; z-index: 30; pointer-events: none; }
