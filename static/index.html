@@ -764,6 +764,11 @@
   .fab-open b { min-width: 22px; padding: 1px 6px; border-radius: 99px; background: var(--accent); color: var(--accent-ink); font: 800 12px Inter, sans-serif; text-align: center; }
   .fab-lbl { font: 700 9.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .fab-open.bad b { background: #ff7a7a; }
+  /* phones: the same tab laid out as a slim pill (icon and count) */
+  .set-fab.compact .fab-open { grid-auto-flow: column; align-items: center; gap: 6px; width: auto; height: 34px; padding: 0 12px 0 11px; border-radius: 11px 0 0 11px; }
+  .set-fab.compact .fab-open svg { width: 18px; height: 18px; }
+  .set-fab.compact .fab-sub, .set-fab.compact .fab-lbl { display: none; }
+  @media (max-width: 380px) { .search-tabs { padding-left: 6px; } .search-tabs button { padding-left: 11px; padding-right: 11px; } }
   @media (max-width: 640px) {
     header { display: none; }
     .brand-row { margin-top: 0; }
@@ -2525,6 +2530,19 @@ function placeSetFab() {
   if (!f || !m || f.hidden) return;
   const mr = m.getBoundingClientRect(), menuTop = mr.top + scrollY, fh = f.offsetHeight || 73, fw = f.offsetWidth || 48;
   const room = innerWidth - mr.right >= fw + 12;
+  // phones: no room beside the menu, so a slim pill at the end of the search tabs row, clear of the header
+  const tabs = !room && document.querySelector(".search-tabs");
+  f.classList.toggle("compact", !!tabs);
+  if (tabs) {
+    // tiny screens where the tabs fill the row: sit beside the first section heading instead
+    const last = [...tabs.querySelectorAll("button")].pop(), fits = last.getBoundingClientRect().right + 6 <= innerWidth - f.offsetWidth;
+    const spot = fits ? tabs : [...document.querySelectorAll("#out .start-label")].find(l => l.offsetParent);
+    if (spot) {
+      const tr = spot.getBoundingClientRect();
+      f.style.top = Math.round(tr.top + scrollY + (tr.height - f.offsetHeight) / 2) + "px";
+      return;
+    }
+  }
   f.style.top = Math.round(room ? menuTop + mr.height / 2 - fh / 2 : menuTop + mr.height + 4) + "px";
 }
 addEventListener("resize", placeSetFab);
