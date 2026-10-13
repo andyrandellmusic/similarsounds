@@ -214,6 +214,17 @@
   .mixbar .mb-x { grid-row: 1 / 3; grid-column: 2; background: none; border: 0; color: var(--accent); font-size: 24px; line-height: 1; padding: 4px 6px; cursor: pointer; }
   /* the box trims the top 32/720 of the picture so the site's banner in the recording doesn't peek in */
   .howvid .vbox { overflow: hidden; aspect-ratio: 1280 / 688; border-radius: 14px; border: 1px solid var(--line); background: #000; }
+  .howvid .vbox { position: relative; }
+  /* a clean play button over the cover until the video starts (no player bar over the picture) */
+  .vplay { position: absolute; inset: 0; z-index: 1; display: grid; place-content: center; justify-items: center; gap: 12px; border: 0; padding: 0; cursor: pointer;
+    background: radial-gradient(ellipse at center, rgba(10,10,14,.15), rgba(10,10,14,.55)); color: var(--text); font: 700 14px Inter, sans-serif; }
+  .vplay[hidden] { display: none; }
+  .vplay-btn { width: 76px; height: 76px; border-radius: 50%; background: var(--accent); display: grid; place-items: center; box-shadow: 0 0 0 10px rgba(198,255,61,.16), 0 10px 30px rgba(0,0,0,.5); transition: transform .2s; }
+  .vplay-btn svg { width: 32px; height: 32px; fill: var(--accent-ink); margin-left: 4px; }
+  .vplay:hover .vplay-btn { transform: scale(1.07); }
+  .vplay:focus-visible .vplay-btn { outline: 3px solid #fff; outline-offset: 4px; }
+  .vplay-tag { padding: 6px 12px; border-radius: 999px; background: rgba(10,10,14,.75); border: 1px solid var(--line); }
+  @media (max-width: 480px) { .vplay-btn { width: 56px; height: 56px; } .vplay-btn svg { width: 24px; height: 24px; } .vplay { gap: 8px; font-size: 12.5px; } }
   .howvid video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: calc(-32 / 1280 * 100%); background: #000; }
   .start-label { font-size: 13.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; color: var(--text); margin-bottom: 12px; }   /* section headings: white */
   /* ...with a soft light sweeping across now and then, to catch the eye */
@@ -1013,7 +1024,7 @@
       <div class="try" id="try"></div>
       <div class="howvid" id="how-video">
         <div class="start-label">How it works</div>
-        <div class="vbox"><video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=7" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
+        <div class="vbox"><button type="button" class="vplay" id="vplay" aria-label="Play the 45-second how it works video"><span class="vplay-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="vplay-tag">Watch how it works · 45s</span></button><video playsinline preload="none" poster="/static/how-it-works.jpg?v=7" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
           <source src="/static/how-it-works.mp4?v=15" type="video/mp4">
         </video></div>
       </div>
@@ -2790,7 +2801,10 @@ function clearSet() {
 }
 /* "How it works" video: when it finishes, go back to the cover picture, ready to play again
    ('ended' doesn't bubble, so listen in the capture phase - the video is re-created on new searches) */
-document.addEventListener("ended", e => { if (e.target.closest?.("#how-video")) e.target.load(); }, true);
+document.addEventListener("ended", e => { if (e.target.closest?.("#how-video")) { e.target.controls = false; e.target.load(); $("#vplay").hidden = false; } }, true);
+$("#vplay")?.addEventListener("click", () => {
+  const v = $("#how-video video"); $("#vplay").hidden = true; v.controls = true; v.play().catch(() => {});
+});
 /* ---------- Import a tracklist into the set */
 function openImport() {
   const empty = !set.length;
@@ -3218,6 +3232,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=56"></script>
+<script src="/static/i18n.js?v=57"></script>
 </body>
 </html>
