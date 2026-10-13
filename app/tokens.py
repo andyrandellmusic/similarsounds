@@ -23,10 +23,15 @@ def device_id(raw: str | None) -> str:
         return str(uuid.uuid4())   # no or bad id: counts against the network's daily free limit
 
 
+def client_ip(request) -> str:
+    """The visitor's real address. Render sits behind Cloudflare, which sets CF-Connecting-IP itself and
+    refuses requests that try to fake it; X-Forwarded-For can be made up by anyone, so it isn't trusted."""
+    return (request.headers.get("cf-connecting-ip") or request.headers.get("true-client-ip")
+            or (request.client.host if request.client else "")).strip()
+
+
 def ip_hash(request) -> str:
-    fwd = request.headers.get("x-forwarded-for", "")
-    ip = fwd.split(",")[0].strip() or (request.client.host if request.client else "")
-    return hashlib.sha256(f"{SALT}:{ip}".encode()).hexdigest()[:32]
+    return hashlib.sha256(f"{SALT}:{client_ip(request)}".encode()).hexdigest()[:32]
 
 
 def check(request, seed: int | None, consume: bool) -> dict | None:
