@@ -261,10 +261,15 @@
   .ta { color: var(--muted); font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .tm { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
   .tm .badge-new { margin: 0 6px 0 0; vertical-align: 1px; }
-  .steps { list-style: none; padding: 0; margin: 0 0 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 18px; max-width: 900px; }
-  .steps li { display: flex; gap: 10px; align-items: flex-start; color: var(--muted); font-size: 13px; }
-  .steps b { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--line); color: var(--accent); display: grid; place-items: center; font-size: 12px; }
-  .steps strong { display: block; color: var(--text); font-size: 14px; margin-bottom: 2px; }
+  /* the three steps: one card in the same style as the sections below */
+  .steps { list-style: none; padding: 0; margin: 30px 0 28px; display: grid; grid-template-columns: repeat(3, 1fr);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 16px; overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+  .steps li { display: flex; gap: 13px; align-items: flex-start; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 18px 20px; }
+  .steps li + li { border-left: 1px solid var(--line); }
+  .steps b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: rgba(198,255,61,.12); color: var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(198,255,61,.35); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
+  .steps strong { display: block; color: var(--text); font-size: 14.5px; margin: 4px 0 3px; }
 
   .msg { margin-top: 28px; padding: 14px 16px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); }
   .msg.err { border-color: #5a2c22; color: var(--warn); }
@@ -805,7 +810,6 @@
     .set-panel { overflow-y: auto; -webkit-overflow-scrolling: touch; }
     .set-panel .set-body { flex: none; overflow: visible; }
     .set-panel.open #set-close { position: fixed; top: 10px; right: 10px; z-index: 5; background: rgba(20,20,27,.92); border-radius: 12px; }
-    #how { padding-right: 40px; }
     .toast { bottom: 84px; }
   }
   .set-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }   /* all four tools on one line */
@@ -917,10 +921,12 @@
     .actions { grid-column: 2; }
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
-    .steps { grid-template-columns: 1fr; gap: 8px; margin-bottom: 18px; }
-    .steps li { font-size: 12.5px; align-items: center; }
+    .steps { grid-template-columns: 1fr; margin: 22px 0 22px; }
+    .steps li { font-size: 12.5px; align-items: center; padding: 12px 14px; gap: 11px; }
+    .steps li + li { border-left: 0; border-top: 1px solid var(--line); }
     .steps strong { display: inline; font-size: 13px; margin: 0 4px 0 0; }
-    .steps b { width: 22px; height: 22px; font-size: 11px; }
+    .steps b { width: 26px; height: 26px; font-size: 12px; }
+    .has-set .steps { margin-right: 44px; }        /* room for the set tab beside the card */
     .icon, select { height: 44px; }
     .icon { padding: 0 14px; font-size: 13px; }
     .seg button { padding: 12px 6px; flex: 1; }
@@ -983,8 +989,7 @@
     </div>
     </div>
   </div>
-  <div class="brand-divider" aria-hidden="true"></div>
-  <h1><span class="h1a">Paste a track.</span> <span class="h1b" data-i18n="hero2">Get <em>the perfect mix</em>.</span></h1>
+  <h1 class="sr-only"><span class="h1a">Paste a track.</span> <span class="h1b" data-i18n="hero2">Get <em>the perfect mix</em>.</span></h1>
   <ol class="steps" id="how">
     <li><b>1</b><span><strong>Pick a track</strong> Type an artist or paste a YouTube, SoundCloud or Beatport link.</span></li>
     <li><b>2</b><span><strong>Get matches</strong> The latest house music that fits its key, BPM, energy and sound.</span></li>
@@ -2535,8 +2540,8 @@ function placeSetFab() {
   if (!f || !m || f.hidden) return;
   const mr = m.getBoundingClientRect(), menuTop = mr.top + scrollY, fh = f.offsetHeight || 73, fw = f.offsetWidth || 48;
   const room = innerWidth - mr.right >= fw + 12;
-  const h1 = !room && document.querySelector("h1");      // phones: level with the headline, clear of the logo row
-  if (h1) { const hr = h1.getBoundingClientRect(); f.style.top = Math.round(hr.top + scrollY + hr.height / 2 - fh / 2) + "px"; return; }
+  const steps = !room && document.querySelector(".steps");   // phones: beside the steps card, clear of the logo row
+  if (steps) { const hr = steps.getBoundingClientRect(); f.style.top = Math.round(hr.top + scrollY + hr.height / 2 - fh / 2) + "px"; return; }
   f.style.top = Math.round(room ? menuTop + mr.height / 2 - fh / 2 : menuTop + mr.height + 4) + "px";
 }
 addEventListener("resize", placeSetFab);
@@ -2587,6 +2592,7 @@ function renderSet() {
   document.querySelector(".set-row2").hidden = !set.length;
   $("#fab-count").textContent = set.length;
   $("#set-fab").hidden = !set.length;
+  document.documentElement.classList.toggle("has-set", !!set.length);
   placeSetFab();
   const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
   $("#fab-sub").textContent = set.length < 2 ? "" : clashes ? `${clashes} clash${clashes > 1 ? "es" : ""}` : "no clashes";
