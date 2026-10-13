@@ -775,7 +775,26 @@
     .rrow .why .dot { margin-top: 4px; }
     .rrow .a { white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
     .rrow .player { grid-column: 1 / -1; grid-row: auto; }
+    /* phones: a compact card - artwork, key and match in a short column, all four buttons on one row */
+    .rrow { grid-template-rows: auto auto; gap: 8px 10px; padding: 9px; }
+    .rrow .side { grid-row: 1; grid-template-rows: auto auto auto; gap: 4px; align-self: start; }
+    .rrow .side .cover { order: -1; align-self: start; width: 58px; height: 58px; }
+    .rrow .side .chip.cam { padding: 3px 0; font-size: 11px; }
+    .rrow .side-match { grid-auto-flow: column; gap: 3px; align-items: baseline; justify-content: center; padding: 3px 0; }
+    .rrow .side-match b { font-size: 11.5px; }
+    .rrow .side-match small { display: none; }
+    .rrow .a { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .rrow .chips { margin-top: 6px; }
+    .rrow .why { margin-top: 5px; font-size: 11.5px; }
+    .rrow .meta .hear { display: none; }
+    .rrow .actions { grid-column: 1 / -1; grid-row: 2; display: grid; grid-template-columns: 1.25fr 1fr auto auto; gap: 6px; align-self: auto; }
+    .rrow .actions .hear-m { display: inline-flex; justify-content: center; margin: 0; height: 34px; padding: 0 6px; font-size: 12.5px; white-space: nowrap; }
+    .rrow .actions .icon { height: 34px; }
+    .rrow .actions .buy-wrap .icon { width: 100%; padding: 0 12px; }
+    .rrow .actions .similar .ga:not(.ga-s) { display: none; }
+    .rrow .actions .similar .ga-s { display: inline; }
   }
+  .hear-m, .ga-s { display: none; }
 
   .filters-sum { display: none; }
   /* "Your set" tab on the right edge, on phones and computers alike */
@@ -1803,9 +1822,10 @@ function renderList() {
         <button type="button" class="hear" data-hear-a="${lastQuery.deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(lastQuery.title)}" data-lb="${esc(t.title)}">Hear the mix</button>
       </div>
       <div class="actions">
+        <button type="button" class="hear hear-m" data-hear-a="${lastQuery.deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(lastQuery.title)}" data-lb="${esc(t.title)}">Hear the mix</button>
         ${addButton(t)}
         ${buyButton(t)}
-        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="ga">Find similar tracks</span></button>
+        <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="ga">Find similar tracks</span><span class="ga ga-s">Similar</span></button>
       </div>
     </div>`).join("");
   markPlayed();
@@ -1904,7 +1924,7 @@ function showTokens(t) {
   el.hidden = false;
   const out = !t.subscribed && t.left === 0;
   el.classList.toggle("out", out);
-  // show it as "used / total" (e.g. 1/3). The total is the most this visitor has had at this stage,
+  // show it as "left / total", counting down (3/3, 2/3 ... 0/3). The total is the most this visitor has had at this stage,
   // so bonus credits and the 24-hour refresh are counted too.
   let total = t.left;
   if (!t.subscribed) {
@@ -1914,10 +1934,10 @@ function showTokens(t) {
     try { localStorage.setItem("ss_tok_peak", JSON.stringify({ stage: t.stage, n: total })); } catch {}
   }
   const used = Math.max(0, total - t.left);
-  el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : `${used}/${total}`;
-  el.querySelector(".tok-l").textContent = "";          // just the numbers (e.g. 1/3), no words
+  el.querySelector(".tok-n").textContent = t.subscribed ? "∞" : `${t.left}/${total}`;
+  el.querySelector(".tok-l").textContent = "";          // just the numbers (e.g. 2/3), no words
   el.title = t.subscribed ? "Unlimited searches"
-    : `${used} of ${total} free searches used · ${t.left === 1 ? "1 search" : `${t.left} searches`} left`;
+    : `${t.left === 1 ? "1 free search" : `${t.left} free searches`} left of ${total} · ${used} used`;
   el.setAttribute("aria-label", el.title);
 }
 $("#tok-pill").addEventListener("click", () => {

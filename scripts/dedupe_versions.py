@@ -19,6 +19,12 @@ def base(title: str):
         return title.strip().lower(), 1
     tag = (m.group(2) or m.group(3) or "").strip()
     if not PLAIN.match(tag):
+        # a remix is its own track, but its edit / shortcut / extended cut is the same remix:
+        # "(MK Remix Edit)" and "(MK Remix)" are one track, "(MK Remix)" and "(Dom Remix)" are two
+        r = re.match(r"^(.*?\b(?:remix|rework|dub|mix|vip))\s+(extended|short|shortcut|radio edit|edit|cut|club mix|version)$", tag, re.I)
+        if r:
+            v = r.group(2).lower()
+            return f"{m.group(1).strip().lower()} ({r.group(1).strip().lower()})", 0 if v.startswith("extended") else 3
         return title.strip().lower(), 1               # e.g. "(MK Remix)": its own track
     t = tag.lower()
     rank = 0 if t.startswith("extended") else 2 if t.startswith("club") else 3 if ("radio" in t or "edit" in t) else 1
