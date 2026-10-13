@@ -4,6 +4,7 @@ Run:  uv run uvicorn app.main:app --reload --port 8000
 """
 import json
 import os
+import random
 import re
 import threading
 from datetime import date
@@ -353,11 +354,18 @@ def stats():
     rows = index.rows
     today = date.today()
     recent = sum(1 for r in rows if r["release_date"] and (today - date.fromisoformat(r["release_date"])).days <= 365)
-    # Example tracks for the start screen: the newest releases, one per artist and sub-genre
+    # "Try a fresh release": four recent releases, one per artist and sub-genre, a different set each day
+    # (picked at random from the last 14 days, widening to 30 / 60 if there aren't enough)
     examples, seen = [], set()
     explicit = re.compile(r"\b(pussy|fuck|shit|bitch|dick|cock|nigga|hoe|sex)\w*", re.I)
-    for r in sorted(rows, key=lambda r: r["release_date"] or "", reverse=True):
-        if not r["cover"] or explicit.search(r["title"]) or r["artist"] in seen or r["style"] in {e["style"] for e in examples}:
+    ok = [r for r in rows if r["cover"] and r["release_date"] and not explicit.search(r["title"])]
+    for days in (14, 30, 60, 100000):
+        pool = [r for r in ok if (today - date.fromisoformat(r["release_date"])).days <= days]
+        if len({r["style"] for r in pool}) >= 4 and len(pool) >= 12:
+            break
+    random.Random(today.toordinal()).shuffle(pool)
+    for r in pool:
+        if r["artist"] in seen or r["style"] in {e["style"] for e in examples}:
             continue
         seen.add(r["artist"])
         examples.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
