@@ -901,8 +901,8 @@
       <div class="try" id="try"></div>
       <div class="howvid" id="how-video">
         <div class="start-label">How it works</div>
-        <div class="vbox"><video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=6" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
-          <source src="/static/how-it-works.mp4?v=12" type="video/mp4">
+        <div class="vbox"><video controls playsinline preload="none" poster="/static/how-it-works.jpg?v=7" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
+          <source src="/static/how-it-works.mp4?v=13" type="video/mp4">
         </video></div>
       </div>
     </section>
@@ -2465,10 +2465,15 @@ function startDrag(item, el, pointerId, x, y) {
   // finger: pad the bottom so the panel can't jump, then scroll by however far the slot moved.
   const list = $("#set-list"), sb = document.querySelector(".set-body");
   const scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
-  const h0 = list.offsetHeight;
+  const h0 = list.offsetHeight, top0 = scroller.scrollTop;
   list.classList.add("is-dragging");
   list.style.paddingBottom = Math.max(0, h0 - list.offsetHeight) + "px";
   scroller.scrollTop += card.getBoundingClientRect().top - r.top;
+  // if the panel couldn't scroll far enough (a short set, or a computer), don't close the list up at all,
+  // so the green slot stays exactly under the card you're holding
+  if (Math.abs(card.getBoundingClientRect().top - r.top) > 0.5) {     // couldn't: keep the list as it was
+    list.classList.remove("is-dragging"); list.style.paddingBottom = ""; scroller.scrollTop = top0;
+  }
   drag.scroller = scroller;
   drag.shift = list.getBoundingClientRect().top + item.offsetTop - list.offsetTop + item.offsetHeight / 2 - (r.top + r.height / 2);
   try { el.setPointerCapture(pointerId); } catch {}
