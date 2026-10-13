@@ -777,6 +777,12 @@
   .set-tools .icon { flex: 1 1 auto; justify-content: center; height: 32px; padding: 0 8px; font-size: 12px; }
   @media (max-width: 480px) { .set-tools { gap: 4px; } .set-tools .icon { height: 36px; padding: 0 4px; font-size: 11px; } }
   .set-tools[hidden], .share-set[hidden] { display: none; }
+  .set-row2 { display: flex; gap: 6px; margin-top: 10px; }
+  .set-row2 .share-set { margin-top: 0; flex: 1; min-width: 0; }
+  .set-row2[hidden] { display: none; }
+  .plan-mini { flex: none; background: rgba(198,255,61,.07); border: 1px solid #3b4a16; color: var(--accent); border-radius: 10px;
+    padding: 0 14px; font: 700 13px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+  .plan-mini:hover { border-color: var(--accent); }
   .share-set { display: flex; align-items: center; gap: 12px; width: 100%; margin-top: 10px; text-align: left; background: rgba(198,255,61,.07);
                border: 1px solid #3b4a16; color: var(--text); border-radius: 10px; padding: 7px 12px; }
   .share-set:hover:not(:disabled) { border-color: var(--accent); }
@@ -847,6 +853,8 @@
   .link { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px 14px; padding: 6px 0 6px 14px; border-left: 3px solid var(--c); font-size: 12px; color: var(--muted); }
   .link .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
   .link b { color: var(--c); font-weight: 700; }
+  .link > span:not(.dot) { flex: 1; min-width: 0; }
+  .link .hear-sm { align-self: flex-end; flex: none; white-space: nowrap; margin: 0 0 0 auto; }
   .link.good { --c: var(--good); } .link.ok { --c: var(--ok); } .link.bad { --c: var(--bad); }
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 19; opacity: 0; pointer-events: none; transition: opacity .25s; }
   .scrim.open { opacity: 1; pointer-events: auto; }
@@ -967,7 +975,6 @@
       </form>
       <div class="suggest" id="dsuggest" role="listbox" hidden></div>
     </div>
-    <button type="button" class="describe-open plan-open" data-plan><span aria-hidden="true">🗓</span> Plan a whole gig</button>
   </div>
 
   <details class="filters-wrap" id="filters-wrap" open>
@@ -1018,10 +1025,13 @@
         <button type="button" class="icon" id="set-clear">Clear set</button>
         <button type="button" class="icon" data-import>Import tracklist</button>
       </div>
-      <button type="button" class="share-set" id="set-share">
+      <div class="set-row2">
+        <button type="button" class="share-set" id="set-share">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span><b>Share your set with others</b><small id="share-sub">Send a link - they'll see your tracks in this order</small></span>
       </button>
+        <button type="button" class="plan-mini" data-plan>Plan a gig</button>
+      </div>
     </div>
     <div class="set-body">
       <p class="set-hint" id="set-hint" hidden>Tip: hold a track, then drag it to move it.</p>
@@ -2526,6 +2536,7 @@ function renderSet() {
   // nothing to sort, copy, clear or share yet: keep the empty panel focused on "Add tracks"
   document.querySelector(".set-tools").hidden = !set.length;
   $("#set-share").hidden = !set.length;
+  document.querySelector(".set-row2").hidden = !set.length;
   $("#fab-count").textContent = set.length;
   $("#set-fab").hidden = !set.length;
   placeSetFab();
@@ -3200,6 +3211,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=54"></script>
+<script src="/static/i18n.js?v=55"></script>
 </body>
 </html>
