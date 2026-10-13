@@ -157,6 +157,11 @@
   .start { margin-top: 30px; }
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
+  /* Home page: spread the top out so that, scrolled to the very top, "How it works" just peeks in at the bottom
+     of the screen. --hs is the extra space, worked out for each screen size by fitHome(). */
+  html:not(.has-results) .steps { margin-top: calc(30px + var(--hs, 0px) * 1.5); margin-bottom: calc(28px + var(--hs, 0px)); }
+  html:not(.has-results) .start { margin-top: calc(34px + var(--hs, 0px)); }
+  html:not(.has-results) .howvid { margin-top: calc(34px + var(--hs, 0px)); }
   .fresh { margin-bottom: 28px; }
 
   .fresh-sub { margin: -4px 0 10px; color: var(--muted); font-size: 13px; }
@@ -1420,7 +1425,7 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   examplesCache = s.examples || [];
   const tryBox = $("#try");
   if (tryBox) tryBox.innerHTML = examplesHtml(examplesCache);
-  loadFresh();
+  loadFresh(); fitHome();
 });
 let examplesCache = [];
 /* "Fresh for your set": the newest releases that mix with what's already in your set (start screen) */
@@ -2110,7 +2115,7 @@ function newSearch(pushHistory = true) {
   $("#out").innerHTML = startHTML;
   document.documentElement.classList.remove("has-results");
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
-  loadFresh();
+  loadFresh(); fitHome();
   if (pushHistory && location.search) history.pushState(null, "", location.pathname);
   document.title = "Find House Music That Mixes With Your Track | SimilarSounds";
   updateClear(); closeSuggest();
@@ -3385,6 +3390,17 @@ $("#set-copy").onclick = async () => {
   catch { toast("Couldn't copy - your browser blocked it"); }
 };
 
+// Home page spacing: how much extra room each gap gets so "How it works" peeks in ~90px from the bottom
+function fitHome() {
+  const root = document.documentElement, v = $("#how-video");
+  root.style.setProperty("--hs", "0px");
+  if (!v || root.classList.contains("has-results")) return;
+  const spare = innerHeight - 90 - (v.getBoundingClientRect().top + scrollY);
+  root.style.setProperty("--hs", `${Math.max(0, Math.min(90, spare / 4.5))}px`);   // 4.5 = the gaps' shares added up
+}
+addEventListener("resize", fitHome);
+addEventListener("load", fitHome);
+new MutationObserver(fitHome).observe(document.documentElement, { attributes: true, attributeFilter: ["class"] });
 renderSet();
 if (reopenedOwnSearch()) history.replaceState(null, "", location.pathname);
 openFromUrl(true);
