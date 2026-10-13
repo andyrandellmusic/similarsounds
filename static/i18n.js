@@ -373,6 +373,8 @@
     "Add to my set": ["Añadir a mi set", "Ajouter à mon set", "Zu meinem Set hinzufügen", "Aggiungi al mio set", "Adicionar ao meu set", "Aan mijn set toevoegen"],
     "Replace my set": ["Reemplazar mi set", "Remplacer mon set", "Mein Set ersetzen", "Sostituisci il mio set", "Substituir meu set", "Mijn set vervangen"],
     "Watch how it works · 45s": ["Mira cómo funciona · 45 s", "Voir comment ça marche · 45 s", "So funktioniert es · 45 Sek.", "Guarda come funziona · 45 s", "Veja como funciona · 45 s", "Bekijk hoe het werkt · 45 s"],
+    "Search less.": ["Busca menos.", "Cherchez moins.", "Weniger suchen.", "Cerca di meno.", "Procure menos.", "Minder zoeken."],
+    "Play more.": ["Pincha más.", "Mixez plus.", "Mehr auflegen.", "Suona di più.", "Toque mais.", "Meer draaien."],
     "Fix this gap": ["Arreglar hueco", "Combler le trou", "Lücke füllen", "Sistema il passaggio", "Corrigir lacuna", "Gat dichten"],
     "Find a track to put in between": ["Busca un tema para poner en medio", "Trouver un titre à placer entre les deux", "Einen Track dazwischen finden", "Trova un brano da mettere in mezzo", "Achar uma faixa para pôr no meio", "Zoek een track voor ertussen"],
     "Fix this gap: find a track to put in between": ["Arregla este hueco: busca un tema para poner en medio", "Combler ce trou : trouver un titre à placer entre les deux", "Lücke füllen: einen Track dazwischen finden", "Sistema questo passaggio: trova un brano da mettere in mezzo", "Corrigir esta lacuna: achar uma faixa para pôr no meio", "Gat dichten: zoek een track voor ertussen"],

@@ -44,6 +44,10 @@
   a.logo:focus-visible { outline-offset: 6px; border-radius: 6px; }
   .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 34px; }
   .brand-row .logo { margin: 0; font-size: 44px; }
+  /* tagline under the logo */
+  .brand { display: flex; flex-direction: column; min-width: 0; }
+  .tagline { margin-top: 9px; font-size: 15px; font-weight: 600; letter-spacing: .02em; color: #b9b9c6; white-space: nowrap; }
+  .tagline span { color: var(--accent); }
   .top-tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
   .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
   .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
@@ -794,6 +798,7 @@
     .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 200px) / 7.8), 32px); }   /* as big as the room beside sign-in, language and menu allows */
     .top-tools { gap: 6px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
+    .tagline { margin-top: 6px; font-size: 11.5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
     .top-tools .acct-btn { padding: 4px; min-height: 40px; min-width: 40px; border-radius: 999px; }
     /* results: less above the first match */
@@ -975,7 +980,10 @@
 <div class="wrap">
 
   <div class="brand-row">
+    <div class="brand">
     <a class="logo" href="/" id="home-link" aria-label="SimilarSounds - home"><svg class="mark" viewBox="0 0 140 140" aria-hidden="true"><path d="M0 70A70 70 0 0 1 70 0V35A35 35 0 0 0 35 70Z M140 0A70 70 0 0 1 70 70V35A35 35 0 0 0 105 0Z" fill="#f2f2f5"/><path d="M0 140A70 70 0 0 1 70 70V105A35 35 0 0 0 35 140Z M140 70A70 70 0 0 1 70 140V105A35 35 0 0 0 105 70Z" fill="#c6ff3d"/></svg>Similar<span>Sounds</span></a>
+      <div class="tagline">Search less. <span>Play more.</span></div>
+    </div>
     <div class="top-tools">
       <div class="acct-group">
         <button type="button" class="tok-pill" id="tok-pill" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 6v12" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/></svg><b class="tok-n" data-no-i18n></b><span class="tok-l"></span></button>
@@ -3320,6 +3328,6 @@ addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=59"></script>
+<script src="/static/i18n.js?v=60"></script>
 </body>
 </html>
