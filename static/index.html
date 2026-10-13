@@ -153,13 +153,12 @@
   .plan-seed { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); }
   .plan-seed b { color: var(--text); }
   /* "Describe a sound" */
-  /* folder tabs sitting on the search bar: the chosen one joins the bar (no line between them) */
+  /* folder tabs sitting right on the search bar, with the bar's top line running straight through */
   .search-tabs { display: flex; gap: 4px; margin: 0; padding-left: 12px; position: relative; z-index: 2; }
   .search-tabs button { position: relative; background: transparent; border: 1px solid transparent; border-bottom: 0; color: var(--muted);
-    border-radius: 11px 11px 0 0; padding: 9px 15px 8px; margin-bottom: -1px; font: 700 13px Inter, sans-serif; cursor: pointer; }
+    border-radius: 11px 11px 0 0; padding: 9px 15px 8px; margin-bottom: 0; font: 700 13px Inter, sans-serif; cursor: pointer; }
   .search-tabs button:hover { color: var(--text); }
   .search-tabs button.on { background: var(--panel); border-color: var(--line); color: var(--accent); }
-  .search-tabs button.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--panel); }
   body:has(form.search:focus-within) .search-tabs button.on { border-color: var(--accent); }
   .search-wrap, .describe-wrap { position: relative; z-index: 1; }
   .search-wrap[hidden], .describe-wrap[hidden] { display: none; }
@@ -216,7 +215,7 @@
   /* ...with a soft light sweeping across now and then, to catch the eye */
   .start-label { width: fit-content; background: linear-gradient(100deg, #dcdce4 0%, #dcdce4 38%, #ffffff 44%, #c6ff3d 49%, #f4ffd6 51%, #ffffff 56%, #dcdce4 62%, #dcdce4 100%);
     background-size: 300% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; color: transparent;
-    animation: label-shimmer 4.5s ease-in-out infinite; }
+    animation: label-shimmer 3s ease-in-out infinite; }
   .start-label .badge-new { -webkit-text-fill-color: var(--accent-ink); }
   @keyframes label-shimmer { 0% { background-position: 100% 0; } 45%, 100% { background-position: 0% 0; } }
   .try { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 10px; min-height: 76px; }
