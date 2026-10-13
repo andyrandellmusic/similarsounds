@@ -1522,6 +1522,7 @@ async function run(exactUrl, fromHistory = false) {
     updateClear();
     if (new URLSearchParams(location.search).get("t") != t)
       history[fromHistory ? "replaceState" : "pushState"]({ t, label }, "", `?t=${t}`);
+    rememberOwn(`t:${t}`);
     document.title = `${label} - similar house tracks | SimilarSounds`;
   } catch (err) {
     showProblem(err, url);
@@ -2127,6 +2128,19 @@ document.addEventListener("click", e => {
   if (e.target.closest("#new-search") || (e.target.closest("#clear") && Date.now() - clearedAt > 600)) newSearch();
 });
 
+// Searches made on this device. When the phone reopens the page (home-screen icon, a restored tab or a refresh)
+// on the address of one of your own searches, start fresh on the home page instead of re-running it.
+// Links from someone else, and clicks from our own pages, still open their search.
+function rememberOwn(k) {
+  try { const a = JSON.parse(localStorage.getItem("ss_own") || "[]").filter(x => x !== k); a.push(k); localStorage.setItem("ss_own", JSON.stringify(a.slice(-50))); } catch {}
+}
+function reopenedOwnSearch() {
+  const p = new URLSearchParams(location.search), k = p.get("t") ? `t:${p.get("t")}` : p.get("d") ? `d:${p.get("d").trim()}` : null;
+  if (!k) return false;
+  let own = []; try { own = JSON.parse(localStorage.getItem("ss_own") || "[]"); } catch {}
+  const nav = performance.getEntriesByType?.("navigation")[0]?.type;
+  return own.includes(k) && (!document.referrer || nav === "reload" || nav === "back_forward");
+}
 function openFromUrl(fromHistory) {
   const dq = new URLSearchParams(location.search).get("d");
   if (dq) { describeSound(dq, true); return true; }
@@ -3232,6 +3246,7 @@ async function describeSound(text, fromHistory) {
   document.documentElement.classList.add("has-results");
   $("#out").innerHTML = `<div class="results-head"><h2>Listening for that sound…</h2></div><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
   if (!fromHistory) history.pushState({ d: text }, "", `?d=${encodeURIComponent(text)}`);
+  rememberOwn(`d:${text}`);
   let d;
   try { d = await (await fetch(`/api/describe?q=${encodeURIComponent(text)}`)).json(); }
   catch { $("#out").innerHTML = `<div class="msg">Couldn't search right now. Try again in a moment.</div>`; return; }
@@ -3366,6 +3381,7 @@ $("#set-copy").onclick = async () => {
 };
 
 renderSet();
+if (reopenedOwnSearch()) history.replaceState(null, "", location.pathname);
 openFromUrl(true);
 openSharedSet();
 // Every page load or refresh starts with both search bars empty (the browser would otherwise refill them),
