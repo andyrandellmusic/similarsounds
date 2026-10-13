@@ -30,6 +30,10 @@ def predict(m, X):
 
 def main():
     rows = json.load(open("data/house_eval.json"))
+    # plus real DJ-library house tracks (free downloads, bootlegs, small labels): measurements only
+    rows += json.load(open("data/house_extra.json"))
+    for r in rows:                                   # dance_genre: 1 dance tag, 0 other tags, 0.5 no tags
+        r["dance_genre"] = float(any(g in (106, 113) for g in r["genres"])) if r.get("genres") else 0.5
     X = np.array([feature_vector(r) for r in rows])
     y = np.array([r["label"] for r in rows])
 

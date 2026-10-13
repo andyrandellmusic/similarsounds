@@ -1,0 +1,1050 @@
+[
+{
+"kick_pulse": 0.18,
+"kick_bar": 0.21116735900498254,
+"kick_offbeat": -0.09113448509808883,
+"pulse": 0.26071417923297074,
+"low_share": 0.9480893015861511,
+"nn_sim": 0.7506600618362427,
+"tempo_free": 66.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #1"
+},
+{
+"kick_pulse": 0.17,
+"kick_bar": 0.24518055626406163,
+"kick_offbeat": 0.1888173405851165,
+"pulse": 0.18727855656582562,
+"low_share": 0.20654746890068054,
+"nn_sim": 0.8766094446182251,
+"tempo_free": 65.0,
+"genres": [
+144,
+146
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #2"
+},
+{
+"kick_pulse": 0.22,
+"kick_bar": 0.31062818266624626,
+"kick_offbeat": 0.13647917169416973,
+"pulse": 0.34095068282426094,
+"low_share": 0.9347633123397827,
+"nn_sim": 0.6490699648857117,
+"tempo_free": 64.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #3"
+},
+{
+"kick_pulse": 0.32,
+"kick_bar": 0.6065145855626254,
+"kick_offbeat": 0.07534840109964043,
+"pulse": 0.7620814727046165,
+"low_share": 0.935989260673523,
+"nn_sim": 0.6968986392021179,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #4"
+},
+{
+"kick_pulse": 0.44,
+"kick_bar": 0.649878087275811,
+"kick_offbeat": 0.1414286713702391,
+"pulse": 0.6395588489889188,
+"low_share": 0.9708694219589233,
+"nn_sim": 0.7589094638824463,
+"tempo_free": 132.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #5"
+},
+{
+"kick_pulse": 0.27,
+"kick_bar": 0.7147444927921682,
+"kick_offbeat": -0.012224030129660758,
+"pulse": 0.5161039542693356,
+"low_share": 0.9710361361503601,
+"nn_sim": 0.7129877209663391,
+"tempo_free": 129.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #6"
+},
+{
+"kick_pulse": 0.5,
+"kick_bar": 0.5298593135084957,
+"kick_offbeat": 0.15975588750916359,
+"pulse": 0.8120079462387366,
+"low_share": 0.9541144967079163,
+"nn_sim": 0.8253434896469116,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #7"
+},
+{
+"kick_pulse": -0.08,
+"kick_bar": 0.7985838574285715,
+"kick_offbeat": 0.0375772278952914,
+"pulse": 0.54367932695179,
+"low_share": 0.967956006526947,
+"nn_sim": 0.8302833437919617,
+"tempo_free": 129.5,
+"genres": [
+132
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #8"
+},
+{
+"kick_pulse": 0.22,
+"kick_bar": 0.5328667071880773,
+"kick_offbeat": 0.0947140142425269,
+"pulse": 0.4916922691918444,
+"low_share": 0.9276153445243835,
+"nn_sim": 0.7115293741226196,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #9"
+},
+{
+"kick_pulse": -0.07,
+"kick_bar": 0.8176722882199101,
+"kick_offbeat": -0.08050995741723455,
+"pulse": 0.5783935402723728,
+"low_share": 0.941658616065979,
+"nn_sim": 0.641628623008728,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #10"
+},
+{
+"kick_pulse": 0.26,
+"kick_bar": 0.6465725579927134,
+"kick_offbeat": -0.08839923847834905,
+"pulse": 0.6577360231299386,
+"low_share": 0.9527133107185364,
+"nn_sim": 0.7300997972488403,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #11"
+},
+{
+"kick_pulse": 0.44,
+"kick_bar": 0.4537455814962211,
+"kick_offbeat": 0.2352386279157004,
+"pulse": 0.660770046453063,
+"low_share": 0.9240061640739441,
+"nn_sim": 0.7165173292160034,
+"tempo_free": 129.5,
+"genres": [
+106,
+111,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #12"
+},
+{
+"kick_pulse": 0.14,
+"kick_bar": 0.42550451308488846,
+"kick_offbeat": 0.058805631182622164,
+"pulse": 0.7526141572743654,
+"low_share": 0.9383324980735779,
+"nn_sim": 0.775199294090271,
+"tempo_free": 126.0,
+"genres": [
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #13"
+},
+{
+"kick_pulse": 0.17,
+"kick_bar": 0.5263007717350375,
+"kick_offbeat": 0.10196611402520495,
+"pulse": 0.5367734811913506,
+"low_share": 0.9631822109222412,
+"nn_sim": 0.7367625832557678,
+"tempo_free": 129.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #14"
+},
+{
+"kick_pulse": 0.08,
+"kick_bar": 0.6657872956532712,
+"kick_offbeat": -0.10906867150109835,
+"pulse": 0.7678084166433945,
+"low_share": 0.9305055737495422,
+"nn_sim": 0.7176279425621033,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #15"
+},
+{
+"kick_pulse": 0.3,
+"kick_bar": 0.22695036977529548,
+"kick_offbeat": 0.014693609119131673,
+"pulse": 0.6601345707447479,
+"low_share": 0.8601176142692566,
+"nn_sim": 0.6613703370094299,
+"tempo_free": 129.5,
+"genres": [
+116
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #16"
+},
+{
+"kick_pulse": 0.3,
+"kick_bar": 0.7552858330309411,
+"kick_offbeat": -0.18306758352376232,
+"pulse": 0.49766481732233186,
+"low_share": 0.9723966717720032,
+"nn_sim": 0.6426600813865662,
+"tempo_free": 86.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #17"
+},
+{
+"kick_pulse": 0.04,
+"kick_bar": 0.12255500858141612,
+"kick_offbeat": 0.07372439220489473,
+"pulse": 0.7628569708375095,
+"low_share": 0.9391793012619019,
+"nn_sim": 0.6612042784690857,
+"tempo_free": 132.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #18"
+},
+{
+"kick_pulse": 0.23,
+"kick_bar": 0.34675211971270226,
+"kick_offbeat": 0.07121174656412785,
+"pulse": 0.5881617390870593,
+"low_share": 0.931390643119812,
+"nn_sim": 0.6735146641731262,
+"tempo_free": 132.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #19"
+},
+{
+"kick_pulse": 0.27,
+"kick_bar": 0.5495816155929454,
+"kick_offbeat": 0.1884748955754648,
+"pulse": 0.745218112387441,
+"low_share": 0.6312326192855835,
+"nn_sim": 0.8737668991088867,
+"tempo_free": 132.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #20"
+},
+{
+"kick_pulse": 0.06,
+"kick_bar": 0.608308914962203,
+"kick_offbeat": 0.05059096134175698,
+"pulse": 0.5789073787759556,
+"low_share": 0.961535632610321,
+"nn_sim": 0.8105241060256958,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #21"
+},
+{
+"kick_pulse": 0.46,
+"kick_bar": 0.610331343057065,
+"kick_offbeat": 0.11800931794837544,
+"pulse": 0.7316816767964223,
+"low_share": 0.9550384879112244,
+"nn_sim": 0.7469280958175659,
+"tempo_free": 129.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #22"
+},
+{
+"kick_pulse": 0.05,
+"kick_bar": 0.6155766784571702,
+"kick_offbeat": -0.02585718166329364,
+"pulse": 0.31338082848546583,
+"low_share": 0.9711738228797913,
+"nn_sim": 0.7941489219665527,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #23"
+},
+{
+"kick_pulse": 0.46,
+"kick_bar": 0.4625466391444206,
+"kick_offbeat": 0.043821276631206274,
+"pulse": 0.7146071121096611,
+"low_share": 0.92729252576828,
+"nn_sim": 0.636982798576355,
+"tempo_free": 126.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #24"
+},
+{
+"kick_pulse": 0.27,
+"kick_bar": 0.2340925873511215,
+"kick_offbeat": 0.0479594397408867,
+"pulse": 0.39154332154430466,
+"low_share": 0.9185732007026672,
+"nn_sim": 0.7890735268592834,
+"tempo_free": 87.5,
+"genres": [
+106,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #25"
+},
+{
+"kick_pulse": 0.32,
+"kick_bar": 0.39333154923702024,
+"kick_offbeat": -0.09072371271620185,
+"pulse": 0.6725627271358976,
+"low_share": 0.9325870275497437,
+"nn_sim": 0.6461485624313354,
+"tempo_free": 132.5,
+"genres": [
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #26"
+},
+{
+"kick_pulse": 0.14,
+"kick_bar": 0.1806821044391168,
+"kick_offbeat": 0.04257359775203013,
+"pulse": 0.5103586429658415,
+"low_share": 0.9264188408851624,
+"nn_sim": 0.5224435925483704,
+"tempo_free": 86.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #27"
+},
+{
+"kick_pulse": 0.69,
+"kick_bar": 0.7339241395776109,
+"kick_offbeat": -0.07852790070823037,
+"pulse": 0.4298877327058176,
+"low_share": 0.7749698758125305,
+"nn_sim": 0.8173447847366333,
+"tempo_free": 65.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #28"
+},
+{
+"kick_pulse": 0.2,
+"kick_bar": 0.11060791000665174,
+"kick_offbeat": 0.06551719708441514,
+"pulse": 0.6603111767422729,
+"low_share": 0.9578787088394165,
+"nn_sim": 0.6946231126785278,
+"tempo_free": 126.0,
+"genres": [
+106,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #29"
+},
+{
+"kick_pulse": 0.78,
+"kick_bar": 0.6954296378478894,
+"kick_offbeat": -0.0901418971977452,
+"pulse": 0.561277415317994,
+"low_share": 0.809964120388031,
+"nn_sim": 0.8323488235473633,
+"tempo_free": 123.0,
+"genres": [
+106,
+111,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #30"
+},
+{
+"kick_pulse": 0.36,
+"kick_bar": 0.3948489651083946,
+"kick_offbeat": -0.021512407503905706,
+"pulse": 0.5694420929066837,
+"low_share": 0.9330363273620605,
+"nn_sim": 0.6888639330863953,
+"tempo_free": 126.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #31"
+},
+{
+"kick_pulse": 0.36,
+"kick_bar": 0.7661687141427651,
+"kick_offbeat": -0.23461141840268213,
+"pulse": 0.5948054211644024,
+"low_share": 0.8856074213981628,
+"nn_sim": 0.7626969218254089,
+"tempo_free": 129.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #32"
+},
+{
+"kick_pulse": 0.57,
+"kick_bar": 0.529631401237566,
+"kick_offbeat": 0.45742662432894576,
+"pulse": 0.5459573386178818,
+"low_share": 0.8074402213096619,
+"nn_sim": 0.6638957858085632,
+"tempo_free": 129.0,
+"genres": [
+106,
+111,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #33"
+},
+{
+"kick_pulse": 0.09,
+"kick_bar": 0.6892445025822319,
+"kick_offbeat": 0.01992098761253983,
+"pulse": 0.7370018336492086,
+"low_share": 0.888668417930603,
+"nn_sim": 0.6122186183929443,
+"tempo_free": 129.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #34"
+},
+{
+"kick_pulse": 0.44,
+"kick_bar": 0.5236560743651353,
+"kick_offbeat": 0.11865546931039717,
+"pulse": 0.503090372782026,
+"low_share": 0.9331185221672058,
+"nn_sim": 0.7768645286560059,
+"tempo_free": 129.0,
+"genres": [
+132
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #35"
+},
+{
+"kick_pulse": 0.21,
+"kick_bar": 0.06771299151632096,
+"kick_offbeat": -0.03228131937570511,
+"pulse": 0.35726516142200954,
+"low_share": 0.9294843673706055,
+"nn_sim": 0.6800036430358887,
+"tempo_free": 65.0,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #36"
+},
+{
+"kick_pulse": 0.16,
+"kick_bar": 0.8697512006530421,
+"kick_offbeat": -0.08936408206444374,
+"pulse": 0.27362090567699976,
+"low_share": 0.9510915279388428,
+"nn_sim": 0.7032315135002136,
+"tempo_free": 65.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #37"
+},
+{
+"kick_pulse": 0.31,
+"kick_bar": 0.21802989651377408,
+"kick_offbeat": 0.014238927373018923,
+"pulse": 0.679897702657259,
+"low_share": 0.8604541420936584,
+"nn_sim": 0.6608135104179382,
+"tempo_free": 129.5,
+"genres": [
+106,
+111,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #38"
+},
+{
+"kick_pulse": 0.18,
+"kick_bar": 0.6767468202205108,
+"kick_offbeat": -0.15032554026479825,
+"pulse": 0.5180126193143029,
+"low_share": 0.922071099281311,
+"nn_sim": 0.5961593389511108,
+"tempo_free": 132.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #39"
+},
+{
+"kick_pulse": 0.17,
+"kick_bar": 0.6468747846665792,
+"kick_offbeat": -0.05617159112944137,
+"pulse": 0.6077459941880079,
+"low_share": 0.9541264176368713,
+"nn_sim": 0.7079963684082031,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #40"
+},
+{
+"kick_pulse": 0.3,
+"kick_bar": 0.5101281926035881,
+"kick_offbeat": -0.007385393106233096,
+"pulse": 0.762715277262032,
+"low_share": 0.8502108454704285,
+"nn_sim": 0.6675515174865723,
+"tempo_free": 126.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #41"
+},
+{
+"kick_pulse": 0.08,
+"kick_bar": 0.6136405260063881,
+"kick_offbeat": -0.05029211149125923,
+"pulse": 0.6700287176252797,
+"low_share": 0.963167130947113,
+"nn_sim": 0.6714885234832764,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #42"
+},
+{
+"kick_pulse": 0.22,
+"kick_bar": 0.7139779349359197,
+"kick_offbeat": 0.010452802563332425,
+"pulse": 0.42498547494268163,
+"low_share": 0.9651504755020142,
+"nn_sim": 0.7687534689903259,
+"tempo_free": 86.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #43"
+},
+{
+"kick_pulse": 0.17,
+"kick_bar": 0.5311872547686995,
+"kick_offbeat": -0.014944296604962373,
+"pulse": 0.5470612445540391,
+"low_share": 0.9292261600494385,
+"nn_sim": 0.798850953578949,
+"tempo_free": 132.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #44"
+},
+{
+"kick_pulse": 0.09,
+"kick_bar": 0.7388958567103674,
+"kick_offbeat": -0.018542514902777796,
+"pulse": 0.7695216772168181,
+"low_share": 0.9481702446937561,
+"nn_sim": 0.7513350248336792,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #45"
+},
+{
+"kick_pulse": 0.14,
+"kick_bar": 0.6063865582691506,
+"kick_offbeat": 0.05095033949282879,
+"pulse": 0.7246945951192174,
+"low_share": 0.9861279726028442,
+"nn_sim": 0.8078790903091431,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #46"
+},
+{
+"kick_pulse": 0.12,
+"kick_bar": 0.8288217093084607,
+"kick_offbeat": -0.11662730189370887,
+"pulse": 0.7192677719276825,
+"low_share": 0.9583337903022766,
+"nn_sim": 0.7096362709999084,
+"tempo_free": 132.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #47"
+},
+{
+"kick_pulse": 0.39,
+"kick_bar": 0.5592215667263833,
+"kick_offbeat": 0.10188709942247859,
+"pulse": 0.463824381586164,
+"low_share": 0.8900285363197327,
+"nn_sim": 0.7056446075439453,
+"tempo_free": 86.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #48"
+},
+{
+"kick_pulse": 0.23,
+"kick_bar": 0.7454306876170449,
+"kick_offbeat": -0.06861633775406517,
+"pulse": 0.6458991609106306,
+"low_share": 0.9552969336509705,
+"nn_sim": 0.6217532157897949,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #49"
+},
+{
+"kick_pulse": 0.28,
+"kick_bar": 0.6375308260321617,
+"kick_offbeat": -0.022193700526258908,
+"pulse": 0.775616648606956,
+"low_share": 0.898690938949585,
+"nn_sim": 0.6178382039070129,
+"tempo_free": 126.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #50"
+},
+{
+"kick_pulse": 0.3,
+"kick_bar": 0.5812753651004591,
+"kick_offbeat": 0.14201547749465895,
+"pulse": 0.482751693146733,
+"low_share": 0.5797931551933289,
+"nn_sim": 0.7899212837219238,
+"tempo_free": 129.5,
+"genres": [
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #51"
+},
+{
+"kick_pulse": 0.66,
+"kick_bar": 0.6245576646178959,
+"kick_offbeat": 0.4133254851701415,
+"pulse": 0.5907397179822018,
+"low_share": 0.8788972496986389,
+"nn_sim": 0.4939587116241455,
+"tempo_free": 132.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #52"
+},
+{
+"kick_pulse": 0.18,
+"kick_bar": 0.4194119110364803,
+"kick_offbeat": 0.14428289933130145,
+"pulse": 0.6270488632250242,
+"low_share": 0.8655269742012024,
+"nn_sim": 0.707893967628479,
+"tempo_free": 132.5,
+"genres": [
+132
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #53"
+},
+{
+"kick_pulse": 0.1,
+"kick_bar": 0.35853817944343336,
+"kick_offbeat": 0.11503116664243856,
+"pulse": 0.4298600212742501,
+"low_share": 0.9048147797584534,
+"nn_sim": 0.8351505398750305,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #54"
+},
+{
+"kick_pulse": 0.37,
+"kick_bar": 0.841249848501042,
+"kick_offbeat": 0.2562921086344151,
+"pulse": 0.42904768217928113,
+"low_share": 0.9327375888824463,
+"nn_sim": 0.6816313862800598,
+"tempo_free": 129.5,
+"genres": [
+106,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #55"
+},
+{
+"kick_pulse": 0.22,
+"kick_bar": 0.03376807338195564,
+"kick_offbeat": 0.03049409358170353,
+"pulse": 0.41111187582110403,
+"low_share": 0.8469125628471375,
+"nn_sim": 0.8013080358505249,
+"tempo_free": 132.5,
+"genres": [
+106,
+113
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #56"
+},
+{
+"kick_pulse": 0.34,
+"kick_bar": 0.591666968682639,
+"kick_offbeat": 0.20616309209547648,
+"pulse": 0.40476718989129234,
+"low_share": 0.948235273361206,
+"nn_sim": 0.5876734256744385,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #57"
+},
+{
+"kick_pulse": 0.36,
+"kick_bar": 0.3706544633414455,
+"kick_offbeat": -0.017689185111938073,
+"pulse": 0.5182694093757914,
+"low_share": 0.9430652856826782,
+"nn_sim": 0.7260109186172485,
+"tempo_free": 87.5,
+"genres": [
+85
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #58"
+},
+{
+"kick_pulse": 0.43,
+"kick_bar": 0.18832373116598572,
+"kick_offbeat": 0.09331933410870734,
+"pulse": 0.251345181740214,
+"low_share": 0.9646096229553223,
+"nn_sim": 0.7597898840904236,
+"tempo_free": 64.5,
+"genres": [
+132
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #59"
+},
+{
+"kick_pulse": 0.25,
+"kick_bar": 0.2449704360646703,
+"kick_offbeat": 0.25177004433666855,
+"pulse": 0.42516572451075657,
+"low_share": 0.6753134727478027,
+"nn_sim": 0.8167183995246887,
+"tempo_free": 129.5,
+"genres": [
+2
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #60"
+},
+{
+"kick_pulse": 0.08,
+"kick_bar": 0.3180510708189104,
+"kick_offbeat": -0.044721318939537014,
+"pulse": 0.6590098849264905,
+"low_share": 0.9258502125740051,
+"nn_sim": 0.8237358331680298,
+"tempo_free": 129.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #61"
+},
+{
+"kick_pulse": 0.43,
+"kick_bar": 0.25907339377758626,
+"kick_offbeat": -0.1767755230405153,
+"pulse": 0.41951642357386054,
+"low_share": 0.9688865542411804,
+"nn_sim": 0.7465486526489258,
+"tempo_free": 65.0,
+"genres": [
+173,
+174
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #62"
+},
+{
+"kick_pulse": 0.64,
+"kick_bar": 0.45699687693815844,
+"kick_offbeat": -0.1697050573112553,
+"pulse": 0.6645725731847472,
+"low_share": 0.9589606523513794,
+"nn_sim": 0.6732591986656189,
+"tempo_free": 136.0,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #63"
+},
+{
+"kick_pulse": -0.01,
+"kick_bar": 0.5787879245785584,
+"kick_offbeat": -0.06908501638099551,
+"pulse": 0.5673187593929466,
+"low_share": 0.9528664946556091,
+"nn_sim": 0.7794956564903259,
+"tempo_free": 129.5,
+"genres": [
+106,
+111
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #64"
+},
+{
+"kick_pulse": 0.36,
+"kick_bar": 0.4986295735632828,
+"kick_offbeat": 0.08900756080931224,
+"pulse": 0.5730907082219019,
+"low_share": 0.9615676999092102,
+"nn_sim": 0.5765200853347778,
+"tempo_free": 132.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #65"
+},
+{
+"kick_pulse": -0.1,
+"kick_bar": 0.6892005073469738,
+"kick_offbeat": -0.03436461971601645,
+"pulse": 0.679698248437151,
+"low_share": 0.9611405730247498,
+"nn_sim": 0.7582839727401733,
+"tempo_free": 129.0,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #66"
+},
+{
+"kick_pulse": 0.29,
+"kick_bar": 0.06738505179048267,
+"kick_offbeat": 0.36284342991145513,
+"pulse": 0.37677029992332894,
+"low_share": 0.812894880771637,
+"nn_sim": 0.7385849952697754,
+"tempo_free": 87.5,
+"genres": [
+132
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #67"
+},
+{
+"kick_pulse": 0.61,
+"kick_bar": 0.5800324463370169,
+"kick_offbeat": 0.3601940745720639,
+"pulse": 0.5410141880962662,
+"low_share": 0.8763262033462524,
+"nn_sim": 0.5164034366607666,
+"tempo_free": 132.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #68"
+},
+{
+"kick_pulse": 0.02,
+"kick_bar": 0.5015569506213063,
+"kick_offbeat": 0.16019447745797644,
+"pulse": 0.44939882083880656,
+"low_share": 0.8982532620429993,
+"nn_sim": 0.79194176197052,
+"tempo_free": 132.5,
+"genres": [
+106
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #69"
+},
+{
+"kick_pulse": 0.08,
+"kick_bar": 0.1802730593257227,
+"kick_offbeat": -0.05573729061423087,
+"pulse": 0.5267416880680962,
+"low_share": 0.9456515908241272,
+"nn_sim": 0.7306157350540161,
+"tempo_free": 129.5,
+"genres": [
+165
+],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #70"
+},
+{
+"kick_pulse": 0.15,
+"kick_bar": 0.37966864699354613,
+"kick_offbeat": 0.13378405731278825,
+"pulse": 0.4598888437836787,
+"low_share": 0.8210887908935547,
+"nn_sim": 0.8303189277648926,
+"tempo_free": 129.5,
+"genres": [],
+"label": 1,
+"kind": "dj_library",
+"name": "dj library #71"
+}
+]
