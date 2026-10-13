@@ -77,10 +77,11 @@
     .acct-group > .tok-pill svg { width: 15px; height: 15px; }
     .accounts-on .acct-group > .tok-pill:not([hidden]) + .acct-btn { padding: 2px 2px 2px 3px; }
   }
-  /* The diamonds make one smooth turn, then rest - every 3 seconds */
-  .logo .mark { transform-box: fill-box; transform-origin: 50% 50%; animation: mark-spin 3s cubic-bezier(.65,0,.35,1) infinite; }
-  @keyframes mark-spin { 0% { transform: rotate(0deg); } 30% { transform: rotate(360deg); } 100% { transform: rotate(360deg); } }
-  .logo:hover .mark { animation-play-state: paused; }
+  /* The logo mark stays still; it makes one smooth turn when the mouse moves over the logo */
+  .logo .mark { transform-box: fill-box; transform-origin: 50% 50%; }
+  .logo:hover .mark { animation: mark-spin .9s cubic-bezier(.65,0,.35,1); }
+  @keyframes mark-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .logo:hover .mark { animation: none; } }
 
   .menu-wrap { position: relative; flex: none; }
   /* language button between the account box and the menu, the same square shape as the menu button */
