@@ -138,6 +138,16 @@
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
   .howvid .start-label { color: var(--accent); }
+  /* "Plan my gig" */
+  .plan-open { margin-left: 18px; }
+  .plan-fld { display: grid; gap: 6px; margin: 0 0 14px; }
+  .plan-fld .fl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+  .plan-fld .seg { display: grid; grid-template-columns: repeat(4, 1fr); }
+  .plan-fld .seg button { padding: 9px 4px; }
+  .plan-fld .seg button.on { background: rgba(198,255,61,.14); color: var(--accent); font-weight: 700; }
+  .plan-fld select { height: 40px; }
+  .plan-seed { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); }
+  .plan-seed b { color: var(--text); }
   /* "Describe a sound" */
   .describe { margin: 10px 0 4px; }
   .describe-open { background: none; border: 0; padding: 4px 0; color: var(--accent); font: 700 14px Inter, sans-serif; cursor: pointer; }
@@ -874,6 +884,7 @@
       </button>
       <nav class="menu" id="menu" hidden aria-label="Main menu">
         <button type="button" data-menu="set"><b>Build your set <span class="badge-new">TRY IT NOW</span></b><small id="menu-set-sub">Your saved tracks</small></button>
+        <button type="button" data-menu="plan"><b>Plan my gig <span class="badge-new">NEW</span></b><small>A whole set for your time slot</small></button>
         <button type="button" data-menu="browse"><b>Browse tracks</b><small>By sub-genre and BPM</small></button>
         <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
         <button type="button" data-menu="legal"><b>Privacy &amp; terms</b><small>Privacy, cookies and terms of use</small></button>
@@ -902,6 +913,7 @@
   </div>
   <div class="describe" id="describe">
     <button type="button" class="describe-open" id="describe-open"><span aria-hidden="true">✨</span> Or describe a sound</button>
+    <button type="button" class="describe-open plan-open" data-plan><span aria-hidden="true">🗓</span> Plan a whole gig</button>
     <form class="search describe-form" id="describe-form" hidden>
       <input id="describe-q" maxlength="200" autocomplete="off" aria-label="Describe a sound"
              placeholder="Describe a sound… e.g. warm sunset deep house with saxophone">
@@ -965,6 +977,7 @@
         <p data-i18n="emptySet">Search for a track, then tap <b>Add to set</b> on the ones you like and drag them into order.</p>
         <button type="button" class="add-tracks" id="add-tracks">+ Add tracks</button>
         <button type="button" class="icon import-empty" data-import>Or import a tracklist</button>
+        <button type="button" class="icon import-empty" data-plan>Or plan a whole gig</button>
         <p class="empty-key" data-i18n="colourKey">Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</p>
       </div>
     </div>
@@ -1050,6 +1063,31 @@
         <p class="acct-msg" role="alert"></p>
         <p class="acct-links"><a href="#" data-go="account">Keep my account</a></p>
       </div>
+    </div>
+  </div>
+  <div class="acct-wrap" id="plan-dlg" hidden>
+    <div class="acct-box plan-box" role="dialog" aria-modal="true" aria-labelledby="plan-title">
+      <button type="button" class="acct-x" id="plan-x" aria-label="Close">×</button>
+      <h2 id="plan-title">Plan my gig</h2>
+      <p class="acct-sub">Tell us how long you're playing and when. We'll build the whole set from the newest releases, every track mixing into the next.</p>
+      <div class="plan-fld"><span class="fl">How long</span>
+        <div class="seg" id="plan-len" role="radiogroup" aria-label="How long">
+          <button type="button" data-v="60" class="on" role="radio" aria-checked="true">1 hour</button>
+          <button type="button" data-v="90" role="radio" aria-checked="false">1½ hours</button>
+          <button type="button" data-v="120" role="radio" aria-checked="false">2 hours</button>
+          <button type="button" data-v="180" role="radio" aria-checked="false">3 hours</button>
+        </div></div>
+      <div class="plan-fld"><span class="fl">Your slot</span>
+        <div class="seg" id="plan-slot" role="radiogroup" aria-label="Your slot">
+          <button type="button" data-v="warmup" role="radio" aria-checked="false">Warm-up</button>
+          <button type="button" data-v="peak" class="on" role="radio" aria-checked="true">Peak time</button>
+          <button type="button" data-v="closing" role="radio" aria-checked="false">Closing</button>
+          <button type="button" data-v="allnight" role="radio" aria-checked="false">All night</button>
+        </div></div>
+      <div class="plan-fld"><label class="fl" for="plan-style">Vibe</label><select id="plan-style"><option value="">Any house</option></select></div>
+      <label class="chk plan-seed" id="plan-seed-wrap" hidden><input type="checkbox" id="plan-seed" checked> <span>Start with <b id="plan-seed-name"></b></span></label>
+      <div class="confirm-btns" id="plan-btns"></div>
+      <p class="acct-msg" id="plan-msg" role="status" aria-live="polite"></p>
     </div>
   </div>
   <div class="acct-wrap" id="import-dlg" hidden>
@@ -2093,6 +2131,7 @@ menu.addEventListener("click", async e => {
   if (what === "set") openSet(true);
   if (what === "legal") location.href = "/privacy";
   if (what === "browse") location.href = "/similar-to";
+  if (what === "plan") openPlan();
   if (what === "how") {
     if (!$("#how-video")) newSearch();
     $("#url").blur();
@@ -2869,6 +2908,50 @@ async function describeSound(text, fromHistory) {
   scrollTo({ top: $("#out").getBoundingClientRect().top + scrollY - 12, behavior: "smooth" });
 }
 
+/* ---------- "Plan my gig": a whole set for a time slot */
+function openPlan() {
+  toggleMenu(false);
+  const sel = $("#plan-style");
+  if (sel.options.length < 2) [...$("#style").options].slice(1).forEach(o => sel.add(new Option(o.text, o.value || o.text)));
+  const seed = lastQuery && document.documentElement.classList.contains("has-results") ? lastQuery : null;
+  $("#plan-seed-wrap").hidden = !seed;
+  if (seed) { $("#plan-seed-name").textContent = `${seed.artist} - ${seed.title}`; $("#plan-seed").dataset.id = seed.deezer_id; }
+  $("#plan-btns").innerHTML = !set.length
+    ? `<button type="button" class="primary" data-planbtn="replace" style="grid-column: 1 / -1">Plan my set</button>`
+    : `<button type="button" class="secondary" data-planbtn="add">Add to my set</button><button type="button" class="primary" data-planbtn="replace">Replace my set</button>`;
+  $("#plan-msg").textContent = ""; $("#plan-msg").className = "acct-msg";
+  $("#plan-dlg").hidden = false;
+}
+function closePlan() { $("#plan-dlg").hidden = true; }
+document.addEventListener("click", e => { if (e.target.closest("[data-plan]")) { openSet(false); openPlan(); } });
+$("#plan-x").onclick = closePlan;
+$("#plan-dlg").addEventListener("click", e => { if (e.target.id === "plan-dlg") closePlan(); });
+["#plan-len", "#plan-slot"].forEach(id => $(id).addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  $(id).querySelectorAll("button").forEach(x => { x.classList.toggle("on", x === b); x.setAttribute("aria-checked", x === b); });
+}));
+$("#plan-btns").addEventListener("click", async e => {
+  const b = e.target.closest("[data-planbtn]"); if (!b) return;
+  const msg = $("#plan-msg");
+  const body = { minutes: Number($("#plan-len .on").dataset.v), slot: $("#plan-slot .on").dataset.v, style: $("#plan-style").value,
+                 seed: !$("#plan-seed-wrap").hidden && $("#plan-seed").checked ? $("#plan-seed").dataset.id : "" };
+  $("#plan-btns").querySelectorAll("button").forEach(x => x.disabled = true);
+  msg.textContent = "Building your set…"; msg.className = "acct-msg";
+  try {
+    const r = await fetch("/api/plan", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const d = await r.json();
+    if (!r.ok) throw new Error(typeof d.detail === "string" ? d.detail : "Couldn't plan that set");
+    const have = new Set(b.dataset.planbtn === "add" ? set.map(t => t.deezer_id) : []);
+    const fresh = d.tracks.filter(t => !have.has(t.deezer_id));
+    set = b.dataset.planbtn === "add" ? [...set, ...fresh] : fresh;
+    saveSet(); renderSet(); refreshAddButtons();
+    closePlan(); openSet(true);
+    announce(`Planned ${fresh.length} tracks`);
+  } catch (err) { msg.textContent = err.message || "Couldn't plan that set"; msg.className = "acct-msg err"; }
+  $("#plan-btns").querySelectorAll("button").forEach(x => x.disabled = false);
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#plan-dlg").hidden) closePlan(); });
+
 /* ---------- Play a preview straight from the set builder (tap the cover) */
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-setplay]"); if (!b) return;
@@ -2953,6 +3036,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=50"></script>
+<script src="/static/i18n.js?v=51"></script>
 </body>
 </html>

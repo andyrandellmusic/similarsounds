@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe
+from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -208,6 +208,25 @@ async def import_tracklist(request: Request):
         except Exception:
             out.append({"line": label, "status": "not_found"})
     return {"items": out, "tokens": await run_in_threadpool(tokens.check, request, None, False)}
+
+
+@app.post("/api/plan")
+async def plan_gig(request: Request):
+    """'Plan my gig': a whole set for a slot (warm-up, peak time, closing, all night), every track mixing into the next."""
+    try:
+        body = await request.json()
+        minutes = int(body.get("minutes") or 60)
+        slot = str(body.get("slot") or "peak")
+        style = str(body.get("style") or "")
+        seed = int(body["seed"]) if str(body.get("seed") or "").isdigit() else None
+    except (ValueError, AttributeError, TypeError):
+        raise HTTPException(400, "Bad plan")
+    if slot not in planner.SLOTS or not 30 <= minutes <= 240 or (style and style not in STYLES):
+        raise HTTPException(400, "Bad plan")
+    tracks = await run_in_threadpool(planner.plan, index, minutes, slot, style, seed)
+    if not tracks:
+        raise HTTPException(404, "Not enough tracks for that yet. Try another vibe.")
+    return {"tracks": tracks}
 
 
 @app.get("/api/describe")
