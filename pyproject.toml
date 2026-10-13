@@ -5,6 +5,7 @@ description = "Find new house music that mixes with any track: matched on sound,
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "essentia==2.1b6.dev1389",
     "fastapi>=0.143.0",
     "httpx>=0.28.1",
     "librosa>=1.0.0",

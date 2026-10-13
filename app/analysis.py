@@ -29,11 +29,16 @@ def strip_id3(data: bytes) -> bytes:
     return data
 
 
-def load_audio(data: bytes) -> np.ndarray:
-    data = strip_id3(data)
-    y, sr = sf.read(io.BytesIO(data), dtype="float32", always_2d=False)
+def decode(data: bytes) -> tuple[np.ndarray, int]:
+    """Mono audio at the file's own sample rate."""
+    y, sr = sf.read(io.BytesIO(strip_id3(data)), dtype="float32", always_2d=False)
     if y.ndim > 1:
         y = y.mean(axis=1)
+    return y, int(sr)
+
+
+def load_audio(data: bytes) -> np.ndarray:
+    y, sr = decode(data)
     if sr != SR:
         y = librosa.resample(y, orig_sr=sr, target_sr=SR)
     return y
@@ -47,8 +52,35 @@ EDM_MINOR = np.array([0.17, 0.06, 0.08, 0.12, 0.05, 0.09, 0.05, 0.13, 0.08, 0.05
 MINOR_LEAN = 0.04          # most house is in a minor key (68% of the Beatport test set)
 
 
-def detect_key(y: np.ndarray) -> tuple[str, str]:
+try:
+    import essentia
+    essentia.log.infoActive = essentia.log.warningActive = False
+    import essentia.standard as _es
+except ImportError:                                  # fall back to the chroma method below
+    _es = None
+ESS_NOTES = {"C": 0, "C#": 1, "Db": 1, "D": 2, "D#": 3, "Eb": 3, "E": 4, "F": 5, "F#": 6, "Gb": 6,
+             "G": 7, "G#": 8, "Ab": 8, "A": 9, "A#": 10, "Bb": 10, "B": 11}
+
+
+def detect_key(y: np.ndarray, sr: int = SR) -> tuple[str, str]:
     """Return (musical key name, Camelot code) e.g. ("A minor", "8A").
+
+    Uses Essentia's key extractor with the Sha'ath profile, best of every free method we tested against
+    the keys Beatport publishes for 629 house tracks: 56% exact / 70% mixable, vs 47% / 66% for our own
+    chroma method (eval: scratch keybpm tests, Oct 2026). Give it audio at the file's own sample rate."""
+    if _es is not None:
+        k, scale, _ = _es.KeyExtractor(profileType="shaath", sampleRate=sr)(np.ascontiguousarray(y, dtype="float32"))
+        tonic = ESS_NOTES[k]
+        if scale == "major":
+            return f"{NOTES[tonic]} major", f"{CAMELOT_MAJOR[tonic]}B"
+        return f"{NOTES[tonic]} minor", f"{CAMELOT_MINOR[tonic]}A"
+    if sr != SR:
+        y = librosa.resample(y, orig_sr=sr, target_sr=SR)
+    return detect_key_chroma(y)
+
+
+def detect_key_chroma(y: np.ndarray) -> tuple[str, str]:
+    """Our own key finder (no Essentia): returns (musical key name, Camelot code) e.g. ("A minor", "8A").
 
     Listens to the harmonic part (drums removed) and mainly to the chord/melody range
     (C3 upwards), because in a 30-second house preview the kick drum smears the bass notes."""
@@ -135,8 +167,10 @@ def rhythm_features(y: np.ndarray, bpm: float) -> dict:
 
 
 def analyse(data: bytes) -> dict:
-    y = load_audio(data)
-    key_name, camelot = detect_key(y)
+    raw, sr = decode(data)
+    key_name, camelot = detect_key(raw, sr)
+    y = librosa.resample(raw, orig_sr=sr, target_sr=SR) if sr != SR else raw
+    del raw
     bpm = detect_bpm(y)
     rhythm = rhythm_features(y, bpm)
 

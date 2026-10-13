@@ -8,9 +8,9 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 from app import sources
-from app.analysis import detect_key, load_audio
+from app.analysis import decode, detect_key
 
-DONE = ROOT / "eval" / "results" / "rekey_done.txt"
+DONE = ROOT / "eval" / "results" / "rekey_done.txt"     # delete it to re-key everything again
 
 
 def fetch(did):
@@ -24,7 +24,7 @@ def fetch(did):
 
 
 def key_of(data):
-    return detect_key(load_audio(data))
+    return detect_key(*decode(data))
 
 
 def main():

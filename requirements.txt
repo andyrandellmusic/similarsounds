@@ -24,6 +24,8 @@ cloudpickle==3.1.2
     # via joblib
 decorator==5.3.1
     # via librosa
+essentia==2.1b6.dev1389
+    # via similarsounds
 fastapi==0.143.0
     # via similarsounds
 h11==0.16.0
@@ -59,6 +61,7 @@ numba==0.68.0
     # via librosa
 numpy==2.5.3
     # via
+    #   essentia
     #   librosa
     #   numba
     #   scikit-learn
@@ -85,7 +88,9 @@ pydantic-core==2.50.0
 python-dotenv==1.2.4
     # via uvicorn
 pyyaml==6.0.3
-    # via uvicorn
+    # via
+    #   essentia
+    #   uvicorn
 requests==2.34.2
     # via pooch
 scikit-learn==1.9.1
@@ -94,6 +99,8 @@ scipy==1.18.1
     # via
     #   librosa
     #   scikit-learn
+six==1.17.0
+    # via essentia
 soundfile==0.14.0
     # via
     #   librosa
