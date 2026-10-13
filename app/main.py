@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist
+from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -208,6 +208,31 @@ async def import_tracklist(request: Request):
         except Exception:
             out.append({"line": label, "status": "not_found"})
     return {"items": out, "tokens": await run_in_threadpool(tokens.check, request, None, False)}
+
+
+@app.get("/api/clip/{deezer_id}")
+async def mix_clip(deezer_id: int):
+    """A track's preview clip, for "Hear the mix" (the browser beatmatches two of these)."""
+    try:
+        data = await run_in_threadpool(mixprev.clip, deezer_id)
+    except Exception:
+        raise HTTPException(404, "No preview for this track")
+    return Response(data, media_type="audio/mpeg", headers={"Cache-Control": "private, max-age=900"})
+
+
+@app.get("/api/mixinfo")
+async def mix_info(a: int, b: int):
+    """Tempo and beat positions for both tracks of a "Hear the mix" preview."""
+    try:
+        qa = await run_in_threadpool(analyse_query, a)
+        qb = await run_in_threadpool(analyse_query, b)
+        ga = await run_in_threadpool(mixprev.beat_grid, a, float(qa["bpm"]))
+        gb = await run_in_threadpool(mixprev.beat_grid, b, float(qb["bpm"]))
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(404, "Couldn't prepare that mix")
+    return {"a": ga, "b": gb}
 
 
 @app.get("/api/bridge")

@@ -138,6 +138,21 @@
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
   .howvid .start-label { color: var(--accent); }
+  /* "Hear the mix": a small button under each match / on each set transition, and a player bar while it plays */
+  .hear { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; background: rgba(198,255,61,.08); color: var(--accent);
+    border: 1px solid rgba(198,255,61,.4); border-radius: 999px; padding: 5px 12px; font: 700 12.5px Inter, sans-serif; cursor: pointer; }
+  .hear:hover { background: rgba(198,255,61,.16); }
+  .hear.on { background: var(--accent); color: var(--accent-ink); }
+  .hear-sm { margin: 0 0 0 8px; padding: 2px 9px; font-size: 11.5px; vertical-align: middle; }
+  .mixbar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 40; width: min(520px, calc(100% - 24px));
+    display: grid; grid-template-columns: auto 1fr auto; grid-template-rows: auto auto; column-gap: 12px; row-gap: 6px; align-items: center;
+    background: var(--panel); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 10px 12px 10px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.55); }
+  .mixbar .mb-ico { grid-row: 1 / 3; font-size: 22px; }
+  .mixbar .mb-txt { font: 600 13.5px Inter, sans-serif; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mixbar .mb-txt b { color: var(--accent); }
+  .mixbar .mb-prog { grid-column: 2; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .mixbar .mb-prog i { display: block; height: 100%; width: 0; background: var(--accent); }
+  .mixbar .mb-x { grid-row: 1 / 3; grid-column: 3; background: none; border: 0; color: var(--accent); font-size: 24px; line-height: 1; padding: 4px 6px; cursor: pointer; }
   /* the box trims the top 32/720 of the picture so the site's banner in the recording doesn't peek in */
   .howvid .vbox { overflow: hidden; aspect-ratio: 1280 / 688; border-radius: 14px; border: 1px solid var(--line); background: #000; }
   .howvid video { display: block; width: 100%; aspect-ratio: 16 / 9; margin-top: calc(-32 / 1280 * 100%); background: #000; }
@@ -1563,6 +1578,7 @@ function renderList() {
           <span class="chip" title="Released ${esc(t.release_date)}">${ago(t.age_days)}</span>
         </div>
         <div class="why"><span class="dot ${t.mix.cls}" aria-hidden="true"></span><span><b class="${t.mix.cls}">${t.mix.label}</b> · ${esc(whyLine(lastQuery, t))}</span></div>
+        <button type="button" class="hear" data-hear-a="${lastQuery.deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(lastQuery.title)}" data-lb="${esc(t.title)}"><span aria-hidden="true">🎧</span> Hear the mix</button>
       </div>
       <div class="actions">
         ${addButton(t)}
@@ -2393,7 +2409,8 @@ function renderSet() {
   $("#set-hint").hidden = set.length < 2;
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
-      ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span></div>
+      ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span>
+        <button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}"><span aria-hidden="true">🎧</span> Hear it</button></div>
         <button type="button" class="gap-btn" data-gap="${i}">Fix this gap: find a track to put in between</button><div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
       <div class="set-card">
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
@@ -2723,6 +2740,86 @@ $("#imp-btns").addEventListener("click", async e => {
   $("#imp-btns").querySelectorAll("button").forEach(x => x.disabled = false);
 });
 
+/* ---------- "Hear the mix": beatmatch two previews and blend them like a DJ would.
+   The incoming track is sped up or slowed to the outgoing track's tempo with its beats lined up, then a
+   16-beat crossfade with a bass swap halfway (only one track's bass at a time). */
+let mixCtx = null, mixSrcs = [], mixTimer = null, mixRun = 0;
+const mixClips = new Map();
+function stopMix() {
+  mixRun++;
+  mixSrcs.forEach(n => { try { n.stop(); } catch {} }); mixSrcs = [];
+  clearInterval(mixTimer); $("#mixbar")?.remove();
+  document.querySelectorAll(".hear.on").forEach(b => b.classList.remove("on"));
+}
+async function mixClip(id) {
+  if (mixClips.has(id)) return mixClips.get(id);
+  const r = await fetch(`/api/clip/${id}`); if (!r.ok) throw new Error("clip");
+  const buf = await mixCtx.decodeAudioData(await r.arrayBuffer());
+  if (mixClips.size > 12) mixClips.delete(mixClips.keys().next().value);
+  mixClips.set(id, buf); return buf;
+}
+async function hearMix(btn) {
+  const was = btn.classList.contains("on");
+  stopMix(); if (was) return;
+  const run = mixRun, aId = btn.dataset.hearA, bId = btn.dataset.hearB, la = btn.dataset.la, lb = btn.dataset.lb;
+  btn.classList.add("on");
+  const bar = document.createElement("div");
+  bar.id = "mixbar"; bar.className = "mixbar"; bar.setAttribute("role", "status");
+  bar.innerHTML = `<span class="mb-ico" aria-hidden="true">🎧</span><span class="mb-txt">Getting the mix ready…</span><button type="button" class="mb-x" aria-label="Stop the mix">×</button><span class="mb-prog"><i></i></span>`;
+  document.body.append(bar);
+  const txt = bar.querySelector(".mb-txt"), prog = bar.querySelector(".mb-prog i");
+  try {
+    mixCtx = mixCtx || new (window.AudioContext || window.webkitAudioContext)();
+    if (mixCtx.state === "suspended") await mixCtx.resume();
+    const [info, bufA, bufB] = await Promise.all([
+      fetch(`/api/mixinfo?a=${aId}&b=${bId}`).then(r => { if (!r.ok) throw new Error("info"); return r.json(); }),
+      mixClip(aId), mixClip(bId)]);
+    if (run !== mixRun) return;
+    const A = info.a, B = info.b, pa = 60 / A.bpm, pb = 60 / B.bpm, rate = A.bpm / B.bpm;
+    const INTRO = 16, BLEND = 16, OUTRO = 16;
+    let kA = Math.max(0, Math.ceil((5 - A.phase) / pa));
+    while (kA > 0 && A.phase + (kA + INTRO + BLEND) * pa > bufA.duration - 0.2) kA--;
+    const intro = Math.min(INTRO, Math.floor((bufA.duration - 0.2 - A.phase - kA * pa) / pa) - BLEND);
+    const offA = A.phase + kA * pa, offB = B.phase + Math.max(0, Math.ceil((0.6 - B.phase) / pb)) * pb;
+    const outro = Math.max(4, Math.min(OUTRO, Math.floor((bufB.duration - 0.2 - offB) / pb) - BLEND));
+    const t0 = mixCtx.currentTime + 0.15, tBlend = t0 + intro * pa, tMid = tBlend + BLEND / 2 * pa,
+          tEnd = tBlend + BLEND * pa, tOut = tEnd + outro * pa;
+    const chain = (buf, r) => {
+      const src = mixCtx.createBufferSource(); src.buffer = buf; src.playbackRate.value = r;
+      const eq = mixCtx.createBiquadFilter(); eq.type = "lowshelf"; eq.frequency.value = 180;
+      const g = mixCtx.createGain(); src.connect(eq).connect(g).connect(mixCtx.destination);
+      return { src, eq, g };
+    };
+    const a = chain(bufA, 1), b = chain(bufB, rate);
+    const curve = up => Float32Array.from({ length: 64 }, (_, i) => up ? Math.sin(i / 63 * Math.PI / 2) : Math.cos(i / 63 * Math.PI / 2));
+    a.g.gain.setValueAtTime(1, t0); a.g.gain.setValueCurveAtTime(curve(false), tBlend, BLEND * pa);
+    b.g.gain.setValueAtTime(0, t0); b.g.gain.setValueCurveAtTime(curve(true), tBlend, BLEND * pa);
+    b.g.gain.setValueAtTime(1, tOut - 4 * pa); b.g.gain.linearRampToValueAtTime(0, tOut);
+    b.eq.gain.setValueAtTime(-24, t0); b.eq.gain.setValueAtTime(-24, tMid); b.eq.gain.linearRampToValueAtTime(0, tMid + 0.08);   // bass swap
+    a.eq.gain.setValueAtTime(0, tMid); a.eq.gain.linearRampToValueAtTime(-24, tMid + 0.08);
+    a.src.start(t0, offA); a.src.stop(tEnd + 0.05);
+    b.src.start(tBlend, offB); b.src.stop(tOut + 0.1);
+    mixSrcs = [a.src, b.src];
+    countPlay();
+    const pct = Math.round((rate - 1) * 1000) / 10;
+    const shift = Math.abs(pct) >= 0.5 ? ` <span class="mb-note">(${esc(lb)} ${pct > 0 ? "sped up" : "slowed"} ${Math.abs(pct)}% to match)</span>` : "";
+    mixTimer = setInterval(() => {
+      const now = mixCtx.currentTime;
+      prog.style.width = Math.min(100, Math.max(0, (now - t0) / (tOut - t0) * 100)) + "%";
+      txt.innerHTML = now < tBlend ? `Playing <b>${esc(la)}</b>…` : now < tEnd ? `Mixing into <b>${esc(lb)}</b>${shift}` : `<b>${esc(lb)}</b>`;
+      if (now > tOut + 0.3) stopMix();
+    }, 120);
+  } catch {
+    if (run !== mixRun) return;
+    txt.textContent = "Couldn't load that mix. Try another track.";
+    setTimeout(() => { if (run === mixRun) stopMix(); }, 2500);
+  }
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest(".hear"); if (b) { e.stopPropagation(); hearMix(b); return; }
+  if (e.target.closest("#mixbar .mb-x")) stopMix();
+});
+
 /* ---------- Play a preview straight from the set builder (tap the cover) */
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-setplay]"); if (!b) return;
@@ -2807,6 +2904,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=48"></script>
+<script src="/static/i18n.js?v=49"></script>
 </body>
 </html>
