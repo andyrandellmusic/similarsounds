@@ -185,9 +185,12 @@
   .try-play .pa, .try-play.on .pi { display: none; }
   .try-play.on .pa { display: inline; }
   .try-play.on { background: rgba(0,0,0,.45); }
-  .try-wrap { display: grid; grid-template-rows: 1fr auto; gap: 6px; min-width: 0; }
-  .try-wrap .try-item { width: 100%; height: 100%; }
-  .try-wrap .add { justify-self: stretch; justify-content: center; height: 34px; }
+  /* describe results: the box and its Add to set button are one card */
+  .try-wrap { display: grid; grid-template-rows: 1fr auto; min-width: 0; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); overflow: hidden; transition: border-color .15s; }
+  .try-wrap:hover { border-color: var(--accent); }
+  .try-wrap .try-item { width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; transform: none; }
+  .try-wrap .add { justify-self: stretch; justify-content: center; height: 36px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.02); }
+  .try-wrap .add:hover { background: rgba(198,255,61,.08); }
   /* already played this visit: a small "Played" strip under the cover */
   .try-item.played .try-cover img { opacity: .5; filter: saturate(.5); }
   .try-item.played .try-cover::after { content: "Played"; position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0 1px;
@@ -450,8 +453,8 @@
   .more a:hover { color: var(--accent); }
   .match { font: 700 13px "JetBrains Mono", monospace; color: var(--accent); }
 
-  .faq { margin-top: 56px; max-width: 760px; }
-  .faq h2 { font-size: 18px; margin: 0 0 10px; }
+  .faq { margin-top: 56px; }
+  .faq h2.start-label { margin: 0 0 12px; }
   .faq details { border-top: 1px solid var(--line); }
   .faq details:last-child { border-bottom: 1px solid var(--line); }
   .faq summary { cursor: pointer; list-style: none; padding: 14px 28px 14px 0; font-weight: 600; position: relative; }
@@ -459,8 +462,8 @@
   .faq summary::after { content: "+"; position: absolute; right: 4px; top: 10px; color: var(--accent); font-size: 22px; font-weight: 600; }
   .faq details[open] summary::after { content: "−"; }
   .faq p { margin: 0 0 14px; color: var(--muted); }
-  .rate { margin-top: 48px; max-width: 760px; padding: 20px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 16px; }
-  .rate h2 { margin: 0 0 8px; font-size: 20px; }
+  .rate { margin-top: 48px; padding: 20px 22px; border: 1px solid var(--line, rgba(127,127,127,.25)); border-radius: 16px; }
+  .rate h2.start-label { margin: 0 0 10px; }
   .rate label { display: block; margin: 12px 0 6px; font-weight: 600; }
   .rate textarea { width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line, rgba(127,127,127,.3));
     background: transparent; color: inherit; font: inherit; resize: vertical; }
@@ -471,7 +474,8 @@
   .rate-msg { color: var(--muted); font-size: 14px; }
   .rate-msg.err { color: #e5534b; }
   .fstar { width: 40px; height: 40px; }
-  footer { margin-top: 50px; color: var(--muted); font-size: 12px; max-width: 640px; }
+  footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  footer > p:first-child { max-width: 720px; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   form.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,255,61,.12); }
   form.search input:focus-visible { outline: none; }
@@ -588,8 +592,9 @@
     color: var(--text); font: 14px/1.45 Inter, sans-serif; resize: vertical; margin-bottom: 8px; }
   .imp-missing { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 13px; max-height: 140px; overflow: auto; }
   .import-empty { margin-top: 10px; }
-  .gap-btn { margin: 6px 0 0 18px; background: none; border: 1px solid rgba(198,255,61,.45); color: var(--accent); border-radius: 8px; padding: 6px 10px;
-    font: 700 12px Inter, sans-serif; cursor: pointer; }
+  .gap-btn { margin: 0; background: none; border: 1px solid rgba(198,255,61,.35); color: var(--accent); border-radius: 999px; padding: 2px 9px;
+    font: 700 11.5px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+  .gap-btn:hover { background: rgba(198,255,61,.1); }
   .gap-box { margin: 8px 0 4px 18px; padding: 10px; border: 1px dashed var(--line); border-radius: 10px; display: grid; gap: 8px; }
   .gap-box > p { margin: 0; color: var(--muted); font-size: 12px; }
   /* tiny loading bar while "Fix this gap" searches */
@@ -853,8 +858,10 @@
   .link { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px 14px; padding: 6px 0 6px 14px; border-left: 3px solid var(--c); font-size: 12px; color: var(--muted); }
   .link .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
   .link b { color: var(--c); font-weight: 700; }
-  .link > span:not(.dot) { flex: 1; min-width: 0; }
-  .link .hear-sm { align-self: flex-end; flex: none; white-space: nowrap; margin: 0 0 0 auto; }
+  .link { flex-wrap: wrap; }
+  .link > span:not(.dot):not(.link-acts) { flex: 1 1 200px; min-width: 0; }
+  .link-acts { display: flex; gap: 6px; flex: none; margin-left: auto; align-self: flex-end; }
+  .link .hear-sm { flex: none; white-space: nowrap; margin: 0; }
   .link.good { --c: var(--good); } .link.ok { --c: var(--ok); } .link.bad { --c: var(--bad); }
   .scrim { position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 19; opacity: 0; pointer-events: none; transition: opacity .25s; }
   .scrim.open { opacity: 1; pointer-events: auto; }
@@ -1231,7 +1238,7 @@
   <div class="sr-only" id="live" aria-live="polite"></div>
 
   <section class="faq" id="faq" aria-labelledby="faq-title">
-    <h2 id="faq-title">Questions</h2>
+    <h2 id="faq-title" class="start-label">Questions</h2>
       <details><summary>What is SimilarSounds?</summary><p>A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first.</p></details>
       <details><summary>How does it decide what mixes?</summary><p>Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend.</p></details>
       <details><summary>What can I paste in?</summary><p>A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list.</p></details>
@@ -1242,7 +1249,7 @@
       <details><summary>How do I build a set?</summary><p>Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link.</p></details>
   </section>
   <section class="rate" id="rate" aria-labelledby="rate-title">
-    <h2 id="rate-title">Rate SimilarSounds</h2>
+    <h2 id="rate-title" class="start-label">Rate SimilarSounds</h2>
     <form id="rate-form">
       <div class="stars" role="group" aria-label="Your rating"><button type="button" class="star fstar" data-fstars="1" aria-label="1 star" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="2" aria-label="2 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="3" aria-label="3 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="4" aria-label="4 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button><button type="button" class="star fstar" data-fstars="5" aria-label="5 stars" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.8l2.8 5.7 6.3.9-4.55 4.43 1.07 6.27L12 17.13l-5.62 2.97 1.07-6.27L2.9 9.4l6.3-.9z"/></svg></button></div>
       <label for="rate-comment">How can we improve?</label>
@@ -2558,8 +2565,8 @@ function renderSet() {
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span>
-        <button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></div>
-        <button type="button" class="gap-btn" data-gap="${i}">Fix this gap: find a track to put in between</button><div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
+        <span class="link-acts"><button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button><button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></span></div>
+        <div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
       <div class="set-card">
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
         <button type="button" class="cover set-play" data-setplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)} by ${esc(t.artist)}">
@@ -3211,6 +3218,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=55"></script>
+<script src="/static/i18n.js?v=56"></script>
 </body>
 </html>
