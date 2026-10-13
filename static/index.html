@@ -1501,7 +1501,7 @@ function showProblem(err, attempted) {
 
 function render({ source, query, results, similar_artists = [] }) {
   const embed = source.embed_html
-    ? `<div class="embed">${PLAYERS[source.source] ? playerOrGate(source.source, source.embed_html) : source.embed_html}</div>` : "";
+    ? `<div class="embed">${PLAYERS[source.source] ? playerOrGate(source.source, pausable(source.embed_html)) : pausable(source.embed_html)}</div>` : "";
   const shared = sharedArrival
     ? `<div class="shared-note" role="status"><span data-i18n="sharedNote">You're viewing a shared search for <b>${esc(query.artist)} – ${esc(query.title)}</b>.</span>
         <button type="button" class="icon" id="new-search">New search</button></div>` : "";
@@ -1774,6 +1774,7 @@ document.addEventListener("click", e => {
   const row = b.closest(".row"), wasOpen = row.classList.contains("playing");
   document.querySelectorAll(".row.playing").forEach(r => { r.classList.remove("playing"); r.querySelector(".player")?.remove(); });
   if (wasOpen) return;
+  stopAllPlayers("row");
   const t = trackCache[b.dataset.id] || {};
   row.classList.add("playing");
   countPlay();
@@ -2021,6 +2022,8 @@ function recentSearches() {
 }
 function newSearch(pushHistory = true) {
   $("#url").value = ""; picked = { text: null, url: null }; lastResults = []; sharedArrival = false;
+  if (boxBtn && !boxBtn.dataset.setplay) stopBoxPlay();      // a preview from the results being cleared
+  if (!$("#set-panel")?.classList.contains("open")) stopMix();
   $("#out").innerHTML = startHTML;
   document.documentElement.classList.remove("has-results");
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
@@ -2825,7 +2828,8 @@ function clearSet() {
 /* "How it works" video: when it finishes, go back to the cover picture, ready to play again
    ('ended' doesn't bubble, so listen in the capture phase - the video is re-created on new searches) */
 document.addEventListener("ended", e => { if (e.target.closest?.("#how-video")) { e.target.controls = false; e.target.load(); $("#vplay").hidden = false; } }, true);
-$("#vplay")?.addEventListener("click", () => {
+document.addEventListener("click", e => {            // delegated: the start screen is redrawn after a new search
+  if (!e.target.closest("#vplay")) return;
   const v = $("#how-video video"); $("#vplay").hidden = true; v.controls = true; v.play().catch(() => {});
 });
 /* ---------- Import a tracklist into the set */
@@ -2952,7 +2956,7 @@ async function mixClip(id) {
 }
 async function hearMix(btn) {
   const was = btn.classList.contains("on");
-  stopBoxPlay();
+  stopAllPlayers("mix");
   stopMix(); if (was) return;
   const run = mixRun, aId = btn.dataset.hearA, bId = btn.dataset.hearB, la = btn.dataset.la, lb = btn.dataset.lb;
   btn.classList.add("on");
@@ -3013,12 +3017,34 @@ document.addEventListener("click", e => {
   if (e.target.closest("#mixbar .mb-x")) stopMix();
 });
 
+/* ---------- Only one thing plays at a time: starting any player cuts off whatever was playing before */
+function pausable(html) { return (html || "").replace(/(youtube(?:-nocookie)?\.com\/embed\/[^"?]+)\??/, "$1?enablejsapi=1&"); }
+function stopAllPlayers(keep, keepEl) {
+  if (keep !== "box") stopBoxPlay();
+  if (keep !== "mix") stopMix();
+  if (keep !== "row") document.querySelectorAll(".row.playing").forEach(r => { if (keepEl && r.contains(keepEl)) return; r.classList.remove("playing"); r.querySelector(".player")?.remove(); });
+  const v = $("#how-video video"); if (keep !== "video" && v && !v.paused) v.pause();
+  document.querySelectorAll(".embed iframe").forEach(f => {          // the pasted YouTube / SoundCloud track
+    if (f === keepEl) return;
+    try {
+      f.contentWindow.postMessage(JSON.stringify({ event: "command", func: "pauseVideo", args: "" }), "*");
+      f.contentWindow.postMessage(JSON.stringify({ method: "pause" }), "*");
+    } catch {}
+  });
+}
+document.addEventListener("play", e => { if (e.target.closest?.("#how-video")) stopAllPlayers("video"); }, true);
+// pressing play inside an embedded player (YouTube, SoundCloud, Deezer): the page loses focus to that frame
+addEventListener("blur", () => setTimeout(() => {
+  const f = document.activeElement;
+  if (f && f.tagName === "IFRAME") stopAllPlayers(f.closest(".row") ? "row" : "", f);
+}, 0));
+
 /* ---------- Play a preview right from a box (Describe a sound results): tap the cover to play / pause */
 var boxAudio = null, boxBtn = null;      // var: the set list (drawn early) checks these too
 function stopBoxPlay() { if (boxAudio) { boxAudio.pause(); boxAudio = null; } boxBtn?.classList.remove("on"); boxBtn = null; }
 function toggleBoxPlay(b) {
   if (boxBtn === b) { stopBoxPlay(); return; }
-  stopBoxPlay(); stopMix();
+  stopBoxPlay(); stopAllPlayers("box");
   boxBtn = b; b.classList.add("on");
   const id = b.dataset.tplay || b.dataset.setplay;
   boxAudio = new Audio(`/api/clip/${id}`);
