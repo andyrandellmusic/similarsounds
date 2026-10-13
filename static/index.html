@@ -169,6 +169,11 @@
   .try-play .pa, .try-play.on .pi { display: none; }
   .try-play.on .pa { display: inline; }
   .try-play.on { background: rgba(0,0,0,.45); }
+  /* already played this visit: a small "Played" strip under the cover */
+  .try-item.played .try-cover img { opacity: .5; filter: saturate(.5); }
+  .try-item.played .try-cover::after { content: "Played"; position: absolute; left: 0; right: 0; bottom: 0; padding: 2px 0 1px;
+    border-radius: 0 0 8px 8px; background: rgba(11,11,15,.82); color: var(--accent); font: 800 9px Inter, sans-serif;
+    letter-spacing: .06em; text-transform: uppercase; text-align: center; pointer-events: none; }
   .results-head h2.dh { white-space: normal; line-height: 1.3; }
   /* "Hear the mix": a small button under each match / on each set transition, and a player bar while it plays */
   .hear { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; background: rgba(198,255,61,.08); color: var(--accent);
@@ -1848,6 +1853,7 @@ const playedIds = new Set((() => { try { return JSON.parse(sessionStorage.getIte
 function markPlayed(id) {
   if (id) { playedIds.add(String(id)); try { sessionStorage.setItem("ss_played", JSON.stringify([...playedIds].slice(-500))); } catch {} }
   document.querySelectorAll(".row[data-id]").forEach(r => r.classList.toggle("played", playedIds.has(String(r.dataset.id))));
+  document.querySelectorAll(".try-item[data-try]").forEach(b => b.classList.toggle("played", playedIds.has(String(b.dataset.try))));
 }
 function reviewDue() { return !store.get("ss_reviewed") && plays() >= (Number(store.get("ss_review_at")) || REVIEW_AFTER); }
 function countPlay() { store.set("ss_plays", plays() + 1); scheduleReview(); }
@@ -2960,6 +2966,7 @@ async function describeSound(text, fromHistory) {
   $("#out").innerHTML = `<div class="results-head"><h2 class="dh">Sounds like: ${d.understood.map(esc).join(" · ")}</h2></div>
     <p class="summary">The ${d.results.length} tracks that sound most like that, newest releases first when it's close. Pick one to see everything that mixes with it.</p>
     <div class="try describe-results">${examplesHtml(d.results, true)}</div>`;
+  markPlayed();
   scrollTo({ top: $("#out").getBoundingClientRect().top + scrollY - 12, behavior: "smooth" });
 }
 
