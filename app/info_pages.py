@@ -72,7 +72,7 @@ def database_page(index) -> str:
     <li>New house releases are added every morning, from about 200 house labels, the artists already in the catalogue and genre playlists.</li>
     <li>Every track is analysed from its 30-second preview for its sound, key, BPM and energy.</li>
     <li>Anything that doesn't sound like house (or isn't at house tempo) is removed automatically.</li>
-    <li>We don't host or store any audio: previews play from Deezer, and every track links to Beatport, SoundCloud and YouTube.</li>
+    <li>We don't host or store any audio: previews play from Deezer, and every track links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube.</li>
   </ul>
   <p class="guide-cta"><a class="btn" href="/">Search it: paste a track and get house music that mixes with it</a></p>"""
     return page(f"What's in the SimilarSounds database: {total:,} house tracks | SimilarSounds",

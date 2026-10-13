@@ -493,6 +493,13 @@
   .badge-new { font: 800 10px/1 Inter, sans-serif; letter-spacing: .06em; background: var(--accent); color: var(--accent-ink); padding: 3px 5px; border-radius: 4px; vertical-align: 2px; margin-left: 4px; }
   .chip.match { color: var(--accent); border-color: #3b4a16; }
   .actions { display: flex; gap: 6px; }
+  .buy-wrap { position: relative; display: inline-flex; }
+  .icon.buy::after { content: ""; width: 0; height: 0; margin-left: 7px; border: 4px solid transparent; border-top-color: var(--accent); transform: translateY(2px); }
+  .buy-menu { position: absolute; top: calc(100% + 6px); right: 0; z-index: 30; min-width: 150px; display: grid; padding: 6px; border-radius: 12px;
+    background: var(--panel); border: 1px solid var(--line); box-shadow: 0 14px 34px rgba(0,0,0,.5); }
+  .buy-menu[hidden] { display: none; }
+  .buy-menu a { padding: 9px 12px; border-radius: 8px; color: var(--text); text-decoration: none; font-size: 13.5px; font-weight: 600; white-space: nowrap; }
+  .buy-menu a:hover, .buy-menu a:focus-visible { background: rgba(198,255,61,.1); color: var(--accent); }
   .icon { background: var(--panel-2); border: 1px solid var(--line); color: var(--text); border-radius: 8px; height: 34px; padding: 0 10px; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; white-space: nowrap; }
   .icon:hover { border-color: #4a4a5c; }
   .player { grid-column: 1 / -1; }
@@ -971,7 +978,7 @@
     .rrow .chips { flex-wrap: wrap; }
   }
 </style>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
 <body>
   <div class="marquee" role="region" aria-label="Try the Set builder and Plan my gig"><div class="mq-mask">
@@ -1299,7 +1306,7 @@
       <details><summary>Is it free? Do I need an account?</summary><p>It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device.</p></details>
       <details><summary>Why only house music?</summary><p>Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set.</p></details>
       <details><summary>How accurate are the key and BPM?</summary><p>They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix.</p></details>
-      <details><summary>Can I download the tracks?</summary><p>No. SimilarSounds doesn't host or sell music. Each match links to Beatport, SoundCloud and YouTube so you can buy or stream it from the artist.</p></details>
+      <details><summary>Can I download the tracks?</summary><p>No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist.</p></details>
       <details><summary>How do I build a set?</summary><p>Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link.</p></details>
   </section>
   <section class="rate" id="rate" aria-labelledby="rate-title">
@@ -1343,6 +1350,24 @@ const camelotColor = code => {
 const energyBar = e => `<span class="chip energy" title="Track energy ${e} out of 10 (1 = deep and chilled, 10 = peak-time)"><span class="e-lbl">Track energy</span><span class="e-lbl e-lbl-s">Energy</span>${Array.from({length: 10}, (_, i) => `<i class="${i < e ? "f" : ""}"></i>`).join("")}<b class="e-num">${e}</b></span>`;
 const ago = d => d < 1 ? "today" : d < 31 ? `${d}d ago` : d < 365 ? `${Math.round(d / 30)}mo ago` : `${(d / 365).toFixed(1)}y ago`;
 const searchQ = r => encodeURIComponent(`${r.artist} ${r.title}`);
+// where DJs buy house music: one small "Buy" menu per track
+const STORES = [["Beatport", q => `https://www.beatport.com/search?q=${q}`], ["Traxsource", q => `https://www.traxsource.com/search?term=${q}`],
+                ["Bandcamp", q => `https://bandcamp.com/search?q=${q}&item_type=t`]];
+function buyButton(t) {
+  const q = searchQ(t);
+  return `<div class="buy-wrap"><button type="button" class="icon buy" data-buy aria-haspopup="menu" aria-expanded="false" aria-label="Buy ${esc(t.title)} by ${esc(t.artist)}">Buy</button>
+    <div class="buy-menu" role="menu" hidden>${STORES.map(([n, u]) => `<a role="menuitem" class="ga-out" target="_blank" rel="noopener" href="${u(q)}">${n}</a>`).join("")}</div></div>`;
+}
+function closeBuyMenus(except) {
+  document.querySelectorAll(".buy-menu:not([hidden])").forEach(m => { if (m === except) return; m.hidden = true; m.previousElementSibling.setAttribute("aria-expanded", "false"); });
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-buy]");
+  if (b) { const m = b.nextElementSibling; closeBuyMenus(m); m.hidden = !m.hidden; b.setAttribute("aria-expanded", String(!m.hidden)); return; }
+  if (e.target.closest(".buy-menu a")) { setTimeout(() => closeBuyMenus(), 0); return; }
+  if (!e.target.closest(".buy-menu")) closeBuyMenus();
+});
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeBuyMenus(); });
 
 function chips(t) {
   return `<div class="chips">
@@ -1578,6 +1603,7 @@ function render({ source, query, results, similar_artists = [] }) {
         </div>
         <div class="actions">
           ${addButton(query)}
+          ${buyButton(query)}
         </div>
       </div>${attribution}${ytAttribution}${bcAttribution}${embed}
     </section>`;
@@ -1778,6 +1804,7 @@ function renderList() {
       </div>
       <div class="actions">
         ${addButton(t)}
+        ${buyButton(t)}
         <button type="button" class="icon similar" data-similar="${t.deezer_id}" aria-label="Find tracks similar to ${esc(t.title)} by ${esc(t.artist)}"><span class="ga">Find similar tracks</span></button>
       </div>
     </div>`).join("");
@@ -1814,6 +1841,8 @@ document.addEventListener("click", e => {
     ${playerOrGate("deezer", deezerPlayer)}
     <div class="more">Also on
       <a class="ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://www.traxsource.com/search?term=${searchQ(t)}">Traxsource</a>
+      <a class="ga-out" target="_blank" rel="noopener" href="https://bandcamp.com/search?q=${searchQ(t)}&item_type=t">Bandcamp</a>
       <a class="ga-out" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud</a>
       <a class="ga-out" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube</a>
     </div></div>`);
@@ -3328,6 +3357,6 @@ addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=60"></script>
+<script src="/static/i18n.js?v=61"></script>
 </body>
 </html>
