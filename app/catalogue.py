@@ -127,6 +127,7 @@ class Index:
         n = len(self.rows)
         self.has_clap = np.zeros(n, dtype=bool)
         self.sound = self.emb
+        self.clap_raw = np.zeros((n, 512), dtype="float32")
         if not CLAP_PATH.exists():
             return
         z = np.load(CLAP_PATH)
@@ -138,6 +139,7 @@ class Index:
                 self.has_clap[i] = True
         if not self.has_clap.any():
             return
+        self.clap_raw = C / (np.linalg.norm(C, axis=1, keepdims=True) + 1e-9)   # as-is, for matching typed descriptions
         mu, sd = C[self.has_clap].mean(0), C[self.has_clap].std(0) + 1e-6
         Cz = np.where(self.has_clap[:, None], (C - mu) / sd, 0)
         Cz /= np.linalg.norm(Cz, axis=1, keepdims=True) + 1e-9

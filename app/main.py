@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev
+from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -208,6 +208,12 @@ async def import_tracklist(request: Request):
         except Exception:
             out.append({"line": label, "status": "not_found"})
     return {"items": out, "tokens": await run_in_threadpool(tokens.check, request, None, False)}
+
+
+@app.get("/api/describe")
+def describe_sound(q: str = Query("", max_length=200)):
+    """'Describe a sound': tracks that sound like the words typed (e.g. "warm sunset deep house with sax")."""
+    return describe.search(index, q)
 
 
 @app.get("/api/clip/{deezer_id}")

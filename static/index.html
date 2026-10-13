@@ -138,6 +138,15 @@
   .start { margin-top: 34px; }
   .howvid { margin-top: 34px; scroll-margin-top: 18px; }
   .howvid .start-label { color: var(--accent); }
+  /* "Describe a sound" */
+  .describe { margin: 10px 0 4px; }
+  .describe-open { background: none; border: 0; padding: 4px 0; color: var(--accent); font: 700 14px Inter, sans-serif; cursor: pointer; }
+  .describe-open:hover { text-decoration: underline; }
+  .describe-open[hidden], .describe-form[hidden] { display: none; }
+  .describe-form { margin-top: 2px; }
+  .describe-ex { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
+  .describe-results { margin-top: 14px; }
+  .results-head h2.dh { white-space: normal; line-height: 1.3; }
   /* "Hear the mix": a small button under each match / on each set transition, and a player bar while it plays */
   .hear { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; background: rgba(198,255,61,.08); color: var(--accent);
     border: 1px solid rgba(198,255,61,.4); border-radius: 999px; padding: 5px 12px; font: 700 12.5px Inter, sans-serif; cursor: pointer; }
@@ -890,6 +899,14 @@
       <button class="go" id="go">Find</button>
     </form>
     <div class="suggest" id="suggest" role="listbox" hidden></div>
+  </div>
+  <div class="describe" id="describe">
+    <button type="button" class="describe-open" id="describe-open"><span aria-hidden="true">✨</span> Or describe a sound</button>
+    <form class="search describe-form" id="describe-form" hidden>
+      <input id="describe-q" maxlength="200" autocomplete="off" aria-label="Describe a sound"
+             placeholder="Describe a sound… e.g. warm sunset deep house with saxophone">
+      <button class="go" type="submit">Find</button>
+    </form>
   </div>
 
   <details class="filters-wrap" id="filters-wrap" open>
@@ -1875,6 +1892,8 @@ document.addEventListener("click", e => {
 });
 
 function openFromUrl(fromHistory) {
+  const dq = new URLSearchParams(location.search).get("d");
+  if (dq) { describeSound(dq, true); return true; }
   const t = new URLSearchParams(location.search).get("t");
   if (!t || !/^\d+$/.test(t)) return false;
   const label = history.state?.label || "";
@@ -2820,6 +2839,36 @@ document.addEventListener("click", e => {
   if (e.target.closest("#mixbar .mb-x")) stopMix();
 });
 
+/* ---------- "Describe a sound": words -> the tracks that sound most like them */
+$("#describe-open").onclick = () => { $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").focus(); };
+$("#describe-form").addEventListener("submit", e => { e.preventDefault(); $("#describe-q").blur(); describeSound($("#describe-q").value); });
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-describe]"); if (!b) return;
+  $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").value = b.dataset.describe;
+  describeSound(b.dataset.describe);
+});
+async function describeSound(text, fromHistory) {
+  text = (text || "").trim(); if (!text) return;
+  if ($("#describe-q").value !== text) { $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").value = text; }
+  document.documentElement.classList.add("has-results");
+  $("#out").innerHTML = `<div class="results-head"><h2>Listening for that sound…</h2></div><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
+  if (!fromHistory) history.pushState({ d: text }, "", `?d=${encodeURIComponent(text)}`);
+  let d;
+  try { d = await (await fetch(`/api/describe?q=${encodeURIComponent(text)}`)).json(); }
+  catch { $("#out").innerHTML = `<div class="msg">Couldn't search right now. Try again in a moment.</div>`; return; }
+  document.title = `${text} - house music that sounds like it | SimilarSounds`;
+  if (!d.understood.length) {
+    $("#out").innerHTML = `<div class="results-head"><h2>We didn't catch that sound</h2></div>
+      <p class="summary">Try describing instruments, vocals, a mood or a time of day. For example:</p>
+      <div class="describe-ex">${(d.examples || []).map(x => `<button type="button" class="la" data-describe="${esc(x)}">${esc(x)}</button>`).join("")}</div>`;
+    return;
+  }
+  $("#out").innerHTML = `<div class="results-head"><h2 class="dh">Sounds like: ${d.understood.map(esc).join(" · ")}</h2></div>
+    <p class="summary">The ${d.results.length} tracks that sound most like that, newest releases first when it's close. Pick one to see everything that mixes with it.</p>
+    <div class="try describe-results">${examplesHtml(d.results)}</div>`;
+  scrollTo({ top: $("#out").getBoundingClientRect().top + scrollY - 12, behavior: "smooth" });
+}
+
 /* ---------- Play a preview straight from the set builder (tap the cover) */
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-setplay]"); if (!b) return;
@@ -2904,6 +2953,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=49"></script>
+<script src="/static/i18n.js?v=50"></script>
 </body>
 </html>
