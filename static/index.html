@@ -1002,6 +1002,7 @@
       <form class="search describe-form" id="describe-form">
         <input id="describe-q" maxlength="200" autocomplete="off" aria-label="Describe a sound" role="combobox" aria-autocomplete="list" aria-controls="dsuggest" aria-expanded="false"
                placeholder="Describe a sound… e.g. warm sunset deep house with saxophone">
+        <button type="button" class="clear" id="dclear" aria-label="Clear and start again" hidden>×</button>
         <button class="go" type="submit">Find</button>
       </form>
       <div class="suggest" id="dsuggest" role="listbox" hidden></div>
@@ -2030,15 +2031,19 @@ function newSearch(pushHistory = true) {
   $("#url").focus();
 }
 if (matchMedia("(max-width: 640px)").matches) $("#url").placeholder = "Artist, track or link…";
-function updateClear() { $("#clear").hidden = !$("#url").value; }
+function updateClear() { $("#clear").hidden = !$("#url").value; if ($("#dclear")) $("#dclear").hidden = !$("#describe-q").value; }
+function clearDescribe() {                          // the × on the Describe a sound bar: same as the search one
+  newSearch(); $("#describe-q").value = ""; closeDsuggest(); updateClear(); $("#describe-q").focus();
+}
 // The × clears on the first tap: act as soon as the finger lifts (iPhones otherwise spend the first tap on hover)
 let clearedAt = 0;
-document.addEventListener("pointerdown", e => { if (e.target.closest("#clear")) e.preventDefault(); }, true);   // don't move focus
+document.addEventListener("pointerdown", e => { if (e.target.closest("#clear, #dclear")) e.preventDefault(); }, true);   // don't move focus
 document.addEventListener("pointerup", e => {
-  if (!e.target.closest("#clear") || e.button > 0) return;
-  clearedAt = Date.now(); newSearch();
+  if (!e.target.closest("#clear, #dclear") || e.button > 0) return;
+  clearedAt = Date.now(); e.target.closest("#dclear") ? clearDescribe() : newSearch();
 });
 document.addEventListener("click", e => {
+  if (e.target.closest("#dclear") && Date.now() - clearedAt > 600) { clearDescribe(); return; }
   if (e.target.closest("#new-search") || (e.target.closest("#clear") && Date.now() - clearedAt > 600)) newSearch();
 });
 
@@ -3077,9 +3082,10 @@ function pickDword(p) {
   const inp = $("#describe-q");
   inp.value = inp.value.replace(/([a-z0-9'-]+)$/i, "").replace(/\s*$/, inp.value.trim() ? " " : "") + p + " ";
   inp.value = inp.value.replace(/^\s+/, "");
-  inp.focus(); closeDsuggest();
+  inp.focus(); closeDsuggest(); updateClear();
 }
 $("#describe-q").addEventListener("input", showDsuggest);
+$("#describe-q").addEventListener("input", updateClear);
 $("#describe-q").addEventListener("focus", showDsuggest);
 $("#describe-q").addEventListener("keydown", e => {
   const items = [...$("#dsuggest").querySelectorAll(".dsg-item")];
@@ -3100,6 +3106,7 @@ async function describeSound(text, fromHistory) {
   text = (text || "").trim(); if (!text) return;
   setSearchMode("describe"); closeDsuggest();
   if ($("#describe-q").value.trim() !== text) $("#describe-q").value = text;
+  updateClear();
   document.documentElement.classList.add("has-results");
   $("#out").innerHTML = `<div class="results-head"><h2>Listening for that sound…</h2></div><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
   if (!fromHistory) history.pushState({ d: text }, "", `?d=${encodeURIComponent(text)}`);
