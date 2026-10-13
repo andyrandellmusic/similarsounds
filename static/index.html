@@ -41,7 +41,7 @@
   a.logo { color: inherit; text-decoration: none; }
   a.logo:focus-visible { outline-offset: 6px; border-radius: 6px; }
   .brand-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 34px; }
-  .brand-row .logo { margin: 0; font-size: 30px; }
+  .brand-row .logo { margin: 0; font-size: 44px; }
   .top-tools { display: flex; align-items: center; gap: 8px; margin-left: auto; }
   .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
   .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
@@ -781,7 +781,7 @@
     .brand-row { margin-top: 0; }
     .wrap { padding-top: 16px; }
     .brand-row { gap: 10px 8px; flex-wrap: wrap; }
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 214px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 200px) / 7.8), 32px); }   /* as big as the room beside sign-in, language and menu allows */
     .top-tools { gap: 6px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
@@ -948,7 +948,7 @@
     .filters { gap: 10px 14px; }
   }
   @media (max-width: 360px) {
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 192px) / 8.45), 24px); }
+    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 180px) / 7.8), 32px); }
     .top-tools { gap: 4px; }
     .tok-pill, .lang-mini { height: 36px; padding: 0 7px; }
     .top-tools .acct-btn { min-height: 36px; padding: 3px; }
