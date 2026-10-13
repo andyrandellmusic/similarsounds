@@ -144,7 +144,7 @@
   .try-txt .tw { font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .try-txt .tw b { color: var(--accent); font-weight: 600; }
   /* "Plan my gig" */
-  .plan-open { margin-left: 18px; }
+  .plan-open { margin-left: 0; }
   .plan-fld { display: grid; gap: 6px; margin: 0 0 14px; }
   .plan-fld .fl { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
   .plan-fld .seg { display: grid; grid-template-columns: repeat(4, 1fr); }
@@ -154,6 +154,18 @@
   .plan-seed { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); }
   .plan-seed b { color: var(--text); }
   /* "Describe a sound" */
+  .search-tabs { display: flex; gap: 6px; margin: 0 0 8px; }
+  .search-tabs button { background: none; border: 1px solid transparent; color: var(--muted); border-radius: 999px; padding: 6px 13px;
+    font: 700 13px Inter, sans-serif; cursor: pointer; }
+  .search-tabs button:hover { color: var(--text); }
+  .search-tabs button.on { background: rgba(198,255,61,.1); border-color: rgba(198,255,61,.45); color: var(--accent); }
+  .search-wrap[hidden], .describe-wrap[hidden] { display: none; }
+  .describe-wrap { position: relative; }
+  .dsg-item { display: flex; align-items: baseline; gap: 10px; padding: 9px 10px; border-radius: 9px; cursor: pointer; }
+  .dsg-item.active, .dsg-item:hover { background: var(--panel-2); }
+  .dsg-item b { font-weight: 600; color: var(--text); }
+  .dsg-item b mark { background: none; color: var(--accent); }
+  .dsg-item small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .describe { margin: 10px 0 4px; }
   .describe-open { background: none; border: 0; padding: 4px 0; color: var(--accent); font: 700 14px Inter, sans-serif; cursor: pointer; }
   .describe-open:hover { text-decoration: underline; }
@@ -923,6 +935,10 @@
     <li><b>3</b><span><strong>Build your set</strong> Line tracks up and see which ones mix smoothly.</span></li>
   </ol>
 
+  <div class="search-tabs" role="tablist" aria-label="Search by">
+    <button type="button" role="tab" data-mode="track" class="on" aria-selected="true">Search a track</button>
+    <button type="button" role="tab" data-mode="describe" aria-selected="false"><span aria-hidden="true">✨</span> Describe a sound</button>
+  </div>
   <div class="search-wrap">
     <form class="search" id="form">
       <input id="url" placeholder="Start typing an artist… or paste a YouTube, SoundCloud, Beatport link" autocomplete="off" required aria-keyshortcuts="/"
@@ -933,13 +949,15 @@
     <div class="suggest" id="suggest" role="listbox" hidden></div>
   </div>
   <div class="describe" id="describe">
-    <button type="button" class="describe-open" id="describe-open"><span aria-hidden="true">✨</span> Or describe a sound</button>
+    <div class="describe-wrap" id="describe-wrap" hidden>
+      <form class="search describe-form" id="describe-form">
+        <input id="describe-q" maxlength="200" autocomplete="off" aria-label="Describe a sound" role="combobox" aria-autocomplete="list" aria-controls="dsuggest" aria-expanded="false"
+               placeholder="Describe a sound… e.g. warm sunset deep house with saxophone">
+        <button class="go" type="submit">Find</button>
+      </form>
+      <div class="suggest" id="dsuggest" role="listbox" hidden></div>
+    </div>
     <button type="button" class="describe-open plan-open" data-plan><span aria-hidden="true">🗓</span> Plan a whole gig</button>
-    <form class="search describe-form" id="describe-form" hidden>
-      <input id="describe-q" maxlength="200" autocomplete="off" aria-label="Describe a sound"
-             placeholder="Describe a sound… e.g. warm sunset deep house with saxophone">
-      <button class="go" type="submit">Find</button>
-    </form>
   </div>
 
   <details class="filters-wrap" id="filters-wrap" open>
@@ -2944,16 +2962,78 @@ document.addEventListener("keydown", e => {
 }, true);
 
 /* ---------- "Describe a sound": words -> the tracks that sound most like them */
-$("#describe-open").onclick = () => { $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").focus(); };
-$("#describe-form").addEventListener("submit", e => { e.preventDefault(); $("#describe-q").blur(); describeSound($("#describe-q").value); });
+// two tabs above the search bar: search by track, or describe a sound (remembered on this device)
+function setSearchMode(mode, focus) {
+  const d = mode === "describe";
+  document.querySelectorAll(".search-tabs [data-mode]").forEach(b => { const on = b.dataset.mode === mode; b.classList.toggle("on", on); b.setAttribute("aria-selected", on); });
+  document.querySelector(".search-wrap").hidden = d; $("#describe-wrap").hidden = !d;
+  if (d) closeSuggest(); else closeDsuggest();
+  try { localStorage.setItem("ss_mode", mode); } catch {}
+  if (focus) (d ? $("#describe-q") : $("#url")).focus();
+}
+document.addEventListener("click", e => { const b = e.target.closest(".search-tabs [data-mode]"); if (b) setSearchMode(b.dataset.mode, true); });
+try { if (localStorage.getItem("ss_mode") === "describe") setSearchMode("describe"); } catch {}
+$("#describe-form").addEventListener("submit", e => {
+  e.preventDefault();
+  const act = $("#dsuggest .dsg-item.active"); if (act && !$("#dsuggest").hidden) { pickDword(act.dataset.p); return; }
+  closeDsuggest(); $("#describe-q").blur(); describeSound($("#describe-q").value);
+});
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-describe]"); if (!b) return;
-  $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").value = b.dataset.describe;
+  setSearchMode("describe"); $("#describe-q").value = b.dataset.describe;
   describeSound(b.dataset.describe);
 });
+// the drop-down while typing: sounds that start with what you've typed (tap one to add it)
+let dWords = null, dActive = -1;
+async function loadDwords() {
+  if (dWords) return dWords;
+  try { dWords = await (await fetch("/api/describe/words")).json(); } catch { dWords = { words: [], examples: [] }; }
+  return dWords;
+}
+function closeDsuggest() { $("#dsuggest").hidden = true; $("#describe-q").setAttribute("aria-expanded", "false"); dActive = -1; }
+async function showDsuggest() {
+  const inp = $("#describe-q"), box = $("#dsuggest"), w = await loadDwords();
+  const val = inp.value, frag = (val.match(/([a-z0-9'-]+)$/i) || [""])[0].toLowerCase(), have = val.toLowerCase();
+  let html = "";
+  if (!val.trim()) {
+    html = `<div class="sg-head">Try</div>` + w.examples.map(x => `<div class="dsg-item" role="option" data-ex="${esc(x)}"><b>${esc(x)}</b></div>`).join("");
+  } else if (frag) {
+    const starts = (t) => t.split(/[\s/-]+/).some(x => x.startsWith(frag));
+    const hits = w.words.filter(([p, syn]) => !have.includes(p.toLowerCase()) && (starts(p.toLowerCase()) || syn.some(x => starts(x.toLowerCase()))))
+      .sort((a, b) => (b[0].toLowerCase().startsWith(frag) - a[0].toLowerCase().startsWith(frag)) || a[0].length - b[0].length).slice(0, 8);
+    const mark = t => esc(t).replace(new RegExp(`(^|\\s)(${frag.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")})`, "i"), "$1<mark>$2</mark>");
+    html = hits.map(([p, syn]) => `<div class="dsg-item" role="option" data-p="${esc(p)}"><b>${mark(p)}</b>${syn.length ? `<small>${esc(syn.slice(0, 3).join(", "))}</small>` : ""}</div>`).join("");
+  }
+  box.innerHTML = html; dActive = -1;
+  box.hidden = !html; inp.setAttribute("aria-expanded", String(!!html));
+}
+function pickDword(p) {
+  const inp = $("#describe-q");
+  inp.value = inp.value.replace(/([a-z0-9'-]+)$/i, "").replace(/\s*$/, inp.value.trim() ? " " : "") + p + " ";
+  inp.value = inp.value.replace(/^\s+/, "");
+  inp.focus(); closeDsuggest();
+}
+$("#describe-q").addEventListener("input", showDsuggest);
+$("#describe-q").addEventListener("focus", showDsuggest);
+$("#describe-q").addEventListener("keydown", e => {
+  const items = [...$("#dsuggest").querySelectorAll(".dsg-item")];
+  if (e.key === "Escape") { closeDsuggest(); return; }
+  if (!items.length || $("#dsuggest").hidden || !["ArrowDown", "ArrowUp"].includes(e.key)) return;
+  e.preventDefault();
+  dActive = (dActive + (e.key === "ArrowDown" ? 1 : -1) + items.length) % items.length;
+  items.forEach((el, j) => el.classList.toggle("active", j === dActive));
+});
+$("#dsuggest").addEventListener("pointerdown", e => e.preventDefault());   // keep focus in the box
+$("#dsuggest").addEventListener("click", e => {
+  const it = e.target.closest(".dsg-item"); if (!it) return;
+  if (it.dataset.ex) { $("#describe-q").value = it.dataset.ex; closeDsuggest(); describeSound(it.dataset.ex); return; }
+  pickDword(it.dataset.p);
+});
+document.addEventListener("pointerdown", e => { if (!e.target.closest("#describe-wrap")) closeDsuggest(); }, true);
 async function describeSound(text, fromHistory) {
   text = (text || "").trim(); if (!text) return;
-  if ($("#describe-q").value !== text) { $("#describe-open").hidden = true; $("#describe-form").hidden = false; $("#describe-q").value = text; }
+  setSearchMode("describe"); closeDsuggest();
+  if ($("#describe-q").value.trim() !== text) $("#describe-q").value = text;
   document.documentElement.classList.add("has-results");
   $("#out").innerHTML = `<div class="results-head"><h2>Listening for that sound…</h2></div><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
   if (!fromHistory) history.pushState({ d: text }, "", `?d=${encodeURIComponent(text)}`);
@@ -3103,6 +3183,6 @@ openFromUrl(true);
 openSharedSet();
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=52"></script>
+<script src="/static/i18n.js?v=53"></script>
 </body>
 </html>

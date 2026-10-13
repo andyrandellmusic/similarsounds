@@ -239,6 +239,12 @@ async def plan_gig(request: Request):
     return {"tracks": tracks}
 
 
+@app.get("/api/describe/words")
+def describe_words():
+    """The sounds "Describe a sound" understands, for the drop-down while typing."""
+    return {"words": [[p, describe._syn.get(p, [])] for p in describe.PHRASES], "examples": describe.EXAMPLES}
+
+
 @app.get("/api/describe")
 def describe_sound(q: str = Query("", max_length=200)):
     """'Describe a sound': tracks that sound like the words typed (e.g. "warm sunset deep house with sax")."""
