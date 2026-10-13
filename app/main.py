@@ -348,6 +348,17 @@ def suggest(q: str = Query("", max_length=100)):
     return suggester.suggest(q)
 
 
+@app.get("/api/_iphdr")          # TEMPORARY diagnostic (no IPs shown): which proxy headers Render passes
+def _iphdr(request: Request):
+    import hashlib
+    h = lambda v: hashlib.sha256(v.strip().encode()).hexdigest()[:6] if v else None
+    xff = [x.strip() for x in request.headers.get("x-forwarded-for", "").split(",") if x.strip()]
+    return {"xff_parts": [h(x) for x in xff], "cf_connecting_ip": h(request.headers.get("cf-connecting-ip", "")),
+            "true_client_ip": h(request.headers.get("true-client-ip", "")), "x_real_ip": h(request.headers.get("x-real-ip", "")),
+            "peer": h(request.client.host if request.client else ""),
+            "names": sorted(k for k in request.headers.keys() if k.startswith(("x-", "cf-", "true-", "forwarded")))}
+
+
 @app.get("/api/stats")
 def stats():
     rows = index.rows
