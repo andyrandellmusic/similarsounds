@@ -72,6 +72,41 @@ def main():
             print("removed", len(weak), "new tracks that don't sound like house", flush=True)
             todo = [d for d in todo if d not in set(weak)]
 
+    # Genre check (the same rules as the big clean-up): new tracks that sound like trance / EDM / techno / pop,
+    # or come from labels that aren't ours, are set aside - kept in the set_aside table, never shown
+    gc_path = ROOT / "data" / "genre_check.npz"
+    new = [d for d in todo if d in done]
+    if new and gc_path.exists():
+        gc = np.load(gc_path)
+        E = np.array([done[d] for d in new], dtype="float32")
+        Z = (E - gc["mu"]) / gc["sd"]; Z /= np.linalg.norm(Z, axis=1, keepdims=True)
+        L = Z @ gc["W"].T + gc["b"]; P = np.exp(L - L.max(1, keepdims=True)); P /= P.sum(1, keepdims=True)
+        p_not = P[:, 1]
+        En = E / np.linalg.norm(E, axis=1, keepdims=True); S = En @ gc["text_emb"].T * 100
+        T = np.exp(S - S.max(1, keepdims=True)); T /= T.sum(1, keepdims=True)
+        hk = [k for k, n in enumerate(gc["text_names"]) if n in set(gc["house"].tolist())]
+        house_text = T[:, hk].sum(1)
+        bad_labels = set(gc["not_labels"].tolist())
+        conn = sqlite3.connect(ROOT / "data" / "catalogue.db")
+        labels = dict(conn.execute(f"SELECT deezer_id, label FROM tracks WHERE deezer_id IN ({','.join('?' * len(new))})", new))
+        out = [d for k, d in enumerate(new)
+               if (labels.get(d) in bad_labels and p_not[k] >= 0.4) or p_not[k] >= 0.85 or (p_not[k] >= 0.6 and house_text[k] < 0.35)]
+        if out:
+            cols = [r[1] for r in conn.execute("PRAGMA table_info(tracks)")]
+            conn.execute("CREATE TABLE IF NOT EXISTS set_aside AS SELECT * FROM tracks WHERE 0")
+            have = {r[1] for r in conn.execute("PRAGMA table_info(set_aside)")}
+            for c in ("aside_kind", "aside_why", "aside_at"):
+                if c not in have:
+                    conn.execute(f"ALTER TABLE set_aside ADD COLUMN {c} TEXT")
+            cl = ", ".join(cols)
+            for d in out:
+                conn.execute(f"INSERT OR REPLACE INTO set_aside ({cl}, aside_kind, aside_why, aside_at) SELECT {cl}, 'not house', "
+                             f"'daily genre check', datetime('now') FROM tracks WHERE deezer_id = ?", (d,))
+                conn.execute("DELETE FROM tracks WHERE deezer_id = ?", (d,))
+            conn.commit()
+            print("set aside", len(out), "new tracks that aren't our genres", flush=True)
+            todo = [d for d in todo if d not in set(out)]
+
     # Label the new tracks' sub-genre by sound: a classifier taught with 629 Beatport chart tracks
     # (Deep House / Tech House / Minimal / Deep Tech / Nu Disco). "House" when it isn't clearly one of them.
     st = np.load(ROOT / "data" / "clap_styles.npz")

@@ -32,6 +32,9 @@ jobs:
       - name: Remove anything added today that isn't house
         if: always()
         run: uv run python -m scripts.clean_catalogue --since "$STARTED" --apply
+      - name: Keep one version of each track (the extended mix when there is one)
+        if: always()
+        run: uv run python -m scripts.dedupe_versions --apply
       - name: Cache the CLAP model (free, CC0 licence)
         uses: actions/cache@v4
         with:

@@ -11,11 +11,12 @@ from app import sources
 from app.analysis import analyse, load_audio
 import librosa, torch, laion_clap
 
-OUT = ROOT / "eval" / "results" / "bp_all.jsonl"
+IN = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "eval" / "beatport_charts.tsv"
+OUT = Path(sys.argv[2]) if len(sys.argv) > 2 else ROOT / "eval" / "results" / "bp_all.jsonl"
 done = set()
 if OUT.exists():
     done = {json.loads(l)["row"] for l in OUT.open()}
-rows = [l.rstrip("\n").split("\t") for l in open(ROOT / "eval" / "beatport_charts.tsv", encoding="utf-8")]
+rows = [l.rstrip("\n").split("\t") for l in open(IN, encoding="utf-8")]
 STOP = {"the", "a", "feat", "ft", "extended", "mix", "original", "remix", "edit", "version", "radio", "club"}
 norm = lambda x: set(w for w in re.sub(r"[^a-z0-9 ]", " ", x.lower()).split() if w not in STOP)
 

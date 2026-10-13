@@ -214,6 +214,10 @@ def main():
 
     conn = connect()
     seen = {r[0] for r in conn.execute("SELECT deezer_id FROM tracks")}
+    try:                                   # tracks set aside by the genre clean-up are never added back
+        seen |= {r[0] for r in conn.execute("SELECT deezer_id FROM set_aside")}
+    except Exception:
+        pass
     isrcs = {r[0] for r in conn.execute("SELECT isrc FROM tracks WHERE isrc IS NOT NULL")}
     print(f"{stamp()} Catalogue currently has {len(seen)} tracks", flush=True)
 
