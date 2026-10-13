@@ -20,17 +20,26 @@ _last = [0.0]
 
 
 def deezer(path: str, **params) -> dict:
-    with _lock:
-        wait = 0.12 - (time.time() - _last[0])
-        if wait > 0:
-            time.sleep(wait)
-        _last[0] = time.time()
-    r = client.get(f"{DEEZER}{path}", params=params)
+    # Deezer says "slow down" either as HTTP 429 or as error code 4 ("Quota limit exceeded"):
+    # wait a little longer each time and retry, rather than losing that search
+    for attempt in range(4):
+        with _lock:
+            wait = 0.12 - (time.time() - _last[0])
+            if wait > 0:
+                time.sleep(wait)
+            _last[0] = time.time()
+        r = client.get(f"{DEEZER}{path}", params=params)
+        if r.status_code == 429 or r.status_code >= 500:
+            time.sleep(3 * (attempt + 1)); continue
+        r.raise_for_status()
+        data = r.json()
+        if isinstance(data, dict) and "error" in data:
+            if (data["error"] or {}).get("code") == 4 and attempt < 3:
+                time.sleep(3 * (attempt + 1)); continue
+            raise RuntimeError(f"Deezer error: {data['error']}")
+        return data
     r.raise_for_status()
-    data = r.json()
-    if isinstance(data, dict) and "error" in data:
-        raise RuntimeError(f"Deezer error: {data['error']}")
-    return data
+    raise RuntimeError("Deezer kept asking us to slow down")
 
 
 def deezer_track(track_id: int) -> dict:

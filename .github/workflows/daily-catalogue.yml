@@ -9,6 +9,7 @@ on:
 
 permissions:
   contents: write
+  issues: write      # to raise a "something went wrong" notice (GitHub emails it to the owner)
 
 jobs:
   update:
@@ -21,8 +22,15 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Note the start time
         run: echo "STARTED=$(date -u '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
-      - run: uv run python -m scripts.seed --per-style 40 --artists 300 --labels 70
+      # 120-minute budget: it stops searching at 48 min and analysing at 120, saving as it goes, so the run
+      # always finishes and commits whatever it found (the rest is picked up tomorrow)
+      - name: Find and analyse new house releases
+        id: seed
+        timeout-minutes: 150
+        continue-on-error: true
+        run: uv run python -m scripts.seed --per-style 40 --artists 300 --labels 70 --minutes 120
       - name: Remove anything added today that isn't house
+        if: always()
         run: uv run python -m scripts.clean_catalogue --since "$STARTED" --apply
       - name: Cache the CLAP model (free, CC0 licence)
         uses: actions/cache@v4
@@ -34,11 +42,13 @@ jobs:
           mkdir -p ~/clap
           [ -f ~/clap/music.pt ] || curl -sL -o ~/clap/music.pt "https://huggingface.co/lukewys/laion_clap/resolve/main/music_audioset_epoch_15_esc_90.14.pt"
       - name: Add CLAP sound fingerprints for new tracks
+        timeout-minutes: 40
         run: >
           uv run --no-project --python 3.10 --with laion-clap --with "torch<2.6" --with torchvision
           --with "transformers<4.45" --with librosa --with httpx --with soundfile --with "numpy<2" --with "setuptools<70"
           python -m scripts.clap_update --ckpt ~/clap/music.pt
       - name: Commit updated catalogue
+        if: always()       # keep whatever was saved, even if a step above had trouble
         run: |
           git config user.name "similarsounds-bot"
           git config user.email "similarsounds-bot@users.noreply.github.com"
@@ -46,6 +56,14 @@ jobs:
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           # site changes may have landed while this ran: take them first, then push (a few tries)
           for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
+      - name: Raise a notice if anything went wrong
+        if: failure() || steps.seed.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh issue create --repo "${{ github.repository }}"
+          --title "Daily catalogue update had a problem ($(date -u +%F))"
+          --body "Something went wrong in today's catalogue update. Tracks already saved were still committed where possible. Run log: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
       - name: Tell Bing / ChatGPT search about today's new track pages (IndexNow)
         continue-on-error: true
         run: sleep 300 && uv run python -m scripts.indexnow --since "$STARTED"

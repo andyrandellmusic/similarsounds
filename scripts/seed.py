@@ -8,6 +8,7 @@ import multiprocessing
 from pathlib import Path
 import os
 import sys
+import time
 from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor, as_completed
 from concurrent.futures.process import BrokenProcessPool
 from datetime import date
@@ -37,9 +38,11 @@ PLAYLISTS_PER_QUERY = 15
 _albums: dict[int, dict] = {}
 
 
-def candidates(style: str, queries: list[str], per_style: int, seen: set[int]) -> list[tuple[int, str]]:
+def candidates(style: str, queries: list[str], per_style: int, seen: set[int], until: float = float("inf")) -> list[tuple[int, str]]:
     out = []
     for q in queries:
+        if time.time() > until:
+            break
         for pl in sources.deezer("/search/playlist", q=q, limit=PLAYLISTS_PER_QUERY).get("data", []):
             tracks = sources.deezer(f"/playlist/{pl['id']}/tracks", limit=100).get("data", [])
             for t in tracks:
@@ -80,7 +83,7 @@ def fetch(track_id: int, style: str) -> tuple[dict, bytes] | None:
 ARTIST_STATE = Path(__file__).resolve().parent.parent / "data" / "artist_follow.json"
 
 
-def artist_candidates(conn, n_artists: int, seen: set[int], max_age_days: int = 120) -> list[tuple[int, str]]:
+def artist_candidates(conn, n_artists: int, seen: set[int], max_age_days: int = 120, until: float = float("inf")) -> list[tuple[int, str]]:
     """New releases from house artists already in the catalogue. Rotates through the artists a few
     hundred a day, so every artist gets checked regularly. (Each track's style is set later by sound.)"""
     import json
@@ -91,7 +94,9 @@ def artist_candidates(conn, n_artists: int, seen: set[int], max_age_days: int = 
     batch = (names[start:] + names[:start])[:n_artists]
     cutoff = (date.today() - timedelta(days=max_age_days)).isoformat()
     out = []
-    for name in batch:
+    for n, name in enumerate(batch):
+        if time.time() > until:
+            print(f"  search time used up after {n} artists", flush=True); n_artists = n; break
         aid = state["ids"].get(name)
         try:
             if aid is None:
@@ -151,7 +156,7 @@ HOUSE_LABELS = [
 DANCE_GENRES = {106, 113}   # Deezer: Electro, Dance
 
 
-def label_candidates(conn, n_labels: int, seen: set[int], max_age_days: int = 120) -> list[tuple[int, str]]:
+def label_candidates(conn, n_labels: int, seen: set[int], max_age_days: int = 120, until: float = float("inf")) -> list[tuple[int, str]]:
     """New releases from house labels. Checks a rotating batch of labels each day; albums already
     looked at are remembered so each run only opens new ones. (Style is set later by sound.)"""
     import json
@@ -165,7 +170,9 @@ def label_candidates(conn, n_labels: int, seen: set[int], max_age_days: int = 12
     batch = (names[start:] + names[:start])[:n_labels]
     cutoff = (date.today() - timedelta(days=max_age_days)).isoformat()
     out = []
-    for name in batch:
+    for n, name in enumerate(batch):
+        if time.time() > until:
+            print(f"  search time used up after {n} labels", flush=True); n_labels = n; break
         try:
             albums = sources.deezer("/search/album", q=f'label:"{name}"', limit=100).get("data", [])
             for a in albums:
@@ -195,79 +202,99 @@ def main():
     ap.add_argument("--max-new", type=int, default=1500, help="most new tracks to fetch and analyse in one run")
     ap.add_argument("--per-style", type=int, default=100)
     ap.add_argument("--styles", nargs="*", help="limit to these style names")
+    ap.add_argument("--minutes", type=float, default=0,
+                    help="time budget: stop looking for new tracks after 40%% of it and stop analysing at the end of it, "
+                         "keeping everything already saved (0 = no limit)")
     args = ap.parse_args()
+
+    t0 = time.time()
+    deadline = t0 + args.minutes * 60 if args.minutes else float("inf")
+    search_until = t0 + args.minutes * 60 * 0.4 if args.minutes else float("inf")
+    stamp = lambda: f"[{(time.time() - t0) / 60:5.1f} min]"
 
     conn = connect()
     seen = {r[0] for r in conn.execute("SELECT deezer_id FROM tracks")}
     isrcs = {r[0] for r in conn.execute("SELECT isrc FROM tracks WHERE isrc IS NOT NULL")}
-    print(f"Catalogue currently has {len(seen)} tracks")
+    print(f"{stamp()} Catalogue currently has {len(seen)} tracks", flush=True)
 
     todo = []
     for style, queries in STYLES.items():
         if args.styles and style not in args.styles:
             continue
-        c = candidates(style, queries, args.per_style, seen)
-        print(f"  {style}: {len(c)} new candidates")
+        if time.time() > search_until:
+            print(f"{stamp()} search time used up: skipping the rest of the playlist styles", flush=True); break
+        c = candidates(style, queries, args.per_style, seen, until=search_until)
+        print(f"{stamp()}   {style}: {len(c)} new candidates", flush=True)
         todo += c
-    if args.artists:
-        c = artist_candidates(conn, args.artists, seen)
-        print(f"  new releases from {args.artists} catalogue artists: {len(c)} candidates")
+    if args.artists and time.time() < search_until:
+        c = artist_candidates(conn, args.artists, seen, until=search_until)
+        print(f"{stamp()}   new releases from catalogue artists: {len(c)} candidates", flush=True)
         todo += c
-    if args.labels:
-        c = label_candidates(conn, args.labels, seen)
-        print(f"  new releases from {args.labels} house labels: {len(c)} candidates")
+    if args.labels and time.time() < search_until:
+        c = label_candidates(conn, args.labels, seen, until=search_until)
+        print(f"{stamp()}   new releases from house labels: {len(c)} candidates", flush=True)
         todo += c
 
     # Keep each daily run inside its time limit; whatever's left is picked up the next day
     if len(todo) > args.max_new:
         print(f"  {len(todo)} candidates: taking the first {args.max_new} this run", flush=True)
         todo = todo[:args.max_new]
-    print(f"  fetching {len(todo)} previews…", flush=True)
+    print(f"{stamp()} fetching and analysing {len(todo)} candidates in batches…", flush=True)
 
-    # 1) download previews (network), 2) analyse them in worker processes (CPU).
-    # A track whose audio crashes a worker is skipped and the workers are restarted,
-    # so one bad file can't stop the whole daily update.
-    fetched = []
+    # In batches: download previews (network threads), analyse them (worker processes), save to the
+    # catalogue. Each batch is saved before the next starts, so a run that's cut short keeps its work.
+    # A track whose audio crashes a worker is skipped and the workers restarted, so one bad file can't
+    # stop the whole daily update.
+    BATCH = 60
+    added = skipped = 0
     with ThreadPoolExecutor(3) as io_pool:
-        for f in as_completed([io_pool.submit(fetch, tid, style) for tid, style in todo]):
-            try:
-                res = f.result()
-            except Exception as e:
-                print("  fetch failed:", e, file=sys.stderr)
-                continue
-            if not res:
-                continue
-            meta, audio = res
-            if meta["isrc"] and meta["isrc"] in isrcs:
-                continue
-            isrcs.add(meta["isrc"])
-            fetched.append((meta, audio))
-
-    added, pending = 0, list(range(len(fetched)))
-    while pending:
-        retry = []
-        # "spawn" workers: on Linux the default ("fork" while download threads exist) can freeze the job
-        with ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1), mp_context=multiprocessing.get_context("spawn")) as cpu:
-            futs = {cpu.submit(analyse, fetched[k][1]): k for k in pending}
-            for f in as_completed(futs):
-                k = futs[f]
-                meta = fetched[k][0]
+        for b in range(0, len(todo), BATCH):
+            if time.time() > deadline:
+                print(f"{stamp()} time budget reached: stopping with {len(todo) - b} candidates left for tomorrow", flush=True)
+                break
+            fetched = []
+            for f in as_completed([io_pool.submit(fetch, tid, style) for tid, style in todo[b:b + BATCH]]):
                 try:
-                    upsert(conn, {**meta, **f.result()})
-                    added += 1
-                    if added % 25 == 0:
-                        print(f"  analysed {added}/{len(fetched)}", flush=True)
-                except BrokenProcessPool:
-                    retry.append(k)      # the pool died; try these again with fresh workers
+                    res = f.result()
                 except Exception as e:
-                    print(f"  analysis failed for {meta['title']}: {e}", file=sys.stderr)
-        if retry and len(retry) == len(pending):   # nothing got through: drop the first one and carry on
-            print(f"  skipped {fetched[retry[0]][0]['title']} (crashed the analyser)", file=sys.stderr)
-            retry = retry[1:]
-        pending = retry
+                    print("  fetch failed:", e, file=sys.stderr)
+                    continue
+                if not res:
+                    continue
+                meta, audio = res
+                if meta["isrc"] and meta["isrc"] in isrcs:
+                    continue
+                isrcs.add(meta["isrc"])
+                fetched.append((meta, audio))
+            pending = list(range(len(fetched)))
+            while pending:
+                retry = []
+                # "spawn" workers: on Linux the default ("fork" while download threads exist) can freeze the job
+                with ProcessPoolExecutor(max(1, (os.cpu_count() or 2) - 1), mp_context=multiprocessing.get_context("spawn")) as cpu:
+                    futs = {cpu.submit(analyse, fetched[k][1]): k for k in pending}
+                    for f in as_completed(futs):
+                        k = futs[f]
+                        meta = fetched[k][0]
+                        try:
+                            upsert(conn, {**meta, **f.result()})
+                            added += 1
+                        except BrokenProcessPool:
+                            retry.append(k)      # the pool died; try these again with fresh workers
+                        except Exception as e:
+                            print(f"  analysis failed for {meta['title']}: {e}", file=sys.stderr)
+                if retry and len(retry) == len(pending):   # nothing got through: drop the first one and carry on
+                    print(f"  skipped {fetched[retry[0]][0]['title']} (crashed the analyser)", file=sys.stderr)
+                    retry = retry[1:]; skipped += 1
+                pending = retry
+            print(f"{stamp()}   saved {added} so far ({min(b + BATCH, len(todo))}/{len(todo)} candidates checked)", flush=True)
 
     total = conn.execute("SELECT COUNT(*) FROM tracks").fetchone()[0]
-    print(f"Added {added} tracks. Catalogue now has {total}.")
+    print(f"{stamp()} Added {added} tracks. Catalogue now has {total}.", flush=True)
+    summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if summary:
+        with open(summary, "a") as fh:
+            fh.write(f"### Catalogue update\n- Added **{added}** tracks ({total} in the catalogue)\n"
+                     f"- {len(todo)} candidates checked in {(time.time() - t0) / 60:.0f} minutes\n")
 
 
 if __name__ == "__main__":
