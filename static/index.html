@@ -832,8 +832,9 @@
   .set-card { display: grid; grid-template-columns: 18px 52px 1fr auto; gap: 8px 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 8px; }
   .set-card .set-play { width: 52px; height: 52px; border-radius: 8px; }
   .set-card img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; display: block; }
-  .set-card .set-play .play-ico { opacity: .9; }            /* always show the play button on set covers */
-  .set-list.is-dragging .set-player { display: none; }
+  .set-card .set-play .play-ico { opacity: .9; }
+  .set-card .set-play.on .play-ico { opacity: 1; background: rgba(11,11,15,.45); }
+  .set-card .set-play.on .play-ico::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 2h1.8v6H2.5zM5.7 2h1.8v6H5.7z' fill='%230b0b0f'/%3E%3C/svg%3E"); }            /* always show the play button on set covers */
   .sc-meta { min-width: 0; display: grid; gap: 2px; }
   .set-card .sc-meta .t { font-size: 13.5px; line-height: 1.2; }
   .set-card .sc-meta .a { font-size: 11.5px; line-height: 1.25; }
@@ -846,8 +847,6 @@
   .gap-box[hidden] { display: none; }
   .item-btns { display: grid !important; grid-template-columns: auto auto; grid-template-areas: "up rm" "down rm"; gap: 2px; }
   .item-btns .up { grid-area: up; } .item-btns .down { grid-area: down; } .item-btns .rm { grid-area: rm; align-self: center; }
-  .set-player { margin: 6px 0 0; }
-  .set-player iframe { width: 100%; height: 92px; border: 0; border-radius: 10px; display: block; }
   .role { font: 800 10px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
   .role-intro, .role-end { color: var(--accent); }
   .role-peak { color: #ff8a3d; }
@@ -2615,6 +2614,10 @@ function renderSet() {
       </div>
       ${i === set.length - 1 ? `<button type="button" class="next-btn last-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>` : ""}
     </li>`).join("");
+  if (boxBtn?.dataset.setplay) {                    // a set track still playing: keep its pause button after the redraw
+    const nb = document.querySelector(`#set-list [data-setplay="${boxBtn.dataset.setplay}"]`);
+    if (nb) { nb.classList.add("on"); boxBtn = nb; } else stopBoxPlay();
+  }
 }
 
 $("#set-list").addEventListener("click", e => {
@@ -3004,15 +3007,16 @@ document.addEventListener("click", e => {
 });
 
 /* ---------- Play a preview right from a box (Describe a sound results): tap the cover to play / pause */
-let boxAudio = null, boxBtn = null;
+var boxAudio = null, boxBtn = null;      // var: the set list (drawn early) checks these too
 function stopBoxPlay() { if (boxAudio) { boxAudio.pause(); boxAudio = null; } boxBtn?.classList.remove("on"); boxBtn = null; }
 function toggleBoxPlay(b) {
   if (boxBtn === b) { stopBoxPlay(); return; }
   stopBoxPlay(); stopMix();
   boxBtn = b; b.classList.add("on");
-  boxAudio = new Audio(`/api/clip/${b.dataset.tplay}`);
+  const id = b.dataset.tplay || b.dataset.setplay;
+  boxAudio = new Audio(`/api/clip/${id}`);
   boxAudio.onended = stopBoxPlay;
-  boxAudio.play().then(() => { countPlay(); markPlayed(b.dataset.tplay); }).catch(stopBoxPlay);
+  boxAudio.play().then(() => { countPlay(); markPlayed(id); }).catch(stopBoxPlay);
 }
 document.addEventListener("click", e => {          // capture phase, so tapping the cover doesn't open the track's matches
   const b = e.target.closest("[data-tplay]"); if (!b) return;
@@ -3162,19 +3166,10 @@ $("#plan-btns").addEventListener("click", async e => {
 });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#plan-dlg").hidden) closePlan(); });
 
-/* ---------- Play a preview straight from the set builder (tap the cover) */
+/* ---------- Play a preview straight from the set builder (tap the cover): plays right there, no player pops up */
 document.addEventListener("click", e => {
   const b = e.target.closest("[data-setplay]"); if (!b) return;
-  const li = b.closest(".set-item"), card = b.closest(".set-card"), wasOpen = card.classList.contains("playing");
-  document.querySelectorAll("#set-list .set-card.playing").forEach(c => { c.classList.remove("playing"); c.parentElement.querySelector(".set-player")?.remove(); });
-  if (wasOpen) return;
-  card.classList.add("playing");
-  countPlay(); markPlayed(b.dataset.setplay);
-  const t = set.find(x => String(x.deezer_id) === b.dataset.setplay) || {};
-  card.insertAdjacentHTML("afterend", `<div class="set-player">${playerOrGate("deezer", `<iframe title="Preview" allow="encrypted-media; clipboard-write" src="https://widget.deezer.com/widget/dark/track/${b.dataset.setplay}?autoplay=true&tracklist=false"></iframe>`)}
-    <div class="more">Also on <a class="ga-out" target="_blank" rel="noopener" href="https://www.beatport.com/search?q=${searchQ(t)}">Beatport</a>
-      <a class="ga-out" target="_blank" rel="noopener" href="https://soundcloud.com/search?q=${searchQ(t)}">SoundCloud</a>
-      <a class="ga-out" target="_blank" rel="noopener" href="https://www.youtube.com/results?search_query=${searchQ(t)}">YouTube</a></div></div>`);
+  toggleBoxPlay(b);
 });
 
 /* ---------- "Fix this gap": tracks that mix with both the track before and the track after */
