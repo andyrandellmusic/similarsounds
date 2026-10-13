@@ -153,11 +153,15 @@
   .plan-seed { margin: 0 0 14px; font-size: 13.5px; color: var(--muted); }
   .plan-seed b { color: var(--text); }
   /* "Describe a sound" */
-  .search-tabs { display: flex; gap: 6px; margin: 0 0 8px; }
-  .search-tabs button { background: none; border: 1px solid transparent; color: var(--muted); border-radius: 999px; padding: 6px 13px;
-    font: 700 13px Inter, sans-serif; cursor: pointer; }
+  /* folder tabs sitting on the search bar: the chosen one joins the bar (no line between them) */
+  .search-tabs { display: flex; gap: 4px; margin: 0; padding-left: 12px; position: relative; z-index: 2; }
+  .search-tabs button { position: relative; background: transparent; border: 1px solid transparent; border-bottom: 0; color: var(--muted);
+    border-radius: 11px 11px 0 0; padding: 9px 15px 8px; margin-bottom: -1px; font: 700 13px Inter, sans-serif; cursor: pointer; }
   .search-tabs button:hover { color: var(--text); }
-  .search-tabs button.on { background: rgba(198,255,61,.1); border-color: rgba(198,255,61,.45); color: var(--accent); }
+  .search-tabs button.on { background: var(--panel); border-color: var(--line); color: var(--accent); }
+  .search-tabs button.on::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--panel); }
+  body:has(form.search:focus-within) .search-tabs button.on { border-color: var(--accent); }
+  .search-wrap, .describe-wrap { position: relative; z-index: 1; }
   .search-wrap[hidden], .describe-wrap[hidden] { display: none; }
   .describe-wrap { position: relative; }
   .dsg-item { display: flex; align-items: baseline; gap: 10px; padding: 9px 10px; border-radius: 9px; cursor: pointer; }
@@ -165,11 +169,12 @@
   .dsg-item b { font-weight: 600; color: var(--text); }
   .dsg-item b mark { background: none; color: var(--accent); }
   .dsg-item small { color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .describe { margin: 10px 0 4px; }
+  .describe { margin: 0 0 4px; }
+  .describe .plan-open { margin-top: 10px; }
   .describe-open { background: none; border: 0; padding: 4px 0; color: var(--accent); font: 700 14px Inter, sans-serif; cursor: pointer; }
   .describe-open:hover { text-decoration: underline; }
   .describe-open[hidden], .describe-form[hidden] { display: none; }
-  .describe-form { margin-top: 2px; }
+  .describe-form { margin-top: 0; }
   .describe-ex { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 0; }
   .describe-results { margin-top: 14px; }
   /* play a preview straight from a box (no video player): tap the cover */
