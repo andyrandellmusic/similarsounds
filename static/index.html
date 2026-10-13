@@ -226,6 +226,10 @@
   .mixbar .mb-txt b { color: var(--accent); }
   .mixbar .mb-prog { grid-column: 1; height: 4px; border-radius: 2px; background: var(--line); overflow: hidden; }
   .mixbar .mb-prog i { display: block; height: 100%; width: 0; background: var(--accent); }
+  /* while the mix is being got ready: a green bar sliding along so you can see it's working */
+  .mixbar.loading .mb-prog i { width: 38%; border-radius: 2px; animation: mb-load 1.1s ease-in-out infinite; box-shadow: 0 0 8px rgba(198,255,61,.6); }
+  @keyframes mb-load { 0% { transform: translateX(-100%); } 100% { transform: translateX(270%); } }
+  @media (prefers-reduced-motion: reduce) { .mixbar.loading .mb-prog i { animation-duration: 2.4s; } }
   .mixbar .mb-x { grid-row: 1 / 3; grid-column: 2; background: none; border: 0; color: var(--accent); font-size: 24px; line-height: 1; padding: 4px 6px; cursor: pointer; }
   /* the box trims the top 32/720 of the picture so the site's banner in the recording doesn't peek in */
   .howvid .vbox { overflow: hidden; aspect-ratio: 1280 / 688; border-radius: 14px; border: 1px solid var(--line); background: #000; }
@@ -2964,7 +2968,7 @@ async function hearMix(btn) {
   const run = mixRun, aId = btn.dataset.hearA, bId = btn.dataset.hearB, la = btn.dataset.la, lb = btn.dataset.lb;
   btn.classList.add("on");
   const bar = document.createElement("div");
-  bar.id = "mixbar"; bar.className = "mixbar"; bar.setAttribute("role", "status");
+  bar.id = "mixbar"; bar.className = "mixbar loading"; bar.setAttribute("role", "status");
   bar.innerHTML = `<span class="mb-txt">Getting the mix ready…</span><button type="button" class="mb-x" aria-label="Stop the mix">×</button><span class="mb-prog"><i></i></span>`;
   document.body.append(bar);
   const txt = bar.querySelector(".mb-txt"), prog = bar.querySelector(".mb-prog i");
@@ -3000,6 +3004,7 @@ async function hearMix(btn) {
     a.src.start(t0, offA); a.src.stop(tEnd + 0.05);
     b.src.start(tBlend, offB); b.src.stop(tOut + 0.1);
     mixSrcs = [a.src, b.src];
+    bar.classList.remove("loading");
     countPlay();
     const pct = Math.round((rate - 1) * 1000) / 10;
     const shift = Math.abs(pct) >= 0.5 ? ` <span class="mb-note">(${esc(lb)} ${pct > 0 ? "sped up" : "slowed"} ${Math.abs(pct)}% to match)</span>` : "";
@@ -3011,6 +3016,7 @@ async function hearMix(btn) {
     }, 120);
   } catch {
     if (run !== mixRun) return;
+    bar.classList.remove("loading");
     txt.textContent = "Couldn't load that mix. Try another track.";
     setTimeout(() => { if (run === mixRun) stopMix(); }, 2500);
   }
