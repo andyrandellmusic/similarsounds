@@ -1467,7 +1467,7 @@ async function run(exactUrl, fromHistory = false) {
     showTokens(data.tokens);
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
-    if (exactUrl) { $("#url").value = label; picked = { text: label, url: exactUrl }; }
+    if (exactUrl) { picked = { text: label, url: exactUrl }; if (!bootLoad) $("#url").value = label; }
     updateClear();
     if (new URLSearchParams(location.search).get("t") != t)
       history[fromHistory ? "replaceState" : "pushState"]({ t, label }, "", `?t=${t}`);
@@ -2077,7 +2077,7 @@ function openFromUrl(fromHistory) {
   const t = new URLSearchParams(location.search).get("t");
   if (!t || !/^\d+$/.test(t)) return false;
   const label = history.state?.label || "";
-  $("#url").value = label; allowNonHouse = false;
+  $("#url").value = bootLoad ? "" : label; allowNonHouse = false;
   run(`https://www.deezer.com/track/${t}`, fromHistory);
   return true;
 }
@@ -3064,6 +3064,7 @@ addEventListener("blur", () => setTimeout(() => {
 }, 0));
 
 /* ---------- Play a preview right from a box (Describe a sound results): tap the cover to play / pause */
+var bootLoad = true;                     // true until the visitor first touches the page after a (re)load
 var boxAudio = null, boxBtn = null;      // var: the set list (drawn early) checks these too
 function stopBoxPlay() { if (boxAudio) { boxAudio.pause(); boxAudio = null; } boxBtn?.classList.remove("on"); boxBtn?.querySelector(".play-ring")?.remove(); boxBtn = null; }
 // a green bar round the artwork's edge that shortens as the preview runs out
@@ -3170,7 +3171,7 @@ document.addEventListener("pointerdown", e => { if (!e.target.closest("#describe
 async function describeSound(text, fromHistory) {
   text = (text || "").trim(); if (!text) return;
   setSearchMode("describe"); closeDsuggest();
-  if ($("#describe-q").value.trim() !== text) $("#describe-q").value = text;
+  if (!bootLoad && $("#describe-q").value.trim() !== text) $("#describe-q").value = text;
   updateClear();
   document.documentElement.classList.add("has-results");
   $("#out").innerHTML = `<div class="results-head"><h2>Listening for that sound…</h2></div><div class="mini-load" role="progressbar" aria-label="Searching"><i></i></div>`;
@@ -3311,6 +3312,12 @@ $("#set-copy").onclick = async () => {
 renderSet();
 openFromUrl(true);
 openSharedSet();
+// Every page load or refresh starts with both search bars empty (the browser would otherwise refill them),
+// even when the page reopens a search from its link; they fill normally again once the visitor does anything.
+function emptyBars() { $("#url").value = ""; $("#describe-q").value = ""; updateClear(); }
+emptyBars();
+addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
+["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=12" defer></script>
 <script src="/static/i18n.js?v=59"></script>
