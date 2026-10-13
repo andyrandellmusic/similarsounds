@@ -425,7 +425,6 @@
   .sort { color: var(--muted); font-size: 13px; display: inline-flex; align-items: center; gap: 8px; }
   .howto { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
   .howto summary { cursor: pointer; width: fit-content; }
-  .howto summary:hover { color: var(--text); }
   /* "How to read these results" and "Key wheel": bigger, with a green arrow so they're noticed */
   /* every small arrow on the site is green */
   .ga::after { content: "→"; margin-left: .3em; color: var(--accent); }
@@ -441,7 +440,9 @@
   .howto summary::before, .keywheel summary::before { content: ""; width: 0; height: 0; border-style: solid;
     border-width: 6px 0 6px 10px; border-color: transparent transparent transparent var(--accent); transition: transform .15s; }
   .howto[open] summary::before, .keywheel[open] summary::before { transform: rotate(90deg); }
-  .howto summary:hover, .keywheel summary:hover { color: var(--accent); }
+  /* green while open (or under the mouse); back to white the moment it closes, phones included */
+  .howto[open] summary, .keywheel[open] summary { color: var(--accent); }
+  @media (hover: hover) { .howto:not(.shut) summary:hover, .keywheel:not(.shut) summary:hover { color: var(--accent); } }
   .howto-grid { display: grid; grid-template-columns: 1fr; margin-top: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 4px 14px; }
   @media (min-width: 760px) { .howto-grid { grid-template-columns: 1fr 1fr; column-gap: 28px; } .howto-grid > div:nth-child(2) { border-top: 0; } }
   /* each explanation on its own row: the picture in a column on the left, the words on the right */
@@ -1702,7 +1703,12 @@ function render({ source, query, results, similar_artists = [] }) {
   // the two drop-downs stay side by side; what they open appears full width underneath, centred
   [["#howto-d", "#howto-body"], ["#keywheel", "#kw-body"]].forEach(([d, b]) => {
     const det = $(d), body = $(b); if (!det || !body) return;
-    det.addEventListener("toggle", () => { body.hidden = !det.open; });
+    det.addEventListener("toggle", () => {
+      body.hidden = !det.open;
+      det.classList.toggle("shut", !det.open);      // just closed: white straight away, even with the mouse still on it
+      if (!det.open) det.querySelector("summary").blur();
+    });
+    det.addEventListener("mouseleave", () => det.classList.remove("shut"));
   });
   if ($("#sort")) { $("#sort").value = sortBy; $("#sort").onchange = e => { sortBy = e.target.value; renderList(); }; }
   renderList();
