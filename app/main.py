@@ -15,7 +15,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner
+from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import Index, energy_vector
@@ -208,6 +208,16 @@ async def import_tracklist(request: Request):
         except Exception:
             out.append({"line": label, "status": "not_found"})
     return {"items": out, "tokens": await run_in_threadpool(tokens.check, request, None, False)}
+
+
+@app.post("/api/fresh")
+async def fresh_for_set(request: Request):
+    """'Fresh for your set': the newest releases that mix with what's already in the visitor's set."""
+    try:
+        ids = [int(x) for x in (await request.json()).get("ids", [])][:60]
+    except (ValueError, AttributeError, TypeError):
+        raise HTTPException(400, "Bad set")
+    return await run_in_threadpool(fresh.fresh, index, ids)
 
 
 @app.post("/api/plan")

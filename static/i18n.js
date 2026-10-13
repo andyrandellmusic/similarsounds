@@ -362,6 +362,8 @@
     "Closing": ["Cierre", "Closing", "Closing", "Chiusura", "Encerramento", "Afsluiter"], "All night": ["Toda la noche", "Toute la nuit", "Die ganze Nacht", "Tutta la notte", "A noite toda", "De hele nacht"],
     "Plan my set": ["Planificar mi sesión", "Planifier mon set", "Set planen", "Pianifica il set", "Planejar meu set", "Plan mijn set"],
     "Building your set…": ["Construyendo tu sesión…", "Construction de ton set…", "Dein Set wird gebaut…", "Costruisco il tuo set…", "Montando seu set…", "Je set wordt gebouwd…"],
+    "Fresh for your set": ["Novedades para tu sesión", "Nouveautés pour ton set", "Neu für dein Set", "Novità per il tuo set", "Novidades para o seu set", "Vers voor je set"],
+    "Goes with": ["Va con", "Va avec", "Passt zu", "Va con", "Combina com", "Past bij"],
     "Add to my set": ["Añadir a mi set", "Ajouter à mon set", "Zu meinem Set hinzufügen", "Aggiungi al mio set", "Adicionar ao meu set", "Aan mijn set toevoegen"],
     "Replace my set": ["Reemplazar mi set", "Remplacer mon set", "Mein Set ersetzen", "Sostituisci il mio set", "Substituir meu set", "Mijn set vervangen"],
     "Fix this gap: find a track to put in between": ["Arregla este hueco: busca un tema para poner en medio", "Combler ce trou : trouver un titre à placer entre les deux", "Lücke füllen: einen Track dazwischen finden", "Sistema questo passaggio: trova un brano da mettere in mezzo", "Corrigir esta lacuna: achar uma faixa para pôr no meio", "Gat dichten: zoek een track voor ertussen"],
@@ -434,6 +436,8 @@
   // ---------- patterns for text that contains numbers or names ($1, $2 … = captured parts)
   const P = [
     [/^That's every match with your filters \((\d+)\)\. Want more\?$/, ["Son todas las coincidencias con tus filtros ($1). ¿Quieres más?", "Ce sont toutes les correspondances avec vos filtres ($1). Vous en voulez plus ?", "Das sind alle Treffer mit deinen Filtern ($1). Mehr?", "Sono tutti i risultati con i tuoi filtri ($1). Ne vuoi altri?", "São todas as correspondências com seus filtros ($1). Quer mais?", "Dat zijn alle matches met je filters ($1). Meer?"]],
+    [/^Released in the last (\d+) days and mixes with tracks in your set\.$/, ["Lanzados en los últimos $1 días y mezclan con temas de tu sesión.", "Sortis ces $1 derniers jours et se mixent avec les titres de ton set.", "In den letzten $1 Tagen erschienen und passt zu Tracks in deinem Set.", "Usciti negli ultimi $1 giorni e si mixano con i brani del tuo set.", "Lançadas nos últimos $1 dias e mixam com faixas do seu set.", "Uitgebracht in de laatste $1 dagen en mixt met nummers in je set."]],
+    [/^Planned (\d+) tracks$/, ["$1 temas planificados", "$1 titres planifiés", "$1 Tracks geplant", "$1 brani pianificati", "$1 faixas planejadas", "$1 nummers gepland"]],
     [/^1 track$/, ["1 tema", "1 titre", "1 Track", "1 brano", "1 faixa", "1 track"]],
     [/^(\d+) tracks? · (\d+) smooth, (\d+) workable, (\d+) clashing$/, ["$1 temas · $2 suaves, $3 aceptables, $4 chocan", "$1 titres · $2 fluides, $3 jouables, $4 en clash", "$1 Tracks · $2 geschmeidig, $3 machbar, $4 kollidierend", "$1 brani · $2 fluidi, $3 accettabili, $4 in conflitto", "$1 faixas · $2 suaves, $3 aceitáveis, $4 em choque", "$1 tracks · $2 soepel, $3 werkbaar, $4 botsend"]],
     [/^(\d) stars$/, ["$1 estrellas", "$1 étoiles", "$1 Sterne", "$1 stelle", "$1 estrelas", "$1 sterren"]],
