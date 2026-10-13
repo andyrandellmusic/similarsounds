@@ -7,7 +7,7 @@ a { color: inherit; }
 .top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 26px; }
 .brand { font-weight: 800; font-size: 24px; letter-spacing: -0.03em; text-decoration: none; white-space: nowrap; }
 .brand span { color: var(--accent); }
-.brand svg { height: 0.86em; width: 1.31em; vertical-align: -0.065em; margin-right: 0.07em; }
+.brand svg { height: 0.82em; width: 0.82em; vertical-align: -0.07em; margin-right: 0.16em; }
 .cta { font-size: 13px; font-weight: 700; text-decoration: none; background: var(--accent); color: #0b0b0f; border-radius: 10px; padding: 9px 12px; white-space: nowrap; }
 .crumbs { color: var(--muted); font: 500 12px "JetBrains Mono", monospace; margin-bottom: 10px; }
 .crumbs a { color: var(--muted); text-decoration: none; }

@@ -13,9 +13,8 @@ from app.artists import main_artist
 SITE = "https://www.similarsounds.com"
 BPM_WINDOWS = [(lo, lo + 2) for lo in range(110, 136, 2)]   # 110-112 … 134-136
 
-LOGO = ('<svg viewBox="16 39 64 42" aria-hidden="true"><path d="M37 39 L58 60 L37 81 L16 60 Z" fill="#f2f2f5"/>'
-        '<path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#0b0b0f" stroke-width="12"/>'
-        '<path d="M59 43.95 L75.05 60 L59 76.05 L42.95 60 Z" fill="none" stroke="#c6ff3d" stroke-width="7"/></svg>')
+LOGO = ('<svg viewBox="0 0 140 140" aria-hidden="true"><path d="M0 70A70 70 0 0 1 70 0V35A35 35 0 0 0 35 70Z M140 0A70 70 0 0 1 70 70V35A35 35 0 0 0 105 0Z" fill="#f2f2f5"/>'
+        '<path d="M0 140A70 70 0 0 1 70 70V105A35 35 0 0 0 35 140Z M140 70A70 70 0 0 1 70 140V105A35 35 0 0 0 105 70Z" fill="#c6ff3d"/></svg>')   # two stacked waves: white over green
 
 
 def slugify(text: str, limit: int = 70) -> str:
@@ -102,9 +101,9 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta property="og:title" content="{escape(title)}">
 <meta property="og:description" content="{escape(description)}">
 <meta property="og:url" content="{SITE}{path}">
-<meta property="og:image" content="{SITE}/static/og.png">
+<meta property="og:image" content="{SITE}/static/og.png?v=2">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="/static/apple-touch-icon.png">
+<link rel="icon" href="/static/apple-touch-icon.png?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/static/pages.css?v=5">
 {jsonld}
