@@ -927,9 +927,11 @@
     header { display: none; }
     .brand-row { margin-top: 0; }
     .wrap { padding-top: 16px; }
-    .brand-row { gap: 10px 8px; flex-wrap: wrap; }
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 200px) / 7.8), 32px); }   /* as big as the room beside sign-in, language and menu allows */
-    .top-tools { gap: 6px; }
+    /* phones: the logo centred on its own line, every button in one neat centred row underneath */
+    .brand-row { flex-direction: column; align-items: center; gap: 14px; }
+    .brand { align-items: center; }
+    .brand-row .logo { font-size: clamp(26px, 8.6vw, 34px); }
+    .top-tools { margin-left: 0; justify-content: center; flex-wrap: nowrap; gap: 8px; }
     .tok-pill, .lang-mini { height: 40px; padding: 0 10px; gap: 5px; }
     .tagline { margin-top: 6px; font-size: 11.5px; }
     .tok-l, .lang-code, .top-tools .acct-txt { display: none; }
@@ -1095,8 +1097,7 @@
     .filters { gap: 10px 14px; }
   }
   @media (max-width: 360px) {
-    .brand-row .logo { font-size: clamp(14px, calc((100vw - 32px - 180px) / 7.8), 32px); }
-    .top-tools { gap: 4px; }
+    .top-tools { gap: 5px; }
     .tok-pill, .lang-mini { height: 36px; padding: 0 7px; }
     .top-tools .acct-btn { min-height: 36px; padding: 3px; }
     .menu-btn { width: 36px; height: 36px; }
