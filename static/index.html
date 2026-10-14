@@ -218,6 +218,9 @@
   .try-wrap .try-item { width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; transform: none; }
   .try-wrap .add { justify-self: stretch; justify-content: center; height: 36px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.02); }
   .try-wrap .add:hover { background: rgba(198,255,61,.08); }
+  .nudge { animation: nudge .38s ease; }
+  @keyframes nudge { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+  @media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }
   /* phones: "Add to set" sits on the right of the row instead of a full-width bar underneath */
   @media (max-width: 640px) {
     .try-wrap { grid-template-rows: none; grid-template-columns: 1fr auto; align-items: center; }
@@ -1478,7 +1481,15 @@ document.addEventListener("click", e => {
 // Set when the visitor chooses "show matches anyway" for a track that doesn't look like house;
 // a new search resets it, filter changes keep it.
 let allowNonHouse = false;
-$("#form").onsubmit = e => { e.preventDefault(); closeSuggest(); allowNonHouse = false; resultLimit = 30; run(); };
+$("#form").onsubmit = e => {
+  e.preventDefault();
+  if (!$("#url").value.trim()) { nudge($("#url")); return; }      // nothing typed: point at the box instead of doing nothing
+  closeSuggest(); allowNonHouse = false; resultLimit = 30; run();
+};
+function nudge(input) {
+  input.focus(); const box = input.closest(".search-wrap, .describe-wrap, form") || input;
+  box.classList.remove("nudge"); void box.offsetWidth; box.classList.add("nudge");
+}
 let resultLimit = 30;
 
 // When a track is picked from the suggestions, remember its exact Deezer link for as long
@@ -3202,6 +3213,7 @@ try { if (localStorage.getItem("ss_mode") === "describe") setSearchMode("describ
 $("#describe-form").addEventListener("submit", e => {
   e.preventDefault();
   const act = $("#dsuggest .dsg-item.active"); if (act && !$("#dsuggest").hidden) { pickDword(act.dataset.p); return; }
+  if (!$("#describe-q").value.trim()) { nudge($("#describe-q")); return; }
   closeDsuggest(); $("#describe-q").blur(); describeSound($("#describe-q").value);
 });
 document.addEventListener("click", e => {
