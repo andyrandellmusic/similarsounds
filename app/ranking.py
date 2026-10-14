@@ -1,4 +1,5 @@
 """Scoring: sound similarity x key x BPM x energy x recency."""
+import re
 from collections import Counter
 
 import numpy as np
@@ -41,6 +42,9 @@ def recency_boost(age_days: np.ndarray) -> np.ndarray:
     return 1 + RECENCY_MAX_BOOST * 0.5 ** (age / RECENCY_HALF_LIFE_DAYS)
 
 
+MAX_PER_ARTIST = 2
+
+
 def rank(index, query: dict, *, exclude_id=None, max_age_days=None, strict_key=False,
          bpm_range=6.0, style=None, limit=30) -> tuple[list[dict], str | None]:
     if not index.rows:
@@ -70,12 +74,19 @@ def rank(index, query: dict, *, exclude_id=None, max_age_days=None, strict_key=F
         mask[index.ids[exclude_id]] = False
 
     score = np.where(mask, score, -1)
-    order = np.argsort(-score)[:limit]
+    order = np.argsort(-score)[:limit * 10]
     results = []
+    per_artist, songs = Counter(), set()
     for i in order:
-        if score[i] < 0:
+        if score[i] < 0 or len(results) >= limit:
             break
         r = index.rows[i]
+        # variety: at most MAX_PER_ARTIST tracks by one artist, and one version of each song
+        artist = re.split(r",| & | feat\.? | x ", (r["artist"] or "").lower())[0].strip()
+        song = (artist, re.sub(r"\s*[\(\[].*$", "", (r["title"] or "").lower()).strip())
+        if per_artist[artist] >= MAX_PER_ARTIST or song in songs:
+            continue
+        per_artist[artist] += 1; songs.add(song)
         results.append({
             "deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
             "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],

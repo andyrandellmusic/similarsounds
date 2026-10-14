@@ -317,6 +317,7 @@
   .legal-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 6px; }
   .legal-links a { color: var(--text); text-decoration: none; font-weight: 600; }
   .legal-links a:hover { color: var(--accent); }
+  @media (max-width: 640px) { .legal-links { gap: 0 18px; } .legal-links a { padding: 7px 0; font-size: 13px; } }   /* easier to tap */
   footer p { margin: 0 0 6px; }
   footer .copy { color: #9a9aac; }
   .problem { margin-top: 28px; padding: 18px 20px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); }
