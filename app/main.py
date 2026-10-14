@@ -56,6 +56,10 @@ async def redirect_to_canonical(request: Request, call_next):
     if request.url.path.startswith("/static/") and response.status_code == 200:
         response.headers["Cache-Control"] = ("public, max-age=31536000, immutable" if "v=" in request.url.query
                                              else "public, max-age=86400")
+    # Pages: browsers must check for a newer version every time (a quick 304 when nothing changed),
+    # so a new release shows up on the next visit instead of an old saved copy.
+    elif "text/html" in response.headers.get("content-type", "") and "Cache-Control" not in response.headers:
+        response.headers["Cache-Control"] = "no-cache"
     return response
 
 
