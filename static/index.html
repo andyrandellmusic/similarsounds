@@ -248,15 +248,15 @@
   /* "Now playing" bar: stays at the bottom while a preview or the video plays, so you can pause from anywhere */
   .nowbar { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%); z-index: 39;
     width: min(460px, calc(100% - 24px)); display: grid; grid-template-columns: 44px 1fr auto auto; gap: 10px; align-items: center;
-    /* frosted glass: a dark smoky tint over a heavy blur, with a fine frost grain and a thin green edge */
-    background-color: rgba(18,19,25,.55); border: 1px solid rgba(198,255,61,.45); border-radius: 14px; padding: 7px 8px 7px 7px;
+    /* frosted glass: a dark purple tint over a heavy blur, with a fine frost grain and a thin green edge */
+    background-color: rgba(42,16,72,.62); border: 1px solid rgba(198,255,61,.55); border-radius: 14px; padding: 7px 8px 7px 7px;
     box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 12px 40px rgba(0,0,0,.45);
     backdrop-filter: blur(24px) saturate(120%) brightness(.75); -webkit-backdrop-filter: blur(24px) saturate(120%) brightness(.75);
     isolation: isolate; overflow: hidden;
     transition: transform .25s ease, opacity .25s ease; opacity: 0; pointer-events: none; }
   .nowbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .14; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background-color: rgba(44,46,54,.94); } }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background-color: rgba(40,16,68,.95); } }
   .nowbar.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
   .nowbar img, .nowbar .nb-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
   .nowbar .nb-logo { display: grid; place-items: center; } .nowbar .nb-logo svg { width: 26px; height: 26px; }
