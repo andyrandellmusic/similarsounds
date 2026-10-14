@@ -246,16 +246,11 @@
   /* "Now playing" bar: stays at the bottom while a preview or the video plays, so you can pause from anywhere */
   .nowbar { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%); z-index: 39;
     width: min(460px, calc(100% - 24px)); display: grid; grid-template-columns: 44px 1fr auto auto; gap: 10px; align-items: center;
-    /* a glass front: see-through and blurred, a bright top edge and a soft shine across the face */
-    background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.03) 45%, rgba(255,255,255,.02)), rgba(22,24,30,.42);
-    border: 1px solid rgba(255,255,255,.16); border-top-color: rgba(255,255,255,.32); border-radius: 16px; padding: 7px 8px 7px 7px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.22), inset 0 -1px 0 rgba(255,255,255,.04), inset 0 0 0 1px rgba(198,255,61,.12),
-      0 14px 44px rgba(0,0,0,.55), 0 0 26px rgba(198,255,61,.08);
-    backdrop-filter: blur(18px) saturate(170%); -webkit-backdrop-filter: blur(18px) saturate(170%); overflow: hidden; isolation: isolate;
+    /* the original bar, but see-through: the page shows faintly behind it */
+    background: rgba(20,20,27,.62); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 7px 8px 7px 7px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     transition: transform .25s ease, opacity .25s ease; opacity: 0; pointer-events: none; }
-  .nowbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
-    background: linear-gradient(115deg, rgba(255,255,255,.16) 0%, rgba(255,255,255,.05) 28%, transparent 29%, transparent 62%, rgba(255,255,255,.05) 63%, transparent 80%); }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background-color: rgba(22,24,30,.94); } }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background: rgba(20,20,27,.9); } }
   .nowbar.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
   .nowbar img, .nowbar .nb-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
   .nowbar .nb-logo { display: grid; place-items: center; } .nowbar .nb-logo svg { width: 26px; height: 26px; }
