@@ -105,7 +105,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=8">
+<link rel="stylesheet" href="/static/pages.css?v=9">
 {jsonld}
 </head>
 <body>
@@ -122,8 +122,29 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
     <p>Previews and track details by Deezer. Key, BPM and energy are estimates from 30-second previews. Not affiliated with Deezer, SoundCloud, YouTube or Beatport.</p>
   </footer>
 </div>
+<script>
+/* tap any artwork to hear its preview; tap again (or another) to stop */
+(() => {{
+  let audio = null, on = null;
+  const stop = () => {{ if (audio) audio.pause(); audio = null; on?.classList.remove("on"); on = null; }};
+  const play = el => {{
+    if (on === el) {{ stop(); return; }}
+    stop(); on = el; el.classList.add("on");
+    audio = new Audio(`/api/clip/${{el.dataset.clip}}`); audio.onended = stop;
+    audio.play().catch(stop);
+  }};
+  document.addEventListener("click", e => {{ const el = e.target.closest("[data-clip]"); if (!el) return; e.preventDefault(); e.stopPropagation(); play(el); }}, true);
+  document.addEventListener("keydown", e => {{ const el = e.target.closest?.("[data-clip]"); if (el && (e.key === "Enter" || e.key === " ")) {{ e.preventDefault(); play(el); }} }});
+}})();
+</script>
 </body>
 </html>"""
+
+
+def art(cover: str | None, deezer_id: int, title: str, size: int = 56) -> str:
+    """Artwork with a play button on it: tap to hear the 30-second preview (the page's little script plays it)."""
+    return (f'<span class="art" style="width:{size}px;height:{size}px"><img src="{escape(cover or "")}" alt="" loading="lazy" width="{size}" height="{size}">'
+            f'<span class="pp" role="button" tabindex="0" data-clip="{deezer_id}" aria-label="Play a preview of {escape(title)}"></span></span>')
 
 
 def chips(t: dict, match: int | None = None) -> str:
@@ -139,7 +160,7 @@ def track_list(rows: list[dict], today: date) -> str:
         age = (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None
         meta = " · ".join(escape(x) for x in [r["artist"], r["label"] or "", r["style"] or ""] if x)
         items.append(f"""<li><a class="row" href="{track_path(r)}">
-      <img src="{escape(r['cover'] or '')}" alt="" loading="lazy" width="56" height="56">
+      {art(r['cover'], r['deezer_id'], r['title'])}
       <span class="meta"><span class="t">{escape(r['title'])}</span><span class="a">{meta}</span>
       <span class="chips">{chips(r)}{f'<span class="chip">{ago(age)}</span>' if age is not None else ''}</span></span>
     </a></li>""")
@@ -159,7 +180,7 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
         meta = " · ".join(escape(x) for x in [t["artist"], t["label"] or "", t["style"] or ""] if x)
         rows.append(f"""<li><a class="row" href="{track_path(t)}">
       <span class="n">{i}</span>
-      <img src="{escape(t['cover'] or '')}" alt="" loading="lazy" width="56" height="56">
+      {art(t['cover'], t['deezer_id'], t['title'])}
       <span class="meta"><span class="t">{escape(t['title'])}</span><span class="a">{meta}</span>
       <span class="chips">{chips(t, t['similarity'])}<span class="chip">{ago(age)}</span></span>
       <span class="mix {cls}"><i></i>{label}</span></span>
@@ -176,7 +197,7 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
     body = f"""<nav class="crumbs" aria-label="Breadcrumb">{crumbs}</nav>
   <h1>Tracks similar to {escape(r['title'])} <span>by {escape(r['artist'])}</span></h1>
   <section class="ref">
-    <img src="{escape(r['cover'] or '')}" alt="" width="96" height="96">
+    {art(r['cover'], r['deezer_id'], r['title'], 96)}
     <div><div class="label">Reference track</div>
       <div class="t">{escape(r['title'])}</div><div class="a">{escape(r['artist'])}{' · ' + meta if meta else ''}</div>
       <div class="chips">{chips(r)}</div>
@@ -270,7 +291,7 @@ def artist_page(artists, name: str) -> str:
     for a in like:
         ex = a["example"]
         items.append(f"""<li><a class="row" href="{artist_path(a['name'])}">
-      <img src="{escape(ex['cover'] or '')}" alt="" loading="lazy" width="56" height="56">
+      {art(ex['cover'], ex['deezer_id'], ex['title'])}
       <span class="meta"><span class="t">{escape(a['name'])}</span>
       <span class="a">For example: {escape(ex['title'])}{' · ' + escape(ex['style']) if ex['style'] else ''}</span>
       <span class="chips"><span class="chip match">{a['similarity']}% alike</span><span class="chip">{a['tracks']} track{'s' if a['tracks'] != 1 else ''}</span></span></span>

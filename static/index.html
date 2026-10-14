@@ -210,6 +210,10 @@
   .try-play { position: absolute; inset: 0; display: grid; place-items: center; border-radius: 8px; background: rgba(0,0,0,.28); cursor: pointer; }
   .try-play svg { width: 30px; height: 30px; padding: 6px; border-radius: 50%; background: var(--accent); fill: var(--accent-ink); box-sizing: border-box; }
   .try-play .pa, .try-play.on .pi { display: none; }
+  /* small artwork (search suggestions, gap ideas): a smaller play button */
+  .try-cover.art-sm { width: 34px; height: 34px; } .try-cover.art-sm img { width: 34px; height: 34px; border-radius: 6px; object-fit: cover; display: block; }
+  .try-cover.art-gap, .try-cover.art-gap img { width: 36px; height: 36px; }
+  .art-sm .try-play { border-radius: 6px; } .art-sm .try-play svg { width: 20px; height: 20px; padding: 4px; }
   .try-play.on .pa { display: inline; }
   .try-play.on { background: rgba(0,0,0,.45); }
   /* describe results: the box and its Add to set button are one card */
@@ -1651,13 +1655,17 @@ async function loadFresh() {
     $("#fresh").hidden = false;
   } catch {}
 }
+// every piece of artwork gets a play button: tap it to hear the preview (tap the rest to open the track)
+function artPlay(id, cover, title, cls = "") {
+  return `<span class="try-cover ${cls}"><img src="${esc(cover || "")}" alt="" loading="lazy"><span class="try-play" role="button" tabindex="0" data-tplay="${id}" aria-label="Play a preview of ${esc(title || "this track")}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pi" d="M8 5v14l11-7z"/><path class="pa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></span></span>`;
+}
 function examplesHtml(list, playable = false) {
   return list.map(t => {
     const m = t.title.match(/^(.*?)\s*[(\[](.+)[)\]]\s*$/);   // "Title (X Remix)" -> "Title" + "X Remix"
     const title = m ? m[1] : t.title, version = m ? m[2] : "";
     const box = `
     <button type="button" class="try-item" data-try="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}">
-      ${playable ? `<span class="try-cover"><img src="${esc(t.cover)}" alt="" loading="lazy"><span class="try-play" role="button" tabindex="0" data-tplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)}"><svg viewBox="0 0 24 24" aria-hidden="true"><path class="pi" d="M8 5v14l11-7z"/><path class="pa" d="M7 5h4v14H7zM13 5h4v14h-4z"/></svg></span></span>` : `<img src="${esc(t.cover)}" alt="" loading="lazy">`}
+      ${artPlay(t.deezer_id, t.cover, t.title)}
       <span class="try-txt">
         <span class="tt">${esc(title)}</span>
         <span class="ta">${esc(t.artist)}${version ? ` · ${esc(version)}` : ""}</span>
@@ -2442,7 +2450,7 @@ function showSuggest({ artists = [], tracks = [], artist }, v) {
     tracks.forEach(t => {
       sgItems.push({ type: "track", value: `${t.artist} - ${t.title}`, id: t.deezer_id });
       html += `<div class="sg-item" role="option" id="sg-${sgItems.length - 1}" data-i="${sgItems.length - 1}">
-        ${t.cover ? `<img src="${esc(t.cover)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
+        ${t.cover ? artPlay(t.deezer_id, t.cover, t.title, "art-sm") : `<div class="ph"></div>`}
         <div class="sg-main"><div class="sg-name">${highlight(t.title, typed)}</div>
         <div class="sg-sub">${esc(t.artist)}${t.release_date ? " · " + esc(t.release_date.slice(0, 4)) : ""}</div></div>
         ${t.in_catalogue ? `<span class="sg-tag">${esc(t.camelot)} · ${esc(t.bpm)}</span>` : ""}
@@ -2487,7 +2495,7 @@ function showRecent() {
   sgItems = recent.map(r => ({ type: "track", value: r.label, id: r.id }));
   box.innerHTML = `<div class="sg-head sg-head-row"><span>Recent searches</span><button type="button" class="sg-clear" id="sg-clear">Clear</button></div>` + recent.map((r, i) => `
     <div class="sg-item" role="option" id="sg-${i}" data-i="${i}">
-      ${r.cover ? `<img src="${esc(r.cover)}" alt="" loading="lazy">` : `<div class="ph"></div>`}
+      ${r.cover ? (r.id ? artPlay(r.id, r.cover, r.label, "art-sm") : `<img src="${esc(r.cover)}" alt="" loading="lazy">`) : `<div class="ph"></div>`}
       <div class="sg-main"><div class="sg-name">${esc(r.label)}</div></div></div>`).join("");
   box.hidden = false; sgActive = -1; sgLastQ = "";
   input.setAttribute("aria-expanded", "true");
@@ -3455,11 +3463,19 @@ let nbPausedRow = null, nbShown = "";
 function nbTrack(id) {
   return trackCache[id] || (typeof set !== "undefined" && set.find(t => String(t.deezer_id) === String(id))) || null;
 }
+// a track that isn't in the cache (a suggestion, a fresh release): read its name off the page
+function nbFromPage(btn) {
+  const box = btn.closest(".try-item, .sg-item, .gap-item"); if (!box) return null;
+  const txt = sel => box.querySelector(sel)?.textContent.trim() || "";
+  const title = txt(".tt") || txt(".sg-name") || txt(".t");
+  const artist = txt(".ta") || txt(".sg-sub").split(" · ")[0] || txt(".a").split(" · ")[0];
+  return { title, artist, cover: box.querySelector("img")?.src };
+}
 function nbState() {
   if ($("#mixbar")) return null;
   if (boxAudio && boxBtn) {
     const id = boxBtn.dataset.tplay || boxBtn.dataset.setplay;
-    return { kind: "box", id, playing: !boxAudio.paused, t: nbTrack(id), el: boxBtn };
+    return { kind: "box", id, playing: !boxAudio.paused, t: nbTrack(id) || nbFromPage(boxBtn), el: boxBtn };
   }
   const row = document.querySelector(".row.playing");
   if (row) { nbPausedRow = null; const id = row.dataset.id || row.querySelector(".play")?.dataset.id; return { kind: "row", id, playing: true, t: nbTrack(id), el: row }; }
@@ -3745,7 +3761,7 @@ document.addEventListener("click", async e => {
       : "No single track bridges these two smoothly. Closest options (or try moving one of the tracks):";
     box.innerHTML = `<p>${lead}</p>` + ranked.slice(0, 3).map(({ t, before, after }) => {
       trackCache[t.deezer_id] = t;
-      return `<div class="gap-item"><img src="${esc(t.cover)}" alt="">
+      return `<div class="gap-item">${artPlay(t.deezer_id, t.cover, t.title, "art-sm art-gap")}
         <div style="min-width:0"><div class="t">${esc(t.title)}</div><div class="a">${esc(t.artist)} · ${esc(t.camelot)} · ${esc(t.bpm)} BPM · energy ${esc(t.energy)}</div>
           <div class="fit">Before: <b class="${before.cls}">${before.label}</b> · After: <b class="${after.cls}">${after.label}</b></div></div>
         <button type="button" class="ins" data-insert="${t.deezer_id}" data-at="${i}">Insert</button></div>`;

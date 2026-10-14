@@ -129,3 +129,17 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
 .az { scroll-margin-top: 64px; }
 .az h2 { font-size: 18px; margin: 22px 0 10px; color: var(--accent); }
 .az[hidden], .pill[hidden] { display: none; }
+
+/* artwork with a play button */
+.art { position: relative; flex: none; display: block; border-radius: 8px; overflow: hidden; }
+.art img { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: inherit; }
+.ref .art { border-radius: 10px; }
+.pp { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(11,11,15,.28); cursor: pointer; }
+.pp::before { content: ""; width: 28px; height: 28px; border-radius: 50%; box-shadow: 0 2px 8px rgba(0,0,0,.5);
+  background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 2 L8 5 L3 8 Z' fill='%230b0b0f'/%3E%3C/svg%3E") center/11px no-repeat; }
+.ref .pp::before { width: 40px; height: 40px; background-size: 15px; }
+.pp.on { background: rgba(11,11,15,.45); }
+.pp.on::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 2h1.8v6H2.5zM5.7 2h1.8v6H5.7z' fill='%230b0b0f'/%3E%3C/svg%3E"); }
+.pp:hover::before { transform: scale(1.08); }
+.pp:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+@media (max-width: 560px) { .ref .art { width: 72px !important; height: 72px !important; } .row .art { width: 48px !important; height: 48px !important; } }
