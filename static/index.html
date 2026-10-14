@@ -350,10 +350,14 @@
   /* the three steps: one card in the same style as the sections below */
   /* the three steps: a card each, with a small green arrow leading from one to the next */
   .steps { list-style: none; padding: 0; margin: 30px 0 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 30px; counter-reset: none; }
-  .steps li { position: relative; display: flex; gap: 13px; align-items: flex-start; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 16px 18px;
-    background: linear-gradient(180deg, #17171f, #111117); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.22);
-    transition: border-color .2s, transform .2s; }
-  .steps li:hover { border-color: #3a3a4a; transform: translateY(-2px); }
+  /* same card as the fresh releases below: flat panel, thin line, green edge on hover */
+  .steps li { position: relative; display: flex; gap: 13px; align-items: center; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 14px 16px; min-height: 92px;
+    background: var(--panel); border: 1px solid var(--line); border-radius: 14px; transition: border-color .15s, transform .15s; }
+  .steps li:hover { border-color: var(--accent); transform: translateY(-1px); }
+  /* the home page's fresh-release cards: a little roomier, to match the steps above */
+  #try .try-item, #fresh-list .try-item { padding: 14px 16px; min-height: 92px; gap: 14px; }
+  #try .try-cover, #try .try-cover img, #fresh-list .try-cover, #fresh-list .try-cover img { width: 64px; height: 64px; }
+  #try .tt, #fresh-list .tt { font-size: 14.5px; }
   .steps li + li::before { content: ""; position: absolute; left: -22px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%);
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='%23c6ff3d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; opacity: .8; }
   .steps b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: rgba(198,255,61,.12); color: var(--accent);
@@ -1118,12 +1122,12 @@
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
     .steps { grid-template-columns: 1fr; margin: 22px 0 22px; }
-    /* phones: one neat grouped box, steps divided by thin lines */
-    .steps { gap: 0; background: linear-gradient(180deg, #17171f, #111117); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.22); }
-    .steps li { font-size: 12.5px; align-items: center; padding: 12px 14px; gap: 11px; background: none; border: 0; border-radius: 0; box-shadow: none; }
+    /* phones: separate cards, like the fresh releases */
+    .steps { gap: 10px; }
+    .steps li { font-size: 12.5px; padding: 12px 14px; gap: 11px; min-height: 0; }
     .steps li:hover { transform: none; }
-    .steps li + li { border-top: 1px solid var(--line); }
     .steps li + li::before { display: none; }
+    #try .try-item, #fresh-list .try-item { padding: 12px 14px; min-height: 0; }
     .steps strong { display: inline; font-size: 13px; margin: 0 4px 0 0; }
     .steps b { width: 26px; height: 26px; font-size: 12px; }
     .has-set .steps { margin-right: 44px; }        /* room for the set tab beside the card */
