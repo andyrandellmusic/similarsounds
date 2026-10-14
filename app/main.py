@@ -265,13 +265,26 @@ def describe_sound(q: str = Query("", max_length=200)):
 
 
 @app.get("/api/clip/{deezer_id}")
-async def mix_clip(deezer_id: int):
-    """A track's preview clip, for "Hear the mix" (the browser beatmatches two of these)."""
+async def mix_clip(deezer_id: int, request: Request):
+    """A track's preview clip, for "Hear the mix" and one-tap previews. Answers byte-range requests,
+    so the player's drag bar can jump to any point in the track."""
     try:
         data = await run_in_threadpool(mixprev.clip, deezer_id)
     except Exception:
         raise HTTPException(404, "No preview for this track")
-    return Response(data, media_type="audio/mpeg", headers={"Cache-Control": "private, max-age=900"})
+    headers = {"Cache-Control": "private, max-age=900", "Accept-Ranges": "bytes"}
+    m = re.match(r"bytes=(\d*)-(\d*)$", request.headers.get("range", "").strip())
+    if m and (m.group(1) or m.group(2)):
+        size = len(data)
+        if m.group(1):
+            start, end = int(m.group(1)), min(int(m.group(2)) if m.group(2) else size - 1, size - 1)
+        else:                                   # "bytes=-500": the last 500 bytes
+            start, end = max(0, size - int(m.group(2))), size - 1
+        if start >= size or start > end:
+            return Response(status_code=416, headers={"Content-Range": f"bytes */{size}"})
+        headers["Content-Range"] = f"bytes {start}-{end}/{size}"
+        return Response(data[start:end + 1], status_code=206, media_type="audio/mpeg", headers=headers)
+    return Response(data, media_type="audio/mpeg", headers=headers)
 
 
 @app.get("/api/mixinfo")
