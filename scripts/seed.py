@@ -4,6 +4,7 @@ Run daily to keep the catalogue fresh:
     uv run python -m scripts.seed --per-style 120
 """
 import argparse
+import json
 import multiprocessing
 from pathlib import Path
 import os
@@ -58,10 +59,16 @@ def candidates(style: str, queries: list[str], per_style: int, seen: set[int], u
 MAX_AGE_DAYS = 730   # only add releases from the last 2 years: newer music matters most
 
 
+BLOCKED_FILE = Path(__file__).resolve().parent.parent / "data" / "blocked_artists.json"
+BLOCKED = {a.lower() for a in (json.loads(BLOCKED_FILE.read_text())["artists"] if BLOCKED_FILE.exists() else [])}
+
+
 def fetch(track_id: int, style: str) -> tuple[dict, bytes] | None:
     from datetime import timedelta
     t = sources.deezer_track(track_id)
     if not t.get("preview") or not release_date_ok(t.get("release_date")):
+        return None
+    if (t.get("artist") or {}).get("name", "").lower() in BLOCKED:     # artists taken off the site never come back
         return None
     if t["release_date"] < (date.today() - timedelta(days=MAX_AGE_DAYS)).isoformat():
         return None
