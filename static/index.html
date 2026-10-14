@@ -3689,14 +3689,33 @@ function tickRing() {
   r.style.strokeDasharray = `${left * 100} 100`;
   requestAnimationFrame(tickRing);
 }
+// a track's preview link straight from Deezer (JSONP, so it works from the browser without our server)
+function deezerPreview(id) {
+  return new Promise(done => {
+    const cb = "dzp" + Math.random().toString(36).slice(2), s = document.createElement("script");
+    const end = url => { delete window[cb]; s.remove(); clearTimeout(timer); done(url || null); };
+    const timer = setTimeout(() => end(null), 6000);
+    window[cb] = d => end(d && d.preview);
+    s.src = `https://api.deezer.com/track/${encodeURIComponent(id)}?output=jsonp&callback=${cb}`;
+    s.onerror = () => end(null);
+    document.head.appendChild(s);
+  });
+}
 function toggleBoxPlay(b) {
   if (boxBtn === b) { stopBoxPlay(); return; }
   stopBoxPlay(); stopAllPlayers("box");
   boxBtn = b; b.classList.add("on");
   const id = b.dataset.tplay || b.dataset.setplay;
-  boxAudio = new Audio(`/api/clip/${id}`);
-  boxAudio.onended = stopBoxPlay;
-  boxAudio.play().then(() => { countPlay(); markPlayed(id); countForMost(id); requestAnimationFrame(tickRing); }).catch(stopBoxPlay);
+  const a = boxAudio = new Audio(`/api/clip/${id}`);
+  a.onended = stopBoxPlay;
+  const started = () => { countPlay(); markPlayed(id); countForMost(id); requestAnimationFrame(tickRing); };
+  a.play().then(started).catch(async () => {
+    // our server (in Germany) can't get previews for tracks that aren't licensed there: ask Deezer from
+    // the visitor's own browser, which gets the preview for their country
+    const url = await deezerPreview(id);
+    if (!url || boxAudio !== a) { if (boxAudio === a) stopBoxPlay(); return; }
+    a.src = url; a.play().then(started).catch(() => { if (boxAudio === a) stopBoxPlay(); });
+  });
 }
 document.addEventListener("click", e => {          // capture phase, so tapping the cover doesn't open the track's matches
   const b = e.target.closest("[data-tplay]"); if (!b) return;
