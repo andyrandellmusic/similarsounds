@@ -62,6 +62,13 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
   .cta { font-size: 12px; padding: 8px 10px; }
   .ref img { width: 72px; height: 72px; }
   .row .n { display: none; }
+  /* compact rows: chips on one line, a smaller cover */
+  .row { gap: 10px; padding: 8px; }
+  .row img { width: 48px; height: 48px; }
+  .row .chips { flex-wrap: nowrap; gap: 4px; overflow: hidden; margin-top: 5px; }
+  .row .chip { font-size: 10.5px; padding: 2px 4px; white-space: nowrap; }
+  .row .mix { margin-top: 4px; }
+  .row .chip .w { display: none; }      /* "79%" and "5/10": the words go, so the release age fits too */
 }
 .g-arr { font-style: normal; color: var(--accent); font-weight: 800; }
 

@@ -105,7 +105,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=6">
+<link rel="stylesheet" href="/static/pages.css?v=8">
 {jsonld}
 </head>
 <body>
@@ -128,9 +128,9 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 
 def chips(t: dict, match: int | None = None) -> str:
     return (f'<span class="chip cam" style="background:{camelot_color(t["camelot"])}" title="{escape(t["key"] or "")}">{escape(t["camelot"])}</span>'
-            + (f'<span class="chip match">{match}% match</span>' if match is not None else '')
+            + (f'<span class="chip match">{match}%<span class="w"> match</span></span>' if match is not None else '')
             + f'<span class="chip">{round(t["bpm"])} BPM</span>'
-            f'<span class="chip">Energy {int(t["energy"])}/10</span>')
+            f'<span class="chip" title="Energy {int(t["energy"])} out of 10"><span class="w">Energy </span>{int(t["energy"])}/10</span>')
 
 
 def track_list(rows: list[dict], today: date) -> str:
