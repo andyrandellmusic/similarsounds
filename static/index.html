@@ -515,6 +515,9 @@
   .play-ico { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(11,11,15,.35); opacity: 0; transition: opacity .15s; }
   .play-ico::before { content: ""; width: 30px; height: 30px; border-radius: 50%; background: var(--accent) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 2 L8 5 L3 8 Z' fill='%230b0b0f'/%3E%3C/svg%3E") center/12px no-repeat; }
   .row:hover .play-ico, .cover:focus-visible .play-ico, .row.playing .play-ico { opacity: 1; }
+  /* one tap plays the preview straight away (the site's own player): pause icon + green ring while it plays */
+  .cover.play.on .play-ico { opacity: 1; }
+  .cover.play.on .play-ico::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 2h1.8v6H2.5zM5.7 2h1.8v6H5.7z' fill='%230b0b0f'/%3E%3C/svg%3E"); }
   .row.playing .play-ico::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M2.5 2h1.8v6H2.5zM5.7 2h1.8v6H5.7z' fill='%230b0b0f'/%3E%3C/svg%3E"); }
   .title-link { all: unset; cursor: pointer; }
   .title-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
@@ -1666,7 +1669,7 @@ function render({ source, query, results, similar_artists = [] }) {
         <div class="side">
           <span class="chip cam" style="background:${camelotColor(query.camelot)}" title="${esc(query.key)}">${esc(query.camelot)}</span>
           <span class="side-match" title="The track you searched"><b>YOUR</b><small>track</small></span>
-          <button type="button" class="cover play" data-id="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
+          <button type="button" class="cover play" data-id="${query.deezer_id}" data-tplay="${query.deezer_id}" aria-label="Preview ${esc(query.title)} by ${esc(query.artist)}">
             <img src="${esc(query.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
           </button>
         </div>
@@ -1872,7 +1875,7 @@ function renderList() {
       <div class="side">
         <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
         <span class="side-match" title="How close it sounds to your track"><b>${t.similarity}%</b><small>match</small></span>
-        <button type="button" class="cover play" data-id="${t.deezer_id}" aria-label="Preview ${esc(t.title)} by ${esc(t.artist)}">
+        <button type="button" class="cover play" data-id="${t.deezer_id}" data-tplay="${t.deezer_id}" aria-label="Preview ${esc(t.title)} by ${esc(t.artist)}">
           <img src="${esc(t.cover)}" alt="" loading="lazy"><span class="play-ico" aria-hidden="true"></span>
         </button>
       </div>
