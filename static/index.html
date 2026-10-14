@@ -241,6 +241,26 @@
   .mixbar { position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%); z-index: 40; width: min(520px, calc(100% - 24px));
     display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto auto; column-gap: 12px; row-gap: 6px; align-items: center;
     background: var(--panel); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 10px 12px 10px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.55); }
+  /* "Now playing" bar: stays at the bottom while a preview or the video plays, so you can pause from anywhere */
+  .nowbar { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%); z-index: 39;
+    width: min(460px, calc(100% - 24px)); display: grid; grid-template-columns: 44px 1fr auto auto; gap: 10px; align-items: center;
+    background: rgba(20,20,27,.96); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 7px 8px 7px 7px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    transition: transform .25s ease, opacity .25s ease; opacity: 0; pointer-events: none; }
+  .nowbar.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
+  .nowbar img, .nowbar .nb-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
+  .nowbar .nb-logo { display: grid; place-items: center; } .nowbar .nb-logo svg { width: 26px; height: 26px; }
+  .nowbar .nb-txt { min-width: 0; background: none; border: 0; padding: 0; text-align: left; color: var(--text); cursor: pointer; }
+  .nowbar .nb-t { display: block; font: 700 13.5px Inter, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nowbar .nb-a { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nowbar .nb-pp { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; }
+  .nowbar .nb-pp svg { width: 18px; height: 18px; fill: currentColor; }
+  .nowbar .nb-x { width: 34px; height: 42px; border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .nowbar .nb-x:hover { color: var(--text); }
+  html.has-nowbar body { padding-bottom: 76px; }        /* so the bottom of the page can still scroll clear of the bar */
+  html.has-nowbar .to-top { bottom: calc(84px + env(safe-area-inset-bottom)); }
+  @media (pointer: coarse) { html.has-nowbar .to-top { bottom: calc(140px + env(safe-area-inset-bottom)); } }
+  @media (prefers-reduced-motion: reduce) { .nowbar { transition: none; } }
   .mixbar .mb-ico { grid-row: 1 / 3; font-size: 22px; }
   .mixbar .mb-txt { font: 600 13.5px Inter, sans-serif; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .mixbar .mb-txt b { color: var(--accent); }
@@ -1338,6 +1358,12 @@
       </div>
       <div class="review-thanks" id="review-thanks" hidden role="status">Thank you!</div>
     </div>
+  </div>
+  <div class="nowbar" id="nowbar" role="region" aria-label="Now playing" aria-hidden="true">
+    <span class="nb-art"></span>
+    <button type="button" class="nb-txt" title="Show this track"><span class="nb-t"></span><span class="nb-a"></span></button>
+    <button type="button" class="nb-pp" aria-label="Pause"></button>
+    <button type="button" class="nb-x" aria-label="Stop">×</button>
   </div>
   <button type="button" class="to-top" id="to-top" aria-label="Back to the top" title="Back to the top"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -3172,6 +3198,73 @@ addEventListener("blur", () => setTimeout(() => {
   const f = document.activeElement;
   if (f && f.tagName === "IFRAME") stopAllPlayers(f.closest(".row") ? "row" : "", f);
 }, 0));
+
+/* ---------- "Now playing" bar: whatever is playing (a track preview or the how-it-works video) gets a small
+   bar at the bottom of the screen with play / pause, so you can control it from anywhere on the page.
+   Hear the mix has its own bar, so this one steps aside while a mix plays. */
+const NB_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5v13l10.5-6.5z"/></svg>',
+      NB_PAUSE = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg>';
+let nbPausedRow = null, nbShown = "";
+function nbTrack(id) {
+  return trackCache[id] || (typeof set !== "undefined" && set.find(t => String(t.deezer_id) === String(id))) || null;
+}
+function nbState() {
+  if ($("#mixbar")) return null;
+  if (boxAudio && boxBtn) {
+    const id = boxBtn.dataset.tplay || boxBtn.dataset.setplay;
+    return { kind: "box", id, playing: !boxAudio.paused, t: nbTrack(id), el: boxBtn };
+  }
+  const row = document.querySelector(".row.playing");
+  if (row) { nbPausedRow = null; const id = row.dataset.id || row.querySelector(".play")?.dataset.id; return { kind: "row", id, playing: true, t: nbTrack(id), el: row }; }
+  if (nbPausedRow) {
+    const el = document.querySelector(`.row .play[data-id="${nbPausedRow}"]`)?.closest(".row");
+    if (el) return { kind: "row", id: nbPausedRow, playing: false, t: nbTrack(nbPausedRow), el };
+    nbPausedRow = null;
+  }
+  const v = $("#how-video video");
+  if (v && !v.ended && (v.currentTime > 0) && $("#vplay")?.hidden) return { kind: "video", playing: !v.paused, el: $("#how-video") };
+  return null;
+}
+function nbSync() {
+  const bar = $("#nowbar"); if (!bar) return;
+  const st = nbState();
+  bar.classList.toggle("show", !!st); bar.setAttribute("aria-hidden", String(!st));
+  document.documentElement.classList.toggle("has-nowbar", !!st);
+  if (!st) { nbShown = ""; return; }
+  const key = `${st.kind}:${st.id || ""}`;
+  if (key !== nbShown) {
+    nbShown = key;
+    const t = st.t || {};
+    bar.querySelector(".nb-art").innerHTML = st.kind === "video"
+      ? `<span class="nb-logo">${document.querySelector(".vplay-logo svg")?.outerHTML || ""}</span>`
+      : `<img src="${esc(t.cover || "")}" alt="">`;
+    bar.querySelector(".nb-t").textContent = st.kind === "video" ? "How SimilarSounds works" : (t.title || "Preview");
+    bar.querySelector(".nb-a").textContent = st.kind === "video" ? "45-second video" : (t.artist || "");
+  }
+  const pp = bar.querySelector(".nb-pp");
+  const want = st.playing ? "pause" : "play";
+  if (pp.dataset.s !== want) { pp.dataset.s = want; pp.innerHTML = st.playing ? NB_PAUSE : NB_PLAY; pp.setAttribute("aria-label", st.playing ? "Pause" : "Play"); }
+}
+setInterval(nbSync, 400);
+$("#nowbar").addEventListener("click", e => {
+  const st = nbState(); if (!st) return;
+  if (e.target.closest(".nb-x")) {
+    if (st.kind === "box") stopBoxPlay();
+    else if (st.kind === "row") { nbPausedRow = null; st.el.querySelector(".play")?.click(); if (st.el.classList.contains("playing")) st.el.querySelector(".play")?.click(); }
+    else if (st.kind === "video") { const v = $("#how-video video"); v.pause(); v.dispatchEvent(new Event("ended")); }
+  } else if (e.target.closest(".nb-pp")) {
+    if (st.kind === "box") { if (boxAudio.paused) boxAudio.play().then(() => requestAnimationFrame(tickRing)).catch(() => {}); else boxAudio.pause(); }
+    else if (st.kind === "row") {
+      // Deezer's own player can't be paused from outside it: pausing closes it, play opens it again
+      if (st.playing) { nbPausedRow = st.id; st.el.querySelector(".play")?.click(); }
+      else { nbPausedRow = null; st.el.querySelector(".play")?.click(); }
+    }
+    else if (st.kind === "video") { const v = $("#how-video video"); if (v.paused) v.play().catch(() => {}); else v.pause(); }
+  } else if (e.target.closest(".nb-txt")) {
+    st.el?.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "center" });
+  }
+  nbSync();
+});
 
 /* ---------- Play a preview right from a box (Describe a sound results): tap the cover to play / pause */
 var bootLoad = true;                     // true until the visitor first touches the page after a (re)load
