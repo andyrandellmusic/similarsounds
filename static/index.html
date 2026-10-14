@@ -225,8 +225,10 @@
   @media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }
   /* phones: "Add to set" sits on the right of the row instead of a full-width bar underneath */
   @media (max-width: 640px) {
-    .try-wrap { grid-template-rows: none; grid-template-columns: 1fr auto; align-items: center; }
-    .try-wrap .add { justify-self: end; height: 34px; margin-right: 10px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
+    .try-wrap { grid-template-rows: none; grid-template-columns: 1fr auto auto; align-items: center; }
+    .try-wrap .add { justify-self: end; height: 34px; margin-right: 2px; padding: 0 11px; border: 1px solid var(--line); border-radius: 8px; font-size: 12px; }
+    .try .try-wrap .fav-box { position: static; background: none; margin-right: 4px; }      /* the heart sits beside Add to set */
+    .try .try-wrap .try-item { padding-right: 0; }
   }
   /* already played this visit: a small "Played" strip under the cover */
   .try-item.played .try-cover img { opacity: .5; filter: saturate(.5); }
@@ -807,10 +809,33 @@
   .vote { position: absolute; top: 8px; right: 8px; display: flex; gap: 2px; z-index: 1; }
   .vote-btn { width: 30px; height: 30px; padding: 6px; border-radius: 8px; background: none; border: 1px solid transparent; color: var(--muted); cursor: pointer; }
   .vote-btn svg { width: 100%; height: 100%; display: block; }
+  /* Favourites: a heart on every track */
+  .fav { width: 30px; height: 30px; padding: 5px; border-radius: 8px; background: none; border: 1px solid transparent; color: var(--muted); cursor: pointer; flex: none; }
+  .fav svg { width: 100%; height: 100%; display: block; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linejoin: round; }
+  .fav:hover { color: #ff5d7d; border-color: var(--line); }
+  .fav.on { color: #ff4d6d; } .fav.on svg { fill: currentColor; }
+  .fav.pop svg { animation: fav-pop .45s cubic-bezier(.25, 1.7, .5, 1); }
+  @keyframes fav-pop { 0% { transform: scale(.6); } 60% { transform: scale(1.25); } 100% { transform: scale(1); } }
+  .try-wrap { position: relative; }
+  .try-wrap .fav-box { position: absolute; top: 6px; right: 6px; z-index: 2; background: rgba(11,11,15,.55); }
+  .try-wrap .try-item { padding-right: 40px; }
+  .fav-top { position: relative; flex: none; width: 48px; height: 48px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); color: var(--muted); display: grid; place-items: center; cursor: pointer; }
+  .fav-top svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linejoin: round; }
+  .fav-top:hover { color: #ff5d7d; border-color: #4a4a5c; }
+  .fav-top.has { color: #ff4d6d; } .fav-top.has svg { fill: currentColor; }
+  .fav-top b { position: absolute; top: -6px; right: -6px; min-width: 19px; height: 19px; padding: 0 5px; border-radius: 99px; background: #ff4d6d; color: #fff; font: 800 11px/19px Inter, sans-serif; text-align: center; }
+  .fav-top b[hidden] { display: none; }
+  @media (max-width: 640px) { .fav-top { width: 40px; height: 40px; } .fav-top svg { width: 20px; height: 20px; } .fav { width: 40px; height: 40px; padding: 9px; } }
+  @media (max-width: 360px) { .fav-top { width: 36px; height: 36px; } }
+  .favs-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin: 30px 0 6px; }
+  .favs-head h2 { margin: 0; font-size: 20px; }
+  .favs-empty { margin-top: 14px; padding: 22px; border: 1px dashed #3a3a4a; border-radius: 14px; color: var(--muted); }
+  .favs-empty b { color: var(--text); }
   .vote-btn:hover { color: var(--text); border-color: var(--line); }
   .vote-btn.on { color: var(--accent); background: rgba(198,255,61,.12); border-color: rgba(198,255,61,.4); }
   .vote-btn.on.down { color: var(--warn); background: rgba(255,138,92,.12); border-color: rgba(255,138,92,.4); }
-  @media (max-width: 640px) { .vote-btn { width: 40px; height: 40px; padding: 9px; } .vote { top: 4px; right: 4px; gap: 0; } .rrow .meta { padding-right: 78px; } }
+  @media (max-width: 640px) { .vote-btn { width: 40px; height: 40px; padding: 9px; } .vote { top: 4px; right: 4px; gap: 0; } .rrow .meta { padding-right: 116px; } .rrow.qsel .meta { padding-right: 40px; } }
+  @media (min-width: 641px) { .rrow .meta { padding-right: 98px; } .rrow.qsel .meta { padding-right: 36px; } }
   /* Result rows: key, match % and artwork stacked down the left */
   .rrow { grid-template-columns: 64px 1fr auto; align-items: start; }
   .rrow .side { display: grid; gap: 6px; align-self: stretch; grid-template-rows: auto auto 1fr; }
@@ -1084,6 +1109,7 @@
         <button type="button" class="tok-pill" id="tok-pill" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8a2 2 0 0 0 2-2h14a2 2 0 0 0 2 2v2a2 2 0 0 0 0 4v2a2 2 0 0 0-2 2H5a2 2 0 0 0-2-2v-2a2 2 0 0 0 0-4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 6v12" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2"/></svg><b class="tok-n" data-no-i18n></b><span class="tok-l"></span></button>
         <button type="button" class="acct-btn acct-only" data-account aria-haspopup="dialog"><span class="acct-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span class="acct-txt"><b class="acct-name">Log in / Sign up</b><small class="acct-state"></small></span></button>
       </div>
+      <button type="button" class="fav-top" id="fav-top" aria-label="Your favourites" title="Your favourites"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.6 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg><b id="fav-count" hidden>0</b></button>
       <label class="lang-mini" title="Language"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z" fill="none" stroke="currentColor" stroke-width="1.8"/></svg><span class="lang-code" data-no-i18n>EN</span><select data-lang-select aria-label="Language"><option value="en">English</option></select></label>
     <div class="menu-col">
     <div class="menu-wrap">
@@ -1092,6 +1118,7 @@
       </button>
       <nav class="menu" id="menu" hidden aria-label="Main menu">
         <button type="button" data-menu="set"><b>Build your set <span class="badge-new">TRY IT NOW</span></b><small id="menu-set-sub">Your saved tracks</small></button>
+        <button type="button" data-menu="favs"><b>Your favourites ♥</b><small id="menu-fav-sub">Tracks you've loved</small></button>
         <button type="button" data-menu="plan"><b>Plan my gig <span class="badge-new">NEW</span></b><small>A whole set for your time slot</small></button>
         <button type="button" data-menu="browse"><b>Browse tracks</b><small>By sub-genre and BPM</small></button>
         <button type="button" data-menu="how"><b>How it works</b><small>Three steps to a set that flows</small></button>
@@ -1529,7 +1556,7 @@ function examplesHtml(list, playable = false) {
         ${t.with ? `<span class="tw">Goes with <b>${esc(t.with.title)}</b></span>` : ""}
       </span>
     </button>`;
-    return playable ? `<div class="try-wrap">${box}${addButton(t)}</div>` : box;
+    return playable ? `<div class="try-wrap">${box}${addButton(t)}${favButton(t, "fav-box")}</div>` : box;
   }).join("");
 }
 document.addEventListener("click", e => {
@@ -1689,6 +1716,7 @@ function render({ source, query, results, similar_artists = [] }) {
   const qAge = query.release_date ? Math.max(0, Math.floor((Date.now() - Date.parse(query.release_date)) / 864e5)) : null;
   let html = shared + `<section class="query">
       <div class="row rrow qsel" data-id="${query.deezer_id}">
+        <span class="vote">${favButton(query)}</span>
         <div class="side">
           <span class="chip cam" style="background:${camelotColor(query.camelot)}" title="${esc(query.key)}">${esc(query.camelot)}</span>
           <span class="side-match" title="The track you searched"><b>YOUR</b><small>track</small></span>
@@ -1891,7 +1919,8 @@ function renderList() {
   };
   list.innerHTML = rows.map(t => groupHead(t) + `
     <div class="row rrow" data-id="${t.deezer_id}">
-      <span class="vote" role="group" aria-label="Rate this match">
+      <span class="vote" role="group" aria-label="Favourite or rate this match">
+        ${favButton(t)}
         <button type="button" class="vote-btn${myVote(t.deezer_id) === 1 ? " on" : ""}" data-vote="1" data-match="${t.deezer_id}" aria-pressed="${myVote(t.deezer_id) === 1}" aria-label="Good match" title="Good match"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9h7.5a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 17.7 10H14V6.5A2.5 2.5 0 0 0 11.5 4L9 11v9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
         <button type="button" class="vote-btn${myVote(t.deezer_id) === -1 ? " on down" : ""}" data-vote="-1" data-match="${t.deezer_id}" aria-pressed="${myVote(t.deezer_id) === -1}" aria-label="Bad match" title="Bad match"><svg viewBox="0 0 24 24" style="transform:rotate(180deg)" aria-hidden="true"><path d="M7 11v9H4v-9h3zm2 9h7.5a2 2 0 0 0 2-1.6l1.2-6A2 2 0 0 0 17.7 10H14V6.5A2.5 2.5 0 0 0 11.5 4L9 11v9z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg></button>
       </span>
@@ -2436,6 +2465,7 @@ menu.addEventListener("click", async e => {
   if (what === "legal") location.href = "/privacy";
   if (what === "browse") location.href = "/similar-to";
   if (what === "plan") openPlan();
+  if (what === "favs") showFavs();
   if (what === "how") {
     if (!$("#how-video")) newSearch();
     $("#url").blur();
@@ -3224,6 +3254,65 @@ addEventListener("blur", () => setTimeout(() => {
   const f = document.activeElement;
   if (f && f.tagName === "IFRAME") stopAllPlayers(f.closest(".row") ? "row" : "", f);
 }, 0));
+
+/* ---------- Favourites: a heart on every track; the list is kept on this device */
+const FAV_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.6 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
+function loadFavs() { try { const a = JSON.parse(localStorage.getItem("ss_favs") || "[]"); return Array.isArray(a) ? a : []; } catch { return []; } }
+let favs = loadFavs();
+const isFav = id => favs.some(t => String(t.deezer_id) === String(id));
+function saveFavs() { try { localStorage.setItem("ss_favs", JSON.stringify(favs.slice(0, 500))); } catch {} }
+function favButton(t, cls = "") {
+  const on = isFav(t.deezer_id);
+  return `<button type="button" class="fav ${cls}${on ? " on" : ""}" data-fav="${t.deezer_id}" aria-pressed="${on}" aria-label="${on ? "Remove from" : "Add to"} favourites" title="${on ? "Remove from" : "Add to"} favourites">${FAV_SVG}</button>`;
+}
+function paintFavs() {
+  document.querySelectorAll("[data-fav]").forEach(b => {
+    const on = isFav(b.dataset.fav); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on);
+    b.setAttribute("aria-label", `${on ? "Remove from" : "Add to"} favourites`); b.title = b.getAttribute("aria-label");
+  });
+  const n = favs.length, c = $("#fav-count"), top = $("#fav-top");
+  if (c) { c.textContent = n > 99 ? "99+" : n; c.hidden = !n; }
+  top?.classList.toggle("has", !!n); top?.setAttribute("aria-label", `Your favourites: ${n} track${n === 1 ? "" : "s"}`);
+  const sub = $("#menu-fav-sub"); if (sub) sub.textContent = n ? `${n} track${n === 1 ? "" : "s"} you've loved` : "Tracks you've loved";
+}
+function toggleFav(id) {
+  if (isFav(id)) { favs = favs.filter(t => String(t.deezer_id) !== String(id)); toast("Removed from your favourites"); }
+  else {
+    const t = trackCache[id] || set.find(x => String(x.deezer_id) === String(id)) || favs.find(x => String(x.deezer_id) === String(id));
+    if (!t) return;
+    const keep = ["deezer_id", "title", "artist", "label", "cover", "style", "key", "camelot", "bpm", "energy", "release_date", "age_days"];
+    favs.unshift(Object.fromEntries(keep.filter(k => t[k] != null).map(k => [k, t[k]])));
+    toast("Saved to your favourites\u00a0♥");
+  }
+  saveFavs(); paintFavs();
+  if ($("#favs-view")) showFavs(true);
+}
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-fav]"); if (!b) return;
+  e.preventDefault(); e.stopPropagation();
+  const was = isFav(b.dataset.fav); toggleFav(b.dataset.fav);
+  if (!was) { b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop"); }
+}, true);
+$("#fav-top").addEventListener("click", () => showFavs());
+function showFavs(keepScroll) {
+  const y = scrollY;
+  stopAllPlayers("box");
+  favs.forEach(t => {        // keep the age fresh, and let play / add / buy find the track
+    if (t.release_date) t.age_days = Math.max(0, Math.floor((Date.now() - Date.parse(t.release_date)) / 864e5));
+    trackCache[t.deezer_id] = trackCache[t.deezer_id] || t;
+  });
+  document.documentElement.classList.add("has-results");
+  $("#out").innerHTML = `<section id="favs-view">
+    <div class="favs-head"><h2>Your favourites <span class="group-n">${favs.length}</span></h2><button type="button" class="icon" id="favs-back">New search</button></div>
+    ${favs.length ? `<p class="summary">Tap the artwork to play, the heart to remove, or the title to find tracks that mix with it.</p>
+      <div class="try describe-results">${examplesHtml(favs, true)}</div>`
+      : `<div class="favs-empty"><b>No favourites yet.</b> Tap the ♥ on any track to save it here, so you can find it again later.</div>`}
+  </section>`;
+  $("#favs-back").onclick = () => newSearch();
+  if (keepScroll) scrollTo(0, y);
+  else requestAnimationFrame(() => $("#favs-view").scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth", block: "start" }));
+}
+paintFavs();
 
 /* ---------- "Now playing" bar: whatever is playing (a track preview or the how-it-works video) gets a small
    bar at the bottom of the screen with play / pause, so you can control it from anywhere on the page.
