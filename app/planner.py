@@ -60,7 +60,7 @@ def plan(index, minutes: int, slot: str, style: str = "", seed: int | None = Non
         for j in order[:400]:
             r = rows[pool[j]]
             t = re.sub(r"\s*[\(\[].*$", "", r["title"]).lower()
-            if used[j] or r["artist"] in artists[-4:] or (r["artist"], t) in titles:
+            if used[j] or r["artist"] in artists[-4:] or artists.count(r["artist"]) >= 2 or (r["artist"], t) in titles:   # at most twice per set
                 continue
             return j
         return None
