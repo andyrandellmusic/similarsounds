@@ -235,6 +235,7 @@
   .try-dots button { width: 8px; height: 8px; padding: 0; border-radius: 99px; border: 0; background: #3a3a48; cursor: pointer; transition: width .25s, background .25s; position: relative; }
   .try-dots button::after { content: ""; position: absolute; inset: -8px -4px; }
   .try-dots button.on { width: 22px; background: var(--accent); }
+  @media (max-width: 640px) { .try-dots { display: none; } }      /* phones rotate one track at a time: too many to dot */
   .nudge { animation: nudge .38s ease; }
   @keyframes nudge { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
   @media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }
@@ -1669,6 +1670,11 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
   examplesCache = s.examples || [];
   freshSets = (s.fresh_sets || []).filter(g => g.length);
+  // phones: one track at a time, rotating through all of them
+  if (matchMedia("(max-width: 640px)").matches && freshSets.length) {
+    freshSets = freshSets.flat().map(t => [t]);
+    s.examples = freshSets[0]; examplesCache = freshSets[0];
+  }
   const tryBox = $("#try");
   if (tryBox) tryBox.innerHTML = examplesHtml(examplesCache);
   loadFresh(); freshDots(); fitHome();
@@ -1708,7 +1714,8 @@ function showFresh(i) {
 // tapping a dot shows that set and starts the 8 seconds again from then
 document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) { showFresh(Number(d.dataset.fresh)); startFreshTimer(); } });
 let freshRotate = null;
-function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, 8000); }
+// computers: a new eight every 8 seconds; phones (one track at a time): a new track every 2 seconds
+function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, matchMedia("(max-width: 640px)").matches ? 2000 : 8000); }
 function freshTick() {
   const box = $("#try");
   if (!box || freshHold || document.hidden || freshSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
