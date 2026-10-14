@@ -407,6 +407,12 @@
   .legal-links { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 10px 0 6px; }
   .legal-links a { color: var(--text); text-decoration: none; font-weight: 600; }
   .legal-links a:hover { color: var(--accent); }
+  /* YouTube channel promotion, in the format YouTube's brand team approved: the official icon + /@handle, with plain-text call to action */
+  .yt-follow { margin: 12px 0 8px; }
+  .yt-follow a { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-weight: 600; text-decoration: none; }
+  .yt-follow img { width: 20px; height: auto; display: block; margin-left: 4px; }
+  .yt-follow span { color: var(--text); }
+  .yt-follow a:hover span { text-decoration: underline; }
   @media (max-width: 640px) { .legal-links { gap: 0 18px; } .legal-links a { padding: 7px 0; font-size: 13px; } }   /* easier to tap */
   footer p { margin: 0 0 6px; }
   footer .copy { color: #9a9aac; }
@@ -1614,6 +1620,8 @@
       <a href="/guides">DJ guides</a><a href="/database">Database</a><a href="/vs">Compare</a><a href="/similar-to">Browse tracks</a><a href="/artists-like">Artists like…</a><a href="/privacy">Privacy Policy</a><a href="/cookies">Cookie Policy</a><a href="/terms">Terms of Use</a>
       <a href="mailto:management@similarsounds.com">Contact</a>
     </nav>
+    <p class="yt-follow"><a href="https://www.youtube.com/@similarsoundsmusic" target="_blank" rel="noopener">Find us on YouTube
+      <img src="/static/brands/youtube/yt_icon_red_digital.png" width="20" height="14" alt="YouTube"><span>/@similarsoundsmusic</span></a></p>
     <p class="copy">© 2026 SimilarSounds</p>
   </footer>
 </div>
