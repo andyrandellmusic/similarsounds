@@ -220,6 +220,12 @@
   .try-wrap .try-item { width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; transform: none; }
   .try-wrap .add { justify-self: stretch; justify-content: center; height: 36px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.02); }
   .try-wrap .add:hover { background: rgba(198,255,61,.08); }
+  #try { transition: opacity .28s ease, transform .28s ease; }
+  #try.swap { opacity: 0; transform: translateY(6px); }
+  .try-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
+  .try-dots button { width: 8px; height: 8px; padding: 0; border-radius: 99px; border: 0; background: #3a3a48; cursor: pointer; transition: width .25s, background .25s; position: relative; }
+  .try-dots button::after { content: ""; position: absolute; inset: -8px -4px; }
+  .try-dots button.on { width: 22px; background: var(--accent); }
   .nudge { animation: nudge .38s ease; }
   @keyframes nudge { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
   @media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }
@@ -1541,11 +1547,41 @@ updateFilterSummary();
 fetch("/api/stats").then(r => r.json()).then(s => {
   s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
   examplesCache = s.examples || [];
+  freshSets = (s.fresh_sets || []).filter(g => g.length);
   const tryBox = $("#try");
   if (tryBox) tryBox.innerHTML = examplesHtml(examplesCache);
-  loadFresh(); fitHome();
+  loadFresh(); freshDots(); fitHome();
 });
 let examplesCache = [];
+/* "Try a fresh release": a new four every 4 seconds (fades across), pausing while it's touched or hovered */
+let freshSets = [], freshIdx = 0, freshHold = false;
+function freshDots() {
+  const box = $("#try"); if (!box || freshSets.length < 2) return;
+  let dots = $("#try-dots");
+  if (!dots) {
+    box.insertAdjacentHTML("afterend", `<div class="try-dots" id="try-dots" role="tablist" aria-label="Fresh release sets">${freshSets.map((_, i) =>
+      `<button type="button" role="tab" data-fresh="${i}" aria-label="Set ${i + 1} of ${freshSets.length}"></button>`).join("")}</div>`);
+    dots = $("#try-dots");
+    ["pointerenter", "focusin", "touchstart"].forEach(ev => box.addEventListener(ev, () => { freshHold = true; }, { passive: true }));
+    ["pointerleave", "focusout"].forEach(ev => box.addEventListener(ev, () => { freshHold = false; }));
+    box.addEventListener("touchend", () => setTimeout(() => { freshHold = false; }, 2500), { passive: true });
+  }
+  dots.querySelectorAll("button").forEach((b, i) => { b.classList.toggle("on", i === freshIdx); b.setAttribute("aria-selected", i === freshIdx); });
+}
+function showFresh(i) {
+  const box = $("#try"); if (!box || !freshSets.length) return;
+  freshIdx = (i + freshSets.length) % freshSets.length;
+  examplesCache = freshSets[freshIdx];
+  box.classList.add("swap");
+  setTimeout(() => { box.innerHTML = examplesHtml(examplesCache); box.classList.remove("swap"); freshDots(); }, 280);
+}
+document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) showFresh(Number(d.dataset.fresh)); });
+setInterval(() => {
+  const box = $("#try");
+  if (!box || freshHold || document.hidden || freshSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = box.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;    // only while it's on screen
+  showFresh(freshIdx + 1);
+}, 4000);
 /* "Fresh for your set": the newest releases that mix with what's already in your set (start screen) */
 async function loadFresh() {
   const box = $("#fresh"); if (!box) return;
@@ -2243,7 +2279,7 @@ function newSearch(pushHistory = true) {
   $("#out").innerHTML = startHTML;
   document.documentElement.classList.remove("has-results");
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
-  loadFresh(); fitHome();
+  loadFresh(); freshDots(); fitHome();
   if (pushHistory && location.search) history.pushState(null, "", location.pathname);
   document.title = "Find House Music That Mixes With Your Track | SimilarSounds";
   updateClear(); closeSuggest();

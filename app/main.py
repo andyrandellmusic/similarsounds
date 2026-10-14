@@ -389,16 +389,26 @@ def stats():
         if len({r["style"] for r in pool}) >= 4 and len(pool) >= 12:
             break
     random.Random(today.toordinal()).shuffle(pool)
-    for r in pool:
-        if r["artist"] in seen or r["style"] in {e["style"] for e in examples}:
-            continue
-        seen.add(r["artist"])
-        examples.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
-                         "cover": r["cover"], "style": r["style"], "camelot": r["camelot"], "bpm": r["bpm"],
-                         "age_days": (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None})
-        if len(examples) == 4:
+    # up to five sets of four (the home page rotates through them), each set one track per sub-genre,
+    # and no artist twice across all of them
+    sets: list[list[dict]] = []
+    for _ in range(5):
+        group = []
+        for r in pool:
+            if r["artist"] in seen or r["style"] in {e["style"] for e in group}:
+                continue
+            seen.add(r["artist"])
+            group.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
+                          "cover": r["cover"], "style": r["style"], "camelot": r["camelot"], "bpm": r["bpm"],
+                          "age_days": (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None})
+            if len(group) == 4:
+                break
+        if len(group) < 4:
             break
-    return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples}
+        sets.append(group)
+    examples = sets[0] if sets else examples
+    return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples,
+            "fresh_sets": sets}
 
 
 LANG_CODES = {"en", "es", "fr", "de", "it", "pt", "nl"}
