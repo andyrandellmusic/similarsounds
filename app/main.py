@@ -6,6 +6,7 @@ import json
 import os
 import random
 import re
+import sqlite3
 import threading
 from datetime import date
 from pathlib import Path
@@ -19,7 +20,7 @@ from fastapi.staticfiles import StaticFiles
 from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
 from app.artists import Artists, main_artist
 from app.analysis import analyse
-from app.catalogue import Index, energy_vector
+from app.catalogue import DB_PATH, Index, energy_vector
 from app.ranking import rank
 from app.suggest import Suggester
 from scripts.seed import STYLES
@@ -451,7 +452,7 @@ def similar_track(slug: str):
     m = re.search(r"-(\d+)$", slug) or re.fullmatch(r"(\d+)", slug)
     deezer_id = int(m.group(1)) if m else None
     if deezer_id not in index.ids:
-        raise HTTPException(404, "We don't have a page for that track yet")
+        return removed_track(deezer_id)
     r = index.rows[index.ids[deezer_id]]
     if pages.track_path(r) != f"/similar-to/{slug}":
         return RedirectResponse(pages.track_path(r), status_code=301)
@@ -462,6 +463,34 @@ def similar_track(slug: str):
             _page_cache.clear()
         _page_cache[deezer_id] = pages.track_page(index, q, results, r["style"] or guessed)
     return _page_cache[deezer_id]
+
+
+_kept_versions: dict = {}
+
+
+def removed_track(deezer_id):
+    """A track page Google may still have, for a track that's left the catalogue. Duplicate versions go
+    to the version we kept (301); tracks set aside as not our genres get a friendly 410 'gone' page."""
+    from scripts.dedupe_versions import key as version_key
+    row = None
+    if deezer_id:
+        with sqlite3.connect(DB_PATH) as conn:
+            try:
+                row = conn.execute("SELECT deezer_id, artist, title, aside_kind FROM set_aside WHERE deezer_id = ?",
+                                   (deezer_id,)).fetchone()
+            except sqlite3.OperationalError:
+                row = None
+    if not row:
+        raise HTTPException(404, "We don't have a page for that track yet")
+    if row[3] == "duplicate version":
+        if _kept_versions.get("n") != len(index.rows):
+            _kept_versions.clear(); _kept_versions["n"] = len(index.rows)
+            for r in index.rows:
+                _kept_versions.setdefault(version_key(r["artist"] or "", r["title"] or "")[:2], r)
+        kept = _kept_versions.get(version_key(row[1] or "", row[2] or "")[:2])
+        if kept:
+            return RedirectResponse(pages.track_path(kept), status_code=301)
+    return HTMLResponse(pages.gone_page(row[0], row[1], row[2]), status_code=410)
 
 
 @app.get("/artists-like", response_class=HTMLResponse)

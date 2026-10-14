@@ -195,6 +195,18 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
     return page(title, desc, path, body)
 
 
+def gone_page(deezer_id: int, artist: str, title: str) -> str:
+    body = f"""<p class="crumbs"><a href="/">Home</a> / <a href="/similar-to">Similar tracks</a></p>
+  <h1>{escape(title)} by {escape(artist)}</h1>
+  <p class="lead">This track is no longer in our catalogue: SimilarSounds covers House, Deep House, Tech House,
+  Minimal / Deep Tech and Funky / Disco House. You can still find house tracks that mix with it.</p>
+  <p class="actions" style="display:flex;flex-wrap:wrap;gap:10px"><a class="btn" href="/?t={deezer_id}">Find house tracks that mix with it</a>
+  <a class="btn ghost" href="/similar-to">Browse similar-track pages <i class="g-arr">›</i></a></p>"""
+    html = page(f"{title} by {artist} | SimilarSounds", f"House tracks that mix with {title} by {artist}.",
+                "/similar-to", body)
+    return html.replace("<meta charset=\"utf-8\">", "<meta charset=\"utf-8\">\n<meta name=\"robots\" content=\"noindex\">", 1)
+
+
 def hub_page(index) -> str:
     rows = index.rows
     styles = Counter(r["style"] for r in rows if r["style"])
