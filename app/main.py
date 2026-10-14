@@ -44,7 +44,18 @@ async def redirect_to_canonical(request: Request, call_next):
     if CANONICAL_HOST and host and host != CANONICAL_HOST and request.url.path != "/healthz":
         query = f"?{request.url.query}" if request.url.query else ""
         return RedirectResponse(f"https://{CANONICAL_HOST}{request.url.path}{query}", status_code=301)
-    return await call_next(request)
+    head = request.method == "HEAD"          # uptime checkers and crawlers use HEAD: answer it like GET, minus the body
+    if head:
+        request.scope["method"] = "GET"
+    response = await call_next(request)
+    if head:
+        request.scope["method"] = "HEAD"    # the server then sends the headers only
+    # Static files: ones linked with a ?v= version change name whenever they change, so browsers can keep
+    # them for a year; the rest (e.g. images linked without a version) for a day.
+    if request.url.path.startswith("/static/") and response.status_code == 200:
+        response.headers["Cache-Control"] = ("public, max-age=31536000, immutable" if "v=" in request.url.query
+                                             else "public, max-age=86400")
+    return response
 
 
 @app.on_event("startup")
