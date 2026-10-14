@@ -8,7 +8,7 @@ from playwright.async_api import async_playwright
 
 OUT = sys.argv[1]
 W, H, DSF = 1600, 900, 2
-ADD = ["Desire", "If There's A Chance", "Echoes From The 90s", "Mas Que Nada Brothers"]
+ADD = ["Time To Connect", "Good Life", "Falling", "Down N Down"]   # after the two drags, one link is an orange "Workable"
 
 CURSOR = """
 addEventListener('DOMContentLoaded', () => {
@@ -237,10 +237,14 @@ async def main():
         await asyncio.sleep(1.0)
         ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
 
-        # "Fix this gap": open the first one, then insert one of the suggestions
-        gap = (await pg.query_selector_all("#set-list .gap-btn"))[0]
+        # tap the orange "Workable" line between two tracks, then "Fix this gap", then insert a suggestion
+        line = await pg.query_selector("#set-list .link-dot.ok .ld") or await pg.query_selector("#set-list .link-dot.bad .ld")
+        print("    line:", await line.evaluate("e => e.closest('.link-dot').className"))
+        await click(line, 900, "line")
+        await asyncio.sleep(0.9)
+        gap = await pg.query_selector("#set-list .link:not([hidden]) .gap-btn")
         gb = await box(gap)
-        await click(gap, 900, "gap_btn")
+        await click(gap, 800, "gap_btn")
         await pg.wait_for_selector(".gap-box:not([hidden]) .gap-item", timeout=60000)
         await asyncio.sleep(1.0)
         ev("gap_box", await box(".gap-box:not([hidden])"))
