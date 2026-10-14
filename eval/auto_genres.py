@@ -18,11 +18,11 @@ R = ROOT / "eval" / "results"
 
 # Discogs styles -> our five, another house style (set aside, maybe added later) or not house at all
 OURS = {"House": "House", "Acid House": "House", "Garage House": "House", "Italo House": "House", "Chicago House": "House",
-        "Deep House": "Deep House", "Tech House": "Tech House", "Minimal": "Minimal / Deep Tech",
+        "Deep House": "Deep House", "Tech House": "Tech House", "Minimal": "Minimal / Deep Tech", "Minimal Techno": "Minimal / Deep Tech",
         "Nu-Disco": "Funky / Disco House", "Disco": "Funky / Disco House", "Boogie": "Funky / Disco House",
         "French House": "Funky / Disco House", "Funk": "Funky / Disco House"}
 OTHER_HOUSE = {"Progressive House", "Tribal House", "Afrobeat", "Afro House", "Ambient House", "Speed Garage", "Latin",
-               "UK Garage", "Hard House", "Minimal Techno", "Deep Techno", "Leftfield"}
+               "UK Garage", "Hard House", "Deep Techno", "Leftfield"}
 NOT_HOUSE = {"Techno", "Trance", "Progressive Trance", "Hard Trance", "Hard Techno", "Tech Trance", "Psy-Trance", "Neo Trance",
              "Goa Trance", "Hardcore", "Hardstyle", "Happy Hardcore", "Gabber", "Drum n Bass", "Jungle", "Dubstep", "Bass Music",
              "Dance-pop", "Synth-pop", "Europop", "Contemporary R&B", "Rhythm & Blues", "Soft Rock", "Synthwave", "Darkwave",
@@ -43,13 +43,11 @@ def discogs_verdict(d):
         return "not", None
     if nots and len(nots) >= len(ours):
         return "not", None
-    if ours and not other:
+    if ours:          # any of our styles listed (e.g. Tech House next to Minimal Techno): it's ours
         specific = [s for s in ours if s != "House"]
         return "ours", (specific[0] if specific else "House")
-    if other and len(other) >= len(ours):
+    if other:
         return "other", None
-    if ours:
-        return "ours", ours[0]
     return None, None
 
 
@@ -90,7 +88,7 @@ def main():
     # honest check: sound model trained without Boss's answers, scored on Boss's 100
     X, y = ours_training(exclude=frozenset(boss))
     m_ours = fit(X, y, 2)
-    bi = [i for i in boss if i in emb]
+    bi = [i for i in boss if i in emb and i in dv]          # tracks still on the site
     p_b = prob(m_ours, np.array([emb[i] for i in bi]))[:, 1]
 
     # ---------- 2. record labels: what do the answered tracks on each label say? ----------
