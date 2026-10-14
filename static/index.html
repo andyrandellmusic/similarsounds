@@ -1823,7 +1823,8 @@ async function run(exactUrl, fromHistory = false) {
     showTokens(data.tokens);
     rememberSearch(data.query);
     const t = data.query.deezer_id, label = `${data.query.artist} - ${data.query.title}`;
-    if (exactUrl) { picked = { text: label, url: exactUrl }; if (!bootLoad) $("#url").value = label; }
+    if (exactUrl) picked = { text: label, url: exactUrl };
+    $("#url").value = "";            // the track's picked: clear the box, ready for the next search
     updateClear();
     if (new URLSearchParams(location.search).get("t") != t)
       history[fromHistory ? "replaceState" : "pushState"]({ t, label }, "", `?t=${t}`);
@@ -2459,7 +2460,7 @@ function openFromUrl(fromHistory) {
   const t = new URLSearchParams(location.search).get("t");
   if (!t || !/^\d+$/.test(t)) return false;
   const label = history.state?.label || "";
-  $("#url").value = bootLoad ? "" : label; allowNonHouse = false;
+  $("#url").value = ""; allowNonHouse = false;
   run(`https://www.deezer.com/track/${t}`, fromHistory);
   return true;
 }
