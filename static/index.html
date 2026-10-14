@@ -256,13 +256,13 @@
     background: var(--panel); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 10px 12px 10px 14px; box-shadow: 0 12px 40px rgba(0,0,0,.55); }
   /* "Now playing" bar: stays at the bottom while a preview or the video plays, so you can pause from anywhere */
   .nowbar { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%); z-index: 39;
-    width: min(460px, calc(100% - 24px)); display: grid; grid-template-columns: 44px 1fr auto auto; gap: 10px; align-items: center;
+    width: min(420px, calc(100% - 24px)); display: grid; grid-template-columns: 40px 1fr auto auto; gap: 9px; align-items: center;
     /* solid dark card like the rest of the site, lifted off the page with a glowing green top edge */
-    background: linear-gradient(180deg, #1d1e27, #131319); border: 1px solid #2c2c3a; border-radius: 16px; padding: 9px 10px 9px 9px;
-    box-shadow: 0 18px 50px rgba(0,0,0,.7), 0 -8px 26px -12px rgba(198,255,61,.45);
+    background: linear-gradient(180deg, #1d1e27, #131319); border: 1px solid #2c2c3a; border-radius: 14px; padding: 7px 8px 7px 7px;
+    box-shadow: 0 16px 44px rgba(0,0,0,.65), 0 -6px 20px -12px rgba(198,255,61,.28);
     transition: transform .25s ease, opacity .25s ease; opacity: 0; pointer-events: none; }
   .nowbar::before { content: ""; position: absolute; left: 14px; right: 14px; top: -1px; height: 2px; border-radius: 2px; pointer-events: none;
-    background: linear-gradient(90deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent); box-shadow: 0 0 12px rgba(198,255,61,.7); }
+    background: linear-gradient(90deg, transparent, var(--accent) 18%, var(--accent) 82%, transparent); box-shadow: 0 0 7px rgba(198,255,61,.45); }
   .nowbar .nb-eye { display: flex; align-items: center; gap: 6px; font: 800 9.5px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
   .nb-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; }
   .nb-eq i { width: 2.5px; height: 30%; border-radius: 1px; background: var(--accent); }
@@ -271,10 +271,10 @@
   @keyframes nb-eq { 0%, 100% { height: 25%; } 50% { height: 100%; } }
   @media (prefers-reduced-motion: reduce) { .nowbar.playing .nb-eq i { animation: none; height: 70%; } }
   .nowbar.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
-  .nowbar img, .nowbar .nb-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
+  .nowbar img, .nowbar .nb-logo { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
   .nowbar .nb-logo { display: grid; place-items: center; } .nowbar .nb-logo svg { width: 26px; height: 26px; }
   .nowbar .nb-txt { min-width: 0; background: none; border: 0; padding: 0; text-align: left; color: var(--text); cursor: pointer; }
-  .nowbar .nb-t { display: block; font: 700 13.5px Inter, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .nowbar .nb-t { display: block; font: 700 13px Inter, sans-serif; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .nowbar .nb-a { display: block; font-size: 12px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .nowbar .nb-mid { min-width: 0; display: grid; gap: 3px; }
   .nowbar .nb-seek { display: flex; align-items: center; gap: 8px; }
@@ -288,9 +288,9 @@
   .nb-range::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; margin-top: -4.5px; border-radius: 50%; background: var(--accent); border: 0; box-shadow: 0 0 0 3px rgba(198,255,61,.2); }
   .nb-range::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--accent); border: 0; }
   .nb-range:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
-  .nowbar .nb-pp { width: 42px; height: 42px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; }
-  .nowbar .nb-pp svg { width: 18px; height: 18px; fill: currentColor; }
-  .nowbar .nb-x { width: 34px; height: 42px; border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
+  .nowbar .nb-pp { width: 38px; height: 38px; border-radius: 50%; border: 0; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; cursor: pointer; }
+  .nowbar .nb-pp svg { width: 16px; height: 16px; fill: currentColor; }
+  .nowbar .nb-x { width: 30px; height: 38px; border: 0; background: none; color: var(--muted); font-size: 22px; line-height: 1; cursor: pointer; }
   .nowbar .nb-x:hover { color: var(--text); }
   html.has-nowbar body { padding-bottom: 76px; }        /* so the bottom of the page can still scroll clear of the bar */
   html.has-nowbar .to-top { bottom: calc(84px + env(safe-area-inset-bottom)); }
