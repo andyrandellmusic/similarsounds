@@ -1716,8 +1716,8 @@ function showFresh(i) {
 // tapping a dot shows that set and starts the 8 seconds again from then
 document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) { showFresh(Number(d.dataset.fresh)); startFreshTimer(); } });
 let freshRotate = null;
-// computers: a new eight every 8 seconds; phones (one track at a time): a new track every 2 seconds
-function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, matchMedia("(max-width: 640px)").matches ? 2000 : 8000); }
+// computers: a new eight every 8 seconds; phones (one track at a time): a new track every 4 seconds
+function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, matchMedia("(max-width: 640px)").matches ? 4000 : 8000); }
 function freshTick() {
   const box = $("#try");
   if (!box || freshHold || document.hidden || freshSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
