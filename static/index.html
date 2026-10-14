@@ -671,12 +671,18 @@
   .flow .fl-n { font: 600 9px "JetBrains Mono", monospace; fill: var(--muted); }
   .flow .fl-grid { stroke: rgba(255,255,255,.06); stroke-dasharray: 3 4; }
   .flow .fl-base { stroke: var(--line); }
-  .flow .fl-e.pk { fill: #ffb070; }
+  .flow .fl-e-pk { fill: #ffb070; } .flow .fl-e-end { fill: var(--accent); }
+  .flow .fl-shine { fill: rgba(255,255,255,.22); pointer-events: none; }
+  .flow .fl-line { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 1.2; stroke-linejoin: round; stroke-dasharray: 2 3; filter: drop-shadow(0 0 3px rgba(198,255,61,.6)); animation: fl-draw .9s .3s ease both; }
+  .flow .fl-dot { fill: #fff; filter: drop-shadow(0 0 3px rgba(198,255,61,.9)); animation: fl-fade .4s .9s ease both; }
+  @keyframes fl-draw { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes fl-fade { from { opacity: 0; } to { opacity: 1; } }
+  .flow { background: radial-gradient(120% 80% at 50% 100%, rgba(198,255,61,.07), transparent 70%); border-radius: 12px; }
   .flow .fl-r { font: 800 8.5px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; fill: #0b0b0f; pointer-events: none; }
   .flow rect { shape-rendering: geometricPrecision; }
   .flow .fl-bar { transform-box: fill-box; transform-origin: 50% 100%; animation: fl-grow .35s ease-out both; }
   @keyframes fl-grow { from { transform: scaleY(0); opacity: 0; } to { transform: scaleY(1); opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { .flow .fl-bar { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { .flow .fl-bar, .flow .fl-line, .flow .fl-dot { animation: none; } }
   .flow-label { font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); display: flex; justify-content: space-between; }
   .flow-label span { letter-spacing: 0; font: 700 11px "JetBrains Mono", monospace; color: var(--text); }
   .icon.smart { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
@@ -976,6 +982,19 @@
   .set-row2 { display: flex; gap: 6px; margin-top: 10px; }
   .set-row2 .share-set { margin-top: 0; flex: 1; min-width: 0; }
   .set-row2[hidden] { display: none; }
+  .plan-wide { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; text-align: left; cursor: pointer;
+    background: linear-gradient(90deg, rgba(198,255,61,.16), rgba(198,255,61,.05)); border: 1px solid rgba(198,255,61,.45); color: var(--text);
+    border-radius: 10px; padding: 8px 12px; }
+  .plan-wide:hover { border-color: var(--accent); }
+  .plan-wide svg { width: 17px; height: 17px; color: var(--accent); flex: none; }
+  .plan-wide b { font-size: 13px; white-space: nowrap; }
+  .plan-wide small { color: var(--muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .share-mini { flex: none; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; background: var(--panel-2); border: 1px solid var(--line);
+    color: var(--text); border-radius: 10px; padding: 0 14px; font: 700 13px Inter, sans-serif; white-space: nowrap; }
+  .share-mini:hover:not(:disabled) { border-color: var(--accent); }
+  .share-mini:disabled { opacity: .45; cursor: not-allowed; }
+  .share-mini svg { width: 15px; height: 15px; color: var(--accent); }
+  @media (max-width: 400px) { .plan-wide small { display: none; } }
   .plan-mini { flex: none; background: rgba(198,255,61,.07); border: 1px solid #3b4a16; color: var(--accent); border-radius: 10px;
     padding: 0 14px; font: 700 13px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
   .plan-mini:hover { border-color: var(--accent); }
@@ -997,7 +1016,9 @@
   .set-list { list-style: none; margin: 0; padding: 0; }
   .set-item { user-select: none; }
   /* compact track cards: cover doubles as a play button; three short lines of info */
-  .set-card { display: grid; grid-template-columns: 18px 52px 1fr auto; gap: 8px 10px; align-items: center; background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px; padding: 7px 8px; }
+  .set-card { display: grid; grid-template-columns: 18px 52px 1fr auto; gap: 8px 10px; align-items: center; background: linear-gradient(180deg, #1c1d26, #16161d);
+    border: 1px solid var(--line); border-radius: 12px; padding: 7px 8px; transition: border-color .15s, box-shadow .15s; }
+  .set-card:hover { border-color: #3a3a4a; box-shadow: 0 6px 18px rgba(0,0,0,.3); }
   .set-card .set-play { width: 52px; height: 52px; border-radius: 8px; }
   .set-card img { width: 100%; height: 100%; border-radius: 8px; object-fit: cover; display: block; }
   .set-card .set-play .play-ico { opacity: .9; }
@@ -1045,8 +1066,22 @@
   .set-list.is-dragging .link, .set-list.is-dragging .gap-btn, .set-list.is-dragging .gap-box { display: none; }   /* a tight list while you drag */
   .set-list.is-dragging .set-item { margin-bottom: 8px; }
 
-  .link { display: flex; align-items: center; gap: 8px; margin: 4px 0 4px 14px; padding: 6px 0 6px 14px; border-left: 3px solid var(--c); font-size: 12px; color: var(--muted); }
-  .link .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--c); flex: none; }
+  .link { display: flex; align-items: center; gap: 8px; margin: 2px 0 2px 34px; padding: 7px 0 7px 14px; border-left: 2px solid var(--c); font-size: 12px; color: var(--muted);
+    background: linear-gradient(90deg, color-mix(in srgb, var(--c) 9%, transparent), transparent 70%); }
+  .link .dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; box-shadow: 0 0 8px var(--c); }
+  .link .lk-txt { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; flex: 1 1 auto !important; min-width: 0; }
+  .link { flex-wrap: nowrap !important; }
+  .link:has(.gap-btn) { flex-wrap: wrap !important; }      /* rough ones also carry "Fix this gap": let those wrap */
+  .link-acts { align-self: center !important; }
+  .link .lk-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+  .link b { font-size: 11.5px; white-space: nowrap; }
+  .link .lk-chips { flex-wrap: nowrap !important; }
+  @media (max-width: 420px) {        /* small phones: a slimmer indent, and the green dot says "mixes well" on its own */
+    .link { margin-left: 22px; padding-left: 10px; gap: 6px; }
+    .link.good b { display: none; }
+    .link .lk-chips i { padding: 1px 4px; font-size: 10px; }
+  }
+  .link .lk-chips i { font: 600 10.5px "JetBrains Mono", monospace; font-style: normal; color: #c9c9d6; background: rgba(255,255,255,.05); border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; white-space: nowrap; }
   .link b { color: var(--c); font-weight: 700; }
   .link { flex-wrap: wrap; }
   .link > span:not(.dot):not(.link-acts) { flex: 1 1 200px; min-width: 0; }
@@ -1239,11 +1274,12 @@
         <button type="button" class="icon" data-import>Import tracklist</button>
       </div>
       <div class="set-row2">
-        <button type="button" class="share-set" id="set-share">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <span><b>Share your set with others</b><small id="share-sub">Send a link - they'll see your tracks in this order</small></span>
-      </button>
-        <button type="button" class="plan-mini" data-plan>Plan a gig</button>
+        <button type="button" class="plan-wide" data-plan>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.6z" fill="currentColor"/></svg>
+          <b>Plan a whole gig</b><small>Fill a set for your time slot</small></button>
+        <button type="button" class="share-mini" id="set-share" title="Send a link - they'll see your tracks in this order">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 8l5-5 5 5M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Share</button>
       </div>
     </div>
     <div class="set-body">
@@ -2704,6 +2740,12 @@ function energyMix(a, b) {
   if (Math.abs(d) === 3) return [1, `energy jump ${s}`];
   return [0, `energy jump ${s}`];
 }
+// short chips for the line between two tracks in the set: key change, BPM, energy change
+function linkChips(a, b) {
+  const ba = Math.round(a.bpm), bb = Math.round(b.bpm), de = (Number(b.energy) || 0) - (Number(a.energy) || 0);
+  return [`${a.camelot}→${b.camelot}`, ba === bb ? `${bb} BPM` : `${ba}→${bb}`, `E ${de > 0 ? "+" + de : de < 0 ? "−" + -de : "="}`]
+    .map(c => `<i>${esc(c)}</i>`).join("");
+}
 function transition(a, b) {
   const parts = [keyMix(a.camelot, b.camelot), bpmMix(a.bpm, b.bpm), energyMix(a.energy, b.energy)];
   const score = Math.min(...parts.map(p => p[0]));
@@ -2729,7 +2771,7 @@ function energyFlow() {
   if (set.length < 2) return "";
   // Column graph: one flat bar per track on a fixed 1-10 energy scale; the peak track is orange,
   // intro and end track bright green; bars grow in one after another.
-  const n = set.length, w = 400, h = 92, top = 16, base = h - 14, gap = n > 24 ? 2 : 4;
+  const n = set.length, w = 400, h = 104, top = 18, base = h - 14, gap = n > 24 ? 2 : 5;
   const bw = (w - gap * (n - 1)) / n, roles = setRoles(set);
   const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
 
@@ -2739,21 +2781,32 @@ function energyFlow() {
     const hs = es.filter((e, i) => roles[i] === r).map(e => (base - top) * e / 10);
     words[r] = (ROLE_SHORT[r] || []).find(t => hs.every(bh => roleFits(t, bw, bh))) || "";
   }
+  // glowing gradient columns (same colours: green for intro / end, olive for the middle, orange for the peak),
+  // rounded tops, and a glowing line joining the tops so the shape of the set reads at a glance
+  const kind = i => roles[i] === "Peak track" ? "pk" : (i === 0 || i === n - 1) ? "end" : "mid";
+  const tops = [];
   const bars = set.map((t, i) => {
     const e = es[i], x = i * (bw + gap), bh = (base - top) * e / 10, y = base - bh;
-    const r = roles[i], peak = r === "Peak track", end = i === 0 || i === n - 1;
-    const fill = peak ? "#ff8a3d" : end ? "#c6ff3d" : "#7fa83a";       // flat, solid colours
-    const rx = Math.min(2, bw / 6).toFixed(1), small = bw < 14;
-    return `<g class="fl-bar" style="animation-delay:${(i * 0.05).toFixed(2)}s"><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
-      <rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${bh.toFixed(1)}" rx="${rx}" fill="${fill}"/>
-      ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 5).toFixed(1)}" text-anchor="middle" class="fl-e${peak ? " pk" : ""}">${e}</text>`}
+    const r = roles[i], k = kind(i), small = bw < 14;
+    const rad = Math.min(5, bw / 3, bh / 2);
+    tops.push([x + bw / 2, y]);
+    const path = `M${x.toFixed(1)} ${base}V${(y + rad).toFixed(1)}Q${x.toFixed(1)} ${y.toFixed(1)} ${(x + rad).toFixed(1)} ${y.toFixed(1)}H${(x + bw - rad).toFixed(1)}Q${(x + bw).toFixed(1)} ${y.toFixed(1)} ${(x + bw).toFixed(1)} ${(y + rad).toFixed(1)}V${base}Z`;
+    return `<g class="fl-bar fl-${k}" style="animation-delay:${(i * 0.05).toFixed(2)}s"><title>${i + 1}. ${esc(t.title)} · ${r} · energy ${e}</title>
+      <path d="${path}" fill="url(#flg-${k})" filter="url(#flglow-${k})"/>
+      <rect x="${(x + 2).toFixed(1)}" y="${(y + 2).toFixed(1)}" width="${Math.max(1, bw * .18).toFixed(1)}" height="${Math.max(0, bh - 4).toFixed(1)}" rx="1" class="fl-shine"/>
+      ${small ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${(y - 6).toFixed(1)}" text-anchor="middle" class="fl-e fl-e-${k}">${e}</text>`}
       ${roleText(r, x, y, bw, bh, words[r])}
       ${small && i % 2 ? "" : `<text x="${(x + bw / 2).toFixed(1)}" y="${h - 3}" text-anchor="middle" class="fl-n">${i + 1}</text>`}</g>`;
   }).join("");
+  const line = tops.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${(y - 1).toFixed(1)}`).join("");
   const grid = [5, 10].map(v => { const y = base - (base - top) * v / 10; return `<line x1="0" x2="${w}" y1="${y}" y2="${y}" class="fl-grid"/>`; }).join("");
+  const grad = (k, a, b) => `<linearGradient id="flg-${k}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>
+    <filter id="flglow-${k}" x="-50%" y="-30%" width="200%" height="160%"><feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="b"/><feColorMatrix in="b" type="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 .55 0"/><feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge></filter>`;
   return `<div class="flow-label">Energy flow <span>${es[0]} <i class="g-arr">→</i> ${Math.max(...es)} peak <i class="g-arr">→</i> ${es[n - 1]}</span></div>
-    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">${grid}
-      <line x1="0" x2="${w}" y1="${base}" y2="${base}" class="fl-base"/>${bars}</svg>`;
+    <svg viewBox="0 0 ${w} ${h}" role="img" aria-label="Energy of each track: ${es.join(", ")}">
+      <defs>${grad("end", "#e2ff86", "#86c21a")}${grad("mid", "#a9d24e", "#4c6a1f")}${grad("pk", "#ffc08a", "#e9581a")}</defs>${grid}
+      <line x1="0" x2="${w}" y1="${base}" y2="${base}" class="fl-base"/>${bars}
+      ${n > 1 ? `<path d="${line}" class="fl-line"/>${tops.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${(y - 1).toFixed(1)}" r="1.8" class="fl-dot"/>`).join("")}` : ""}</svg>`;
 }
 
 /* Smart order: try every starting track, then greedily take the next track that mixes best
@@ -2885,7 +2938,7 @@ function renderSet() {
   $("#set-hint").hidden = set.length < 2;
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
-      ${i > 0 ? `<div class="link ${links[i - 1].cls}"><span class="dot"></span><span><b>${links[i - 1].label}</b> · ${esc(links[i - 1].detail)}</span>
+      ${i > 0 ? `<div class="link ${links[i - 1].cls}" title="${esc(links[i - 1].detail)}"><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
         <span class="link-acts">${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button>` : ""}<button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></span></div>
         <div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
       <div class="set-card">
