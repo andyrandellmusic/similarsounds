@@ -143,6 +143,9 @@
   .yt-top img { width: 20px; height: auto; display: block; }
   .yt-top:hover .yt-h, .yt-top:focus-visible .yt-h { box-shadow: inset 0 0 0 1.5px #fff, 0 0 16px rgba(255,255,255,.2); }
   @media (max-width: 640px) { .top-right { align-items: center; margin-left: 0; gap: 12px; } }
+  .yt-desk { margin-left: auto; align-self: center; padding: 0 2px 6px; }
+  .yt-phone { display: none; }
+  @media (max-width: 640px) { .yt-desk { display: none; } .yt-phone { display: inline-flex; } }
   .mq-pill:hover, .mq-pill:focus-visible { transform: translateY(-1px) scale(1.05); box-shadow: 0 0 22px rgba(198,255,61,.7); }
   .mq-pill.pg:hover, .mq-pill.pg:focus-visible { box-shadow: inset 0 0 0 1.5px var(--accent), 0 0 22px rgba(198,255,61,.6); }
   .mq-pill:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
@@ -1282,7 +1285,7 @@
     </div>
     </div>
     </div>
-    <a class="yt-top" href="https://www.youtube.com/@similarsoundsmusic" target="_blank" rel="noopener">Find us on YouTube <span class="yt-h"><img src="/static/brands/youtube/yt_icon_red_digital.png" width="20" height="14" alt="YouTube">/@similarsoundsmusic</span></a>
+    <a class="yt-top yt-phone" href="https://www.youtube.com/@similarsoundsmusic" target="_blank" rel="noopener">Find us on YouTube <span class="yt-h"><img src="/static/brands/youtube/yt_icon_red_digital.png" width="20" height="14" alt="YouTube">/@similarsoundsmusic</span></a>
     </div>
   </div>
   <h1 class="sr-only"><span class="h1a">Paste a track.</span> <span class="h1b" data-i18n="hero2">Get <em>the perfect mix</em>.</span></h1>
@@ -1295,6 +1298,8 @@
   <div class="search-tabs" role="tablist" aria-label="Search by">
     <button type="button" role="tab" data-mode="track" class="on" aria-selected="true">Search a track</button>
     <button type="button" role="tab" data-mode="describe" aria-selected="false">Describe a sound</button>
+
+    <a class="yt-top yt-desk" href="https://www.youtube.com/@similarsoundsmusic" target="_blank" rel="noopener">Find us on YouTube <span class="yt-h"><img src="/static/brands/youtube/yt_icon_red_digital.png" width="20" height="14" alt="YouTube">/@similarsoundsmusic</span></a>
   </div>
   <div class="search-wrap">
     <form class="search" id="form">
