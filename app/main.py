@@ -386,24 +386,24 @@ def stats():
     ok = [r for r in rows if r["cover"] and r["release_date"] and not explicit.search(r["title"])]
     for days in (14, 30, 60, 100000):
         pool = [r for r in ok if (today - date.fromisoformat(r["release_date"])).days <= days]
-        if len({r["style"] for r in pool}) >= 4 and len(pool) >= 12:
+        if len({r["style"] for r in pool}) >= 4 and len(pool) >= 60:
             break
     random.Random(today.toordinal()).shuffle(pool)
-    # up to five sets of four (the home page rotates through them), each set one track per sub-genre,
+    # up to five sets of eight (the home page rotates through them), each set at most two per sub-genre,
     # and no artist twice across all of them
     sets: list[list[dict]] = []
     for _ in range(5):
         group = []
         for r in pool:
-            if r["artist"] in seen or r["style"] in {e["style"] for e in group}:
+            if r["artist"] in seen or sum(e["style"] == r["style"] for e in group) >= 2:
                 continue
             seen.add(r["artist"])
             group.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"],
                           "cover": r["cover"], "style": r["style"], "camelot": r["camelot"], "bpm": r["bpm"],
                           "age_days": (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None})
-            if len(group) == 4:
+            if len(group) == 8:
                 break
-        if len(group) < 4:
+        if len(group) < 8:
             break
         sets.append(group)
     examples = sets[0] if sets else examples

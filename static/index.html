@@ -1674,7 +1674,7 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   loadFresh(); freshDots(); fitHome();
 });
 let examplesCache = [];
-/* "Try a fresh release": a new four every 8 seconds (fades across), pausing while it's touched or hovered */
+/* "Try a fresh release": a new eight every 8 seconds (fades across), pausing while it's touched or hovered */
 let freshSets = [], freshIdx = 0, freshHold = false;
 function freshDots() {
   const box = $("#try"); if (!box || freshSets.length < 2) return;
