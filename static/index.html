@@ -1589,13 +1589,17 @@ function showFresh(i) {
     setTimeout(() => { box.classList.remove("entering"); box.style.minHeight = ""; }, 900);
   }, 560);
 }
-document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) showFresh(Number(d.dataset.fresh)); });
-setInterval(() => {
+// tapping a dot shows that set and starts the 4 seconds again from then
+document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) { showFresh(Number(d.dataset.fresh)); startFreshTimer(); } });
+let freshRotate = null;
+function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, 4000); }
+function freshTick() {
   const box = $("#try");
   if (!box || freshHold || document.hidden || freshSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const r = box.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;    // only while it's on screen
   showFresh(freshIdx + 1);
-}, 4000);
+}
+startFreshTimer();
 /* "Fresh for your set": the newest releases that mix with what's already in your set (start screen) */
 async function loadFresh() {
   const box = $("#fresh"); if (!box) return;
