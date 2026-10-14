@@ -551,7 +551,11 @@
   footer { margin-top: 56px; padding-top: 22px; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
   footer > p:first-child { max-width: 720px; }
   :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-  form.search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(198,255,61,.12); }
+  /* clicked into: a thicker line, a green glow and a lighter box, so it's obvious you're typing in it */
+  form.search { transition: box-shadow .18s ease, background-color .18s ease; }
+  form.search:focus-within { border-color: var(--accent); background: #1b1d17;
+    box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 4px rgba(198,255,61,.2), 0 0 28px rgba(198,255,61,.16); }
+  form.search:focus-within input::placeholder { color: #6f7368; }
   form.search input:focus-visible { outline: none; }
   /* Close / clear X buttons everywhere: green X, no green box around it (a soft background shows keyboard focus) */
   .acct-x, .review-x, .close, .clear, .mini { color: var(--accent) !important; outline: none !important; box-shadow: none !important; border: 0 !important; }
