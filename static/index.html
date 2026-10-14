@@ -379,9 +379,12 @@
     .res-info .guide-row { flex-wrap: nowrap; gap: 0 12px; }
     .res-info .howto summary, .res-info .keywheel summary { font-size: 13.5px; gap: 6px; white-space: nowrap; }
     .copy-link { height: 38px; }
-    .sort-bar { justify-content: stretch; margin-top: 14px; }
-    .sort-bar .sort { width: 100%; }
-    .sort-bar select { flex: 1; height: 44px; font-size: 16px; }
+    /* small and on the right, like the computer version (16px text so iPhones don't zoom in when it's tapped) */
+    .sort-bar { margin-top: 12px; }
+    .sort-bar .sort { font-size: 12.5px; gap: 6px; }
+    .sort-bar .sort svg { width: 16px; height: 16px; }
+    .sort-bar select { height: 44px; font-size: 16px; font-weight: 700; padding: 0 38px 0 14px; border-radius: 11px;
+      transform: scale(.82); transform-origin: right center; margin: -4px 0 -4px -30px; }   /* shows like the 13px desktop one */
   }
   .results-head h2 { margin: 0; font-size: 18px; }
   .sound { margin-top: 8px; font-size: 13px; color: var(--muted); }
