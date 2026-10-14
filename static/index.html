@@ -353,7 +353,7 @@
   /* same card as the fresh releases below: flat panel, thin line, green edge on hover */
   .steps li { position: relative; display: flex; gap: 13px; align-items: center; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 14px 16px; min-height: 92px;
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px; transition: border-color .15s, transform .15s; }
-  .steps li:hover { border-color: var(--accent); transform: translateY(-1px); }
+  .steps li:hover { border-color: var(--line); transform: none; }   /* not clickable, so no hover effect */
   /* the home page's fresh-release cards: a little roomier, to match the steps above */
   #try .try-item, #fresh-list .try-item { padding: 14px 16px; min-height: 92px; gap: 14px; }
   #try .try-cover, #try .try-cover img, #fresh-list .try-cover, #fresh-list .try-cover img { width: 64px; height: 64px; }
