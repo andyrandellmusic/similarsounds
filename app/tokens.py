@@ -74,3 +74,28 @@ def vote(request, seed: int, match: int, value: int, rank=None, similarity=None,
         return r.status_code < 300
     except httpx.HTTPError:
         return False
+
+
+def count_play(deezer_id: int) -> bool:
+    """One play of a track's preview, for the "Most played" list. Never blocks the page."""
+    if not ENABLED:
+        return False
+    try:
+        r = _client.post(f"{URL}/rest/v1/rpc/count_play", headers={"apikey": KEY, "Content-Type": "application/json"},
+                         json={"p_id": deezer_id})
+        return r.status_code < 300
+    except httpx.HTTPError:
+        return False
+
+
+def top_played(days: int = 7, limit: int = 30) -> list[tuple[int, int]]:
+    """[(deezer_id, plays)] most played first, over the last `days` days. Empty if Supabase can't be reached."""
+    if not ENABLED:
+        return []
+    try:
+        r = _client.post(f"{URL}/rest/v1/rpc/top_played", headers={"apikey": KEY, "Content-Type": "application/json"},
+                         json={"p_days": days, "p_limit": limit})
+        r.raise_for_status()
+        return [(int(x["deezer_id"]), int(x["plays"])) for x in r.json()]
+    except (httpx.HTTPError, ValueError, KeyError, TypeError):
+        return []

@@ -231,6 +231,17 @@
   @keyframes fresh-in { from { opacity: 0; transform: translateY(16px) scale(.96); filter: blur(6px); } 60% { filter: blur(0); } to { opacity: 1; transform: none; filter: none; } }
   @keyframes fresh-art { from { transform: scale(.7) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
   @media (prefers-reduced-motion: reduce) { #try.leaving > *, #try.entering > *, #try.entering > * img { animation: none; } }
+  /* home page: fresh releases and most played, each in its own box, side by side on computers */
+  .home-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
+  .home-pair:has(#most-box:not([hidden])) { grid-template-columns: 1fr 1fr; }
+  .home-box { border: 1px solid var(--line); border-radius: 16px; padding: 14px 14px 12px; background: rgba(20,20,27,.55); min-width: 0; }
+  .home-box .start-label { margin-top: 0; }
+  .home-box #try, .home-box #most { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .home-pair:not(:has(#most-box:not([hidden]))) .home-box #try { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+  .most .try-item { position: relative; }
+  .most .rank { flex: none; width: 18px; font: 800 13px "JetBrains Mono", monospace; color: var(--accent); text-align: center; }
+  @media (max-width: 900px) { .home-pair:has(#most-box:not([hidden])) { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .home-box { padding: 12px 10px 10px; } .home-box #try, .home-box #most { grid-template-columns: 1fr; } }
   .try-dots { display: flex; justify-content: center; gap: 8px; margin-top: 12px; }
   .try-dots button { width: 8px; height: 8px; padding: 0; border-radius: 99px; border: 0; background: #3a3a48; cursor: pointer; transition: width .25s, background .25s; position: relative; }
   .try-dots button::after { content: ""; position: absolute; inset: -8px -4px; }
@@ -360,8 +371,8 @@
     background: var(--panel); border: 1px solid var(--line); border-radius: 14px; transition: border-color .15s, transform .15s; }
   .steps li:hover { border-color: var(--line); transform: none; }   /* not clickable, so no hover effect */
   /* the home page's fresh-release cards: a little roomier, to match the steps above */
-  #try .try-item, #fresh-list .try-item { padding: 10px 12px 10px 10px; min-height: 92px; gap: 12px; }   /* artwork and words closer to the edges */
-  #try .try-cover, #try .try-cover img, #fresh-list .try-cover, #fresh-list .try-cover img { width: 64px; height: 64px; }
+  #try .try-item, #fresh-list .try-item, #most .try-item { padding: 10px 12px 10px 10px; min-height: 92px; gap: 12px; }   /* artwork and words closer to the edges */
+  #try .try-cover, #try .try-cover img, #fresh-list .try-cover, #fresh-list .try-cover img, #most .try-cover, #most .try-cover img { width: 64px; height: 64px; }
   #try .tt, #fresh-list .tt { font-size: 14.5px; }
   .steps li + li::before { content: ""; position: absolute; left: -22px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%);
     background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='%23c6ff3d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; opacity: .8; }
@@ -1187,7 +1198,7 @@
     .steps li { font-size: 12.5px; padding: 12px 14px; gap: 11px; min-height: 0; }
     .steps li:hover { transform: none; }
     .steps li + li::before { display: none; }
-    #try .try-item, #fresh-list .try-item { padding: 8px 10px 8px 8px; min-height: 0; }
+    #try .try-item, #fresh-list .try-item, #most .try-item { padding: 8px 10px 8px 8px; min-height: 0; }
     .steps strong { display: inline; font-size: 13px; margin: 0 4px 0 0; }
     .steps b { width: 26px; height: 26px; font-size: 12px; }
     .has-set .steps { margin-right: 44px; }        /* room for the set tab beside the card */
@@ -1314,8 +1325,16 @@
         <p class="fresh-sub" id="fresh-sub"></p>
         <div class="try" id="fresh-list"></div>
       </div>
-      <div class="start-label">Try a fresh release</div>
-      <div class="try" id="try"></div>
+      <div class="home-pair">
+        <div class="home-box">
+          <div class="start-label">Try a fresh release</div>
+          <div class="try" id="try"></div>
+        </div>
+        <div class="home-box" id="most-box" hidden>
+          <div class="start-label">Most played this week</div>
+          <div class="try most" id="most"></div>
+        </div>
+      </div>
       <div class="howvid" id="how-video">
         <div class="vbox"><button type="button" class="vplay" id="vplay" aria-label="Play the 48-second how it works video"><span class="vplay-logo" aria-hidden="true"><svg viewBox="0 0 140 140"><path d="M0 70A70 70 0 0 1 70 0V35A35 35 0 0 0 35 70Z M140 0A70 70 0 0 1 70 70V35A35 35 0 0 0 105 0Z" fill="#f2f2f5"/><path d="M0 140A70 70 0 0 1 70 70V105A35 35 0 0 0 35 140Z M140 70A70 70 0 0 1 70 140V105A35 35 0 0 0 105 70Z" fill="#c6ff3d"/></svg><span class="vl-name">Similar<span>Sounds</span></span></span><span class="vplay-btn" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M7.25 5.5v13l10.5-6.5z"/></svg></span><span class="vplay-tag">How it works</span></button><video playsinline preload="none" poster="/static/how-it-works.jpg?v=9" aria-label="How SimilarSounds works: search a track, add matches to your set, then reorder it">
           <source src="/static/how-it-works.mp4?v=18" type="video/mp4">
@@ -1672,16 +1691,33 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   s.styles.forEach(st => $("#style").insertAdjacentHTML("beforeend", `<option>${esc(st)}</option>`));
   examplesCache = s.examples || [];
   freshSets = (s.fresh_sets || []).filter(g => g.length);
-  // phones: one track at a time, rotating through all of them
-  if (matchMedia("(max-width: 640px)").matches && freshSets.length) {
-    freshSets = freshSets.flat().map(t => [t]);
+  // computers: four at a time beside "Most played"; phones: one track at a time
+  if (freshSets.length) {
+    const all = freshSets.flat(), size = matchMedia("(max-width: 640px)").matches ? 1 : 4;
+    freshSets = []; for (let i = 0; i + size <= all.length; i += size) freshSets.push(all.slice(i, i + size));
     s.examples = freshSets[0]; examplesCache = freshSets[0];
   }
+  mostPlayed = s.most_played || []; showMost();
   const tryBox = $("#try");
   if (tryBox) tryBox.innerHTML = examplesHtml(examplesCache);
   loadFresh(); freshDots(); fitHome();
 });
 let examplesCache = [];
+/* "Most played this week": the tracks visitors have played most (counted on the server) */
+let mostPlayed = [];
+function showMost() {
+  const box = $("#most"), wrap = $("#most-box"); if (!box || !wrap) return;
+  wrap.hidden = !mostPlayed.length;
+  mostPlayed.forEach(t => { trackCache[t.deezer_id] = trackCache[t.deezer_id] || t; });
+  box.innerHTML = examplesHtml(mostPlayed);
+  box.querySelectorAll(".try-item").forEach((el, i) => el.insertAdjacentHTML("afterbegin", `<span class="rank">${i + 1}</span>`));
+}
+// every preview played on the site counts once per visit towards "Most played"
+const playedCounted = new Set();
+function countForMost(id) {
+  if (!id || playedCounted.has(String(id))) return; playedCounted.add(String(id));
+  fetch("/api/play", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: Number(id) }), keepalive: true }).catch(() => {});
+}
 /* "Try a fresh release": a new eight every 8 seconds (fades across), pausing while it's touched or hovered */
 let freshSets = [], freshIdx = 0, freshHold = false;
 function freshDots() {
@@ -2427,6 +2463,7 @@ function newSearch(pushHistory = true) {
   $("#out").innerHTML = startHTML;
   document.documentElement.classList.remove("has-results");
   if ($("#try")) $("#try").innerHTML = examplesHtml(examplesCache);
+  showMost();
   loadFresh(); freshDots(); fitHome();
   if (pushHistory && location.search) history.pushState(null, "", location.pathname);
   document.title = "Find House Music That Mixes With Your Track | SimilarSounds";
@@ -3659,7 +3696,7 @@ function toggleBoxPlay(b) {
   const id = b.dataset.tplay || b.dataset.setplay;
   boxAudio = new Audio(`/api/clip/${id}`);
   boxAudio.onended = stopBoxPlay;
-  boxAudio.play().then(() => { countPlay(); markPlayed(id); requestAnimationFrame(tickRing); }).catch(stopBoxPlay);
+  boxAudio.play().then(() => { countPlay(); markPlayed(id); countForMost(id); requestAnimationFrame(tickRing); }).catch(stopBoxPlay);
 }
 document.addEventListener("click", e => {          // capture phase, so tapping the cover doesn't open the track's matches
   const b = e.target.closest("[data-tplay]"); if (!b) return;

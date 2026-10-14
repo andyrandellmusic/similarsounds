@@ -408,7 +408,43 @@ def stats():
         sets.append(group)
     examples = sets[0] if sets else examples
     return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples,
-            "fresh_sets": sets}
+            "fresh_sets": sets, "most_played": most_played()}
+
+
+_top_cache = {"at": 0.0, "rows": []}
+
+
+def most_played(n: int = 4) -> list[dict]:
+    """The tracks played most on the site in the last 7 days (refreshed every 5 minutes), one per artist."""
+    import time
+    if time.time() - _top_cache["at"] > 300:
+        _top_cache["rows"] = tokens.top_played(7, 40); _top_cache["at"] = time.time()
+    today = date.today(); out, artists_seen = [], set()
+    for did, plays in _top_cache["rows"]:
+        if did not in index.ids:
+            continue
+        r = index.rows[index.ids[did]]
+        if r["artist"] in artists_seen:
+            continue
+        artists_seen.add(r["artist"])
+        out.append({"deezer_id": r["deezer_id"], "title": r["title"], "artist": r["artist"], "cover": r["cover"],
+                    "style": r["style"], "camelot": r["camelot"], "key": r["key"], "bpm": r["bpm"], "plays": plays,
+                    "age_days": (today - date.fromisoformat(r["release_date"])).days if r["release_date"] else None})
+        if len(out) == n:
+            break
+    return out
+
+
+@app.post("/api/play")
+async def play(request: Request):
+    """Count one preview play for the "Most played" list (only tracks in the catalogue)."""
+    try:
+        did = int((await request.json()).get("id"))
+    except (ValueError, TypeError):
+        raise HTTPException(400, "Bad track id")
+    if did not in index.ids:
+        return {"ok": False}
+    return {"ok": await run_in_threadpool(tokens.count_play, did)}
 
 
 LANG_CODES = {"en", "es", "fr", "de", "it", "pt", "nl"}
