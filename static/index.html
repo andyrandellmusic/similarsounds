@@ -1050,10 +1050,17 @@
   .dk-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
   .dk { display: grid; justify-items: center; gap: 4px; text-align: center; }
   .dk.good { --c: var(--good); } .dk.ok { --c: var(--ok); } .dk.bad { --c: var(--bad); }
-  .dk i { width: 14px; height: 14px; border-radius: 50%; background: var(--c); border: 2px solid var(--panel-2); box-shadow: 0 0 0 1px var(--c), 0 0 10px var(--c); margin-bottom: 2px; }
-  .dk b { color: var(--c); font-size: 12.5px; }
+  .dk-pill { display: inline-flex; align-items: center; gap: 5px; height: 22px; padding: 0 9px 0 7px; border-radius: 99px; white-space: nowrap;
+    border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); background: color-mix(in srgb, var(--c) 14%, var(--panel)); color: var(--c);
+    font: 700 11px Inter, sans-serif; box-shadow: 0 0 10px color-mix(in srgb, var(--c) 25%, transparent); margin-bottom: 3px; }
+  .dk-pill i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); }
   .dk small { color: var(--muted); font-size: 11px; line-height: 1.3; }
   .dk-tip { margin-top: 12px; font-size: 11.5px; color: var(--muted); }
+  @media (max-width: 400px) {      /* small phones: one per line, the explanation beside its pill */
+    .dk-row { grid-template-columns: 1fr; gap: 8px; }
+    .dk { grid-template-columns: 96px 1fr; justify-items: start; align-items: center; text-align: left; gap: 10px; }
+    .dk-pill { margin: 0; }
+  }
   .set-list { list-style: none; margin: 0; padding: 0; }
   .set-item { user-select: none; }
   .set-list { display: grid; gap: 0; }
@@ -1107,14 +1114,18 @@
   .set-item.dragging .set-card { border-color: var(--accent); box-shadow: 0 8px 30px rgba(0,0,0,.5); position: relative; z-index: 2; }
   .set-list.is-dragging .link, .set-list.is-dragging .gap-btn, .set-list.is-dragging .gap-box, .set-list.is-dragging .link-dot .ld { display: none; }
   /* between two tracks: just a coloured dot (green mixes well, amber workable, red clashes); tap it for the details */
-  .link-dot { position: relative; min-height: 14px; }
+  .link-dot { position: relative; min-height: 26px; }
   .link-dot.good { --c: var(--good); } .link-dot.ok { --c: var(--ok); } .link-dot.bad { --c: var(--bad); }
-  .link-dot .ld { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; width: 14px; height: 14px; padding: 0; border-radius: 50%;
-    border: 2px solid var(--panel); background: var(--c); box-shadow: 0 0 0 1px var(--c), 0 0 10px var(--c); cursor: pointer; transition: transform .15s; }
-  .link-dot .ld::after { content: ""; position: absolute; inset: -12px; }       /* easy to tap */
-  .link-dot .ld:hover, .link-dot .ld[aria-expanded="true"] { transform: translate(-50%, -50%) scale(1.25); }
-  .link-dot:has(.link:not([hidden])) { min-height: 0; padding-top: 16px; }
-  .link-dot:has(.link:not([hidden])) .ld { top: 8px; }
+  /* between two tracks: a small pill in the mix colour saying how well they mix; tap it for the details */
+  .link-dot .ld { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; display: inline-flex; align-items: center; gap: 6px;
+    height: 22px; padding: 0 10px 0 8px; border-radius: 99px; border: 1px solid color-mix(in srgb, var(--c) 55%, transparent);
+    background: color-mix(in srgb, var(--c) 14%, var(--panel)); color: var(--c); font: 700 11px Inter, sans-serif; white-space: nowrap; cursor: pointer;
+    box-shadow: 0 0 10px color-mix(in srgb, var(--c) 25%, transparent); transition: background .15s, border-color .15s; }
+  .link-dot .ld i { width: 7px; height: 7px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); }
+  .link-dot .ld::after { content: ""; position: absolute; inset: -8px -4px; }       /* easy to tap */
+  .link-dot .ld:hover, .link-dot .ld[aria-expanded="true"] { background: color-mix(in srgb, var(--c) 24%, var(--panel)); border-color: var(--c); }
+  .link-dot:has(.link:not([hidden])) { min-height: 0; padding-top: 28px; }
+  .link-dot:has(.link:not([hidden])) .ld { top: 14px; }
   .link-dot .link { margin: 2px 0 4px; }
   .link-dot .link[hidden] { display: none !important; }   /* a tight list while you drag */
   .set-list.is-dragging .set-item { margin-bottom: 8px; }
@@ -1350,13 +1361,13 @@
           <button type="button" class="icon import-empty" data-import>Import a tracklist</button>
         </div>
         <div class="dot-key">
-          <div class="dk-title">Between every two tracks you'll see a dot</div>
+          <div class="dk-title">Between every two tracks you'll see how well they mix</div>
           <div class="dk-row">
-            <span class="dk good"><i></i><b>Mixes well</b><small>Keys, BPM and energy all fit</small></span>
-            <span class="dk ok"><i></i><b>Workable</b><small>Mixable with a bit of care</small></span>
-            <span class="dk bad"><i></i><b>Will clash</b><small>Try another track between</small></span>
+            <span class="dk good"><span class="dk-pill"><i></i>Mixes well</span><small>Keys, BPM and energy all fit</small></span>
+            <span class="dk ok"><span class="dk-pill"><i></i>Workable</span><small>Mixable with a bit of care</small></span>
+            <span class="dk bad"><span class="dk-pill"><i></i>Will clash</span><small>Try another track between</small></span>
           </div>
-          <div class="dk-tip">Tap a dot to see why, and to hear the two tracks mixed.</div>
+          <div class="dk-tip">Tap one to see why, and to hear the two tracks mixed.</div>
         </div>
       </div>
     </div>
@@ -3004,7 +3015,7 @@ function renderSet() {
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link-dot ${links[i - 1].cls}">
-        <button type="button" class="ld" data-ld="${i}" aria-expanded="false" aria-label="${esc(links[i - 1].label)}: show how these two mix" title="${esc(links[i - 1].label)} · ${esc(links[i - 1].detail)}"></button>
+        <button type="button" class="ld" data-ld="${i}" aria-expanded="false" aria-label="${esc(links[i - 1].label)}: show how these two mix" title="${esc(links[i - 1].detail)}"><i></i>${links[i - 1].label}</button>
         <div class="link ${links[i - 1].cls}" data-lmore="${i}" hidden><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
         <span class="link-acts">${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button>` : ""}<button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></span></div>
         <div class="gap-box" data-gapbox="${i}" hidden></div></div>` : ""}
