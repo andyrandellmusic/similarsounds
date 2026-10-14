@@ -1333,7 +1333,7 @@
       </div>
       <div class="home-pair">
         <div class="home-box">
-          <div class="start-label">Try a fresh release</div>
+          <div class="start-label">New releases</div>
           <div class="try" id="try"></div>
         </div>
         <div class="home-box" id="most-box" hidden>
@@ -1726,7 +1726,7 @@ function countForMost(id) {
   if (!id || playedCounted.has(String(id))) return; playedCounted.add(String(id));
   fetch("/api/play", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: Number(id) }), keepalive: true }).catch(() => {});
 }
-/* "Try a fresh release": a new eight every 8 seconds (fades across), pausing while it's touched or hovered */
+/* "New releases": a new four every 6 seconds on computers (fades across), pausing while it's touched or hovered */
 let freshSets = [], freshIdx = 0, freshHold = false;
 function freshDots() {
   const box = $("#try"); if (!box || freshSets.length < 2) return;
@@ -1760,8 +1760,8 @@ function showFresh(i) {
 // tapping a dot shows that set and starts the 8 seconds again from then
 document.addEventListener("click", e => { const d = e.target.closest("[data-fresh]"); if (d) { showFresh(Number(d.dataset.fresh)); startFreshTimer(); } });
 let freshRotate = null;
-// computers: a new eight every 8 seconds; phones (one track at a time): a new track every 4 seconds
-function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, matchMedia("(max-width: 640px)").matches ? 4000 : 8000); }
+// computers: a new four every 6 seconds; phones (one track at a time): a new track every 4 seconds
+function startFreshTimer() { clearInterval(freshRotate); freshRotate = setInterval(freshTick, matchMedia("(max-width: 640px)").matches ? 4000 : 6000); }
 function freshTick() {
   const box = $("#try");
   if (!box || freshHold || document.hidden || freshSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -1892,7 +1892,7 @@ async function run(exactUrl, fromHistory = false) {
 function showProblem(err, attempted) {
   const typed = isLink(attempted || "") ? "" : (attempted || "").trim();
   const tryAgain = `<button type="button" class="icon" id="retry">Try again</button>`;
-  const examples = examplesCache.length ? `<div class="start-label" style="margin-top:18px">Or try a fresh release</div>
+  const examples = examplesCache.length ? `<div class="start-label" style="margin-top:18px">Or try a new release</div>
     <div class="try">${examplesHtml(examplesCache)}</div>` : "";
   let title, body, actions = "";
   if (err.kind === "tokens") {
@@ -3970,6 +3970,6 @@ addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=12" defer></script>
-<script src="/static/i18n.js?v=61"></script>
+<script src="/static/i18n.js?v=63"></script>
 </body>
 </html>
