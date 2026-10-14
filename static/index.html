@@ -1023,6 +1023,16 @@
   .add-tracks { background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 12px; height: 46px; padding: 0 24px; font-weight: 800; font-size: 15px; }
   .add-tracks:hover { filter: brightness(1.05); }
   .set-empty .empty-key { margin-top: 22px; font-size: 13px; }
+  /* empty set: a preview of the energy chart a real set gets, and the gig planner up front */
+  .set-empty { padding-top: 22px; }
+  .empty-flow { position: relative; margin: 0 auto 18px; max-width: 360px; padding: 10px 10px 4px; border: 1px dashed #34343f; border-radius: 14px; opacity: .9; }
+  .empty-flow .ef-tag { position: absolute; top: 8px; left: 10px; font: 800 9.5px Inter, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .empty-flow svg { width: 100%; height: auto; display: block; }
+  .set-empty .plan-empty { width: 100%; max-width: 360px; margin: 4px auto 10px; padding: 12px 14px; }
+  .set-empty .plan-empty span { display: grid; gap: 2px; text-align: left; min-width: 0; }
+  .set-empty .plan-empty small { display: block !important; }
+  .empty-row { display: flex; gap: 8px; justify-content: center; max-width: 360px; margin: 0 auto; }
+  .empty-row > * { flex: 1; margin: 0 !important; height: 40px; justify-content: center; }
   .set-list { list-style: none; margin: 0; padding: 0; }
   .set-item { user-select: none; }
   /* compact track cards: cover doubles as a play button; three short lines of info */
@@ -1296,11 +1306,16 @@
       <p class="set-hint" id="set-hint" hidden>Tip: hold a track, then drag it to move it.</p>
       <ol class="set-list" id="set-list"></ol>
       <div class="set-empty" id="set-empty">
+        <div class="empty-flow" aria-hidden="true"><span class="ef-tag">Preview</span><div id="empty-flow-svg"></div></div>
         <div class="empty-title">Your set is empty</div>
         <p data-i18n="emptySet">Search for a track, then tap <b>Add to set</b> on the ones you like and drag them into order.</p>
-        <button type="button" class="add-tracks" id="add-tracks">+ Add tracks</button>
-        <button type="button" class="icon import-empty" data-import>Or import a tracklist</button>
-        <button type="button" class="icon import-empty" data-plan>Or plan a whole gig</button>
+        <button type="button" class="plan-wide plan-empty" data-plan>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.2 5.4L20 9l-4.4 3.8L17 18.5 12 15.6 7 18.5l1.4-5.7L4 9l5.8-.6z" fill="currentColor"/></svg>
+          <span><b>Plan a whole gig</b><small>Fill a set for your time slot in seconds</small></span></button>
+        <div class="empty-row">
+          <button type="button" class="add-tracks" id="add-tracks">+ Add tracks</button>
+          <button type="button" class="icon import-empty" data-import>Import a tracklist</button>
+        </div>
         <p class="empty-key" data-i18n="colourKey">Each pair gets a colour: <span style="color:var(--good)">green</span> mixes well, <span style="color:var(--ok)">amber</span> is workable, <span style="color:var(--bad)">red</span> will clash.</p>
       </div>
     </div>
@@ -2823,6 +2838,16 @@ function energyFlow() {
       ${n > 1 ? `<path d="${line}" class="fl-line"/>${tops.map(([x, y]) => `<circle cx="${x.toFixed(1)}" cy="${(y - 1).toFixed(1)}" r="1.8" class="fl-dot"/>`).join("")}` : ""}</svg>`;
 }
 
+// the empty set's preview: eight made-up tracks drawn with the real chart, so people see what a set looks like
+function emptyFlow() {
+  const el = $("#empty-flow-svg"); if (!el || el.dataset.drawn) return;
+  const demo = [3, 4, 5, 6, 7, 9, 7, 5].map((e, i) => ({ deezer_id: -i - 1, title: "Example track", energy: e, camelot: "8A", bpm: 124 }));
+  const real = set; set = demo;
+  try { el.innerHTML = energyFlow().replace(/<div class="flow-label">[\s\S]*?<\/div>/, "").replace(/id="(flg|flglow)-/g, 'id="e$1-').replace(/url\(#(flg|flglow)-/g, "url(#e$1-"); }
+  finally { set = real; }
+  el.dataset.drawn = 1; el.classList.add("flow");
+}
+
 /* Smart order: try every starting track, then greedily take the next track that mixes best
    (key + BPM + energy), preferring a gentle energy build. Keeps the best-scoring order. */
 function smartOrder(tracks) {
@@ -2941,6 +2966,7 @@ function renderSet() {
   $("#fab-open").classList.toggle("bad", !!clashes);
   $("#fab-open").setAttribute("aria-label", `Open your set: ${set.length} track${set.length === 1 ? "" : "s"}${clashes ? `, ${clashes} clash${clashes > 1 ? "es" : ""}` : ""}`);
   $("#set-empty").style.display = set.length ? "none" : "";
+  if (!set.length) emptyFlow();
   $("#set-flow").innerHTML = energyFlow();
   const links = set.slice(1).map((t, i) => transition(set[i], t));
   const rough = links.filter(l => l.score === 0).length, workable = links.filter(l => l.score === 1).length;
