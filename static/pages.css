@@ -112,3 +112,13 @@ footer nav a { color: var(--text); text-decoration: none; font-weight: 600; }
 .vs .n { color: var(--bad); font-weight: 800; font-size: 16px; }
 .vs .p { color: var(--ok); font-weight: 800; font-size: 16px; }
 .vs th:nth-child(2), .vs td:nth-child(2) { background: rgba(198,255,61,.06); }
+
+/* Artists like… hub: filter box, A-Z jump bar, letter sections */
+.az-find { width: 100%; max-width: 420px; height: 44px; margin: 4px 0 14px; padding: 0 14px; border-radius: 12px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: 500 16px Inter, sans-serif; }
+.az-find:focus { outline: none; border-color: var(--accent); }
+.az-jump { position: sticky; top: 0; z-index: 2; display: flex; flex-wrap: wrap; gap: 2px; padding: 8px 0; margin-bottom: 8px; background: var(--bg, #0b0b0f); border-bottom: 1px solid var(--line); }
+.az-jump a { min-width: 30px; height: 30px; display: grid; place-items: center; border-radius: 8px; text-decoration: none; font: 700 13px "JetBrains Mono", monospace; color: var(--muted); }
+.az-jump a:hover { color: var(--accent); background: var(--panel); }
+.az { scroll-margin-top: 64px; }
+.az h2 { font-size: 18px; margin: 22px 0 10px; color: var(--accent); }
+.az[hidden], .pill[hidden] { display: none; }

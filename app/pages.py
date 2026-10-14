@@ -105,7 +105,7 @@ def page(title: str, description: str, path: str, body: str, *, jsonld: str = ""
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/static/apple-touch-icon.png?v=2">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/static/pages.css?v=5">
+<link rel="stylesheet" href="/static/pages.css?v=6">
 {jsonld}
 </head>
 <body>
@@ -286,11 +286,34 @@ def artist_page(artists, name: str) -> str:
 
 
 def artists_hub(artists) -> str:
-    links = "".join(f'<a class="pill" href="{artist_path(n)}">{escape(n)}</a>' for n in artists.names)
+    # grouped A-Z with a jump bar and a filter box, so 3,000+ artists stay easy to get through
+    def letter(n):
+        c = n[:1].upper()
+        return c if c.isalpha() and c.isascii() else "#"
+    groups: dict[str, list[str]] = {}
+    for n in artists.names:
+        groups.setdefault(letter(n), []).append(n)
+    order = sorted(groups, key=lambda c: (c != "#", c))
+    jump = "".join(f'<a href="#l-{"0" if c == "#" else c}">{c}</a>' for c in order)
+    sections = "".join(
+        f'<section class="az" id="l-{"0" if c == "#" else c}"><h2>{c}</h2><div class="pills">'
+        + "".join(f'<a class="pill" href="{artist_path(n)}">{escape(n)}</a>' for n in groups[c]) + "</div></section>"
+        for c in order)
     body = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / Artists like…</nav>
   <h1>Artists that sound alike</h1>
   <p class="summary">Pick an artist to see the house artists who sound most like them, measured from the music itself rather than tags or listener stats. {len(artists.names):,} artists.</p>
-  <div class="pills">{links}</div>"""
+  <input class="az-find" type="search" placeholder="Find an artist…" aria-label="Find an artist" autocomplete="off">
+  <nav class="az-jump" aria-label="Jump to letter">{jump}</nav>
+  {sections}
+  <p class="az-none" hidden>No artist by that name yet.</p>
+  <script>
+  (() => {{ const box = document.querySelector(".az-find"), none = document.querySelector(".az-none");
+    box.addEventListener("input", () => {{ const q = box.value.trim().toLowerCase(); let any = false;
+      document.querySelectorAll(".az").forEach(sec => {{ let shown = 0;
+        sec.querySelectorAll(".pill").forEach(a => {{ const hit = !q || a.textContent.toLowerCase().includes(q); a.hidden = !hit; shown += hit; }});
+        sec.hidden = !shown; any ||= !!shown; }});
+      document.querySelector(".az-jump").hidden = !!q; none.hidden = any; }}); }})();
+  </script>"""
     return page("House artists that sound alike | SimilarSounds",
                 "Find house artists who sound like the ones you love, measured from the music itself.", "/artists-like", body)
 
