@@ -344,9 +344,14 @@
   .tm { color: var(--muted); font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 2px; }
   .tm .badge-new { margin: 0 6px 0 0; vertical-align: 1px; }
   /* the three steps: one card in the same style as the sections below */
-  /* the three steps sit straight on the page: no box, no dividers */
-  .steps { list-style: none; padding: 0; margin: 30px 0 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 28px; }
-  .steps li { display: flex; gap: 13px; align-items: flex-start; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 4px 0; }
+  /* the three steps: a card each, with a small green arrow leading from one to the next */
+  .steps { list-style: none; padding: 0; margin: 30px 0 28px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 0 30px; counter-reset: none; }
+  .steps li { position: relative; display: flex; gap: 13px; align-items: flex-start; color: var(--muted); font-size: 13px; line-height: 1.45; padding: 16px 18px;
+    background: linear-gradient(180deg, #17171f, #111117); border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 24px rgba(0,0,0,.22);
+    transition: border-color .2s, transform .2s; }
+  .steps li:hover { border-color: #3a3a4a; transform: translateY(-2px); }
+  .steps li + li::before { content: ""; position: absolute; left: -22px; top: 50%; width: 14px; height: 14px; transform: translateY(-50%);
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 5l7 7-7 7' fill='none' stroke='%23c6ff3d' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/contain no-repeat; opacity: .8; }
   .steps b { flex: none; width: 30px; height: 30px; border-radius: 50%; background: rgba(198,255,61,.12); color: var(--accent);
     box-shadow: inset 0 0 0 1px rgba(198,255,61,.35); display: grid; place-items: center; font-size: 13px; font-weight: 800; }
   .steps strong { display: block; color: var(--text); font-size: 14.5px; margin: 4px 0 3px; }
@@ -1074,8 +1079,12 @@
     .go { padding: 0 14px; }
     .set-panel { width: 100%; }
     .steps { grid-template-columns: 1fr; margin: 22px 0 22px; }
-    .steps { gap: 12px; }
-    .steps li { font-size: 12.5px; align-items: center; padding: 0; gap: 11px; }
+    /* phones: one neat grouped box, steps divided by thin lines */
+    .steps { gap: 0; background: linear-gradient(180deg, #17171f, #111117); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.22); }
+    .steps li { font-size: 12.5px; align-items: center; padding: 12px 14px; gap: 11px; background: none; border: 0; border-radius: 0; box-shadow: none; }
+    .steps li:hover { transform: none; }
+    .steps li + li { border-top: 1px solid var(--line); }
+    .steps li + li::before { display: none; }
     .steps strong { display: inline; font-size: 13px; margin: 0 4px 0 0; }
     .steps b { width: 26px; height: 26px; font-size: 12px; }
     .has-set .steps { margin-right: 44px; }        /* room for the set tab beside the card */
