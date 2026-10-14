@@ -580,6 +580,8 @@
   .query .row.qsel { border-color: var(--accent) !important; box-shadow: 0 0 16px rgba(198,255,61,.22), 0 0 0 1px rgba(198,255,61,.25); }
   /* The card under the mouse lights up to full lime (and the one that's playing) */
   @media (hover: hover) { .query .row:hover, #list .row:hover { border-color: var(--accent); } }
+  /* the 30 matches: the one under the mouse also gets the search bar's green glow */
+  @media (hover: hover) { #list .row:hover { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
   .query .row.playing, #list .row.playing, .query .row:has(.cover.play.on), #list .row:has(.cover.play.on) { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
   /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
