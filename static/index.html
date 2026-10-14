@@ -115,7 +115,7 @@
   .brand-divider { height: 1px; margin-top: 26px; border-radius: 1px; background: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
 
-  form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 6px; }
+  form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--accent); border-radius: 14px; padding: 6px; }   /* always outlined green */
   form.search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--text); font: inherit; font-size: 16px; padding: 12px 12px; outline: none; }
   button { font: inherit; cursor: pointer; }
   /* Scrolling promo banner along the very top: Set builder and Plan my gig */
@@ -184,7 +184,7 @@
     border-radius: 11px 11px 0 0; padding: 9px 15px 8px; margin-bottom: 0; font: 700 13px Inter, sans-serif; cursor: pointer; }
   .search-tabs button:hover { color: var(--text); }
   .search-tabs button.on { background: var(--panel); border-color: var(--line); color: var(--accent); }
-  body:has(form.search:focus-within) .search-tabs button.on { border-color: var(--accent); }
+  .search-tabs button.on { border-color: var(--accent); }   /* the open tab joins the green outline */
   .search-wrap, .describe-wrap { position: relative; z-index: 1; }
   .search-wrap[hidden], .describe-wrap[hidden] { display: none; }
   .describe-wrap { position: relative; }
