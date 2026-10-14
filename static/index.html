@@ -1040,6 +1040,7 @@
   .empty-row > * { flex: 1; margin: 0 !important; height: 40px; justify-content: center; }
   .set-list { list-style: none; margin: 0; padding: 0; }
   .set-item { user-select: none; }
+  .set-list { display: grid; gap: 0; }
   /* compact track cards: cover doubles as a play button; three short lines of info */
   .set-card { display: grid; grid-template-columns: 18px 52px 1fr auto; gap: 8px 10px; align-items: center; background: linear-gradient(180deg, #1c1d26, #16161d);
     border: 1px solid var(--line); border-radius: 12px; padding: 7px 8px; transition: border-color .15s, box-shadow .15s; }
@@ -1088,7 +1089,18 @@
   .mini:disabled { color: var(--muted); opacity: .35; cursor: default; }
   .mini:disabled:hover { background: none; }
   .set-item.dragging .set-card { border-color: var(--accent); box-shadow: 0 8px 30px rgba(0,0,0,.5); position: relative; z-index: 2; }
-  .set-list.is-dragging .link, .set-list.is-dragging .gap-btn, .set-list.is-dragging .gap-box { display: none; }   /* a tight list while you drag */
+  .set-list.is-dragging .link, .set-list.is-dragging .gap-btn, .set-list.is-dragging .gap-box, .set-list.is-dragging .link-dot .ld { display: none; }
+  /* between two tracks: just a coloured dot (green mixes well, amber workable, red clashes); tap it for the details */
+  .link-dot { position: relative; min-height: 14px; }
+  .link-dot.good { --c: var(--good); } .link-dot.ok { --c: var(--ok); } .link-dot.bad { --c: var(--bad); }
+  .link-dot .ld { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 2; width: 14px; height: 14px; padding: 0; border-radius: 50%;
+    border: 2px solid var(--panel); background: var(--c); box-shadow: 0 0 0 1px var(--c), 0 0 10px var(--c); cursor: pointer; transition: transform .15s; }
+  .link-dot .ld::after { content: ""; position: absolute; inset: -12px; }       /* easy to tap */
+  .link-dot .ld:hover, .link-dot .ld[aria-expanded="true"] { transform: translate(-50%, -50%) scale(1.25); }
+  .link-dot:has(.link:not([hidden])) { min-height: 0; padding-top: 16px; }
+  .link-dot:has(.link:not([hidden])) .ld { top: 8px; }
+  .link-dot .link { margin: 2px 0 4px; }
+  .link-dot .link[hidden] { display: none !important; }   /* a tight list while you drag */
   .set-list.is-dragging .set-item { margin-bottom: 8px; }
 
   .link { display: flex; align-items: center; gap: 8px; margin: 2px 0 2px 34px; padding: 7px 0 7px 14px; border-left: 2px solid var(--c); font-size: 12px; color: var(--muted);
@@ -2775,6 +2787,12 @@ function energyMix(a, b) {
   return [0, `energy jump ${s}`];
 }
 // short chips for the line between two tracks in the set: key change, BPM, energy change
+document.addEventListener("click", e => {
+  const d = e.target.closest("[data-ld]"); if (!d) return;
+  const more = document.querySelector(`[data-lmore="${d.dataset.ld}"]`); if (!more) return;
+  more.hidden = !more.hidden; d.setAttribute("aria-expanded", String(!more.hidden));
+  if (more.hidden) document.querySelector(`[data-gapbox="${d.dataset.ld}"]`)?.setAttribute("hidden", "");
+});
 function linkChips(a, b) {
   const ba = Math.round(a.bpm), bb = Math.round(b.bpm), de = (Number(b.energy) || 0) - (Number(a.energy) || 0);
   return [`${a.camelot}→${b.camelot}`, ba === bb ? `${bb} BPM` : `${ba}→${bb}`, `E ${de > 0 ? "+" + de : de < 0 ? "−" + -de : "="}`]
@@ -2982,9 +3000,11 @@ function renderSet() {
   $("#set-hint").hidden = set.length < 2;
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
-      ${i > 0 ? `<div class="link ${links[i - 1].cls}" title="${esc(links[i - 1].detail)}"><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
+      ${i > 0 ? `<div class="link-dot ${links[i - 1].cls}">
+        <button type="button" class="ld" data-ld="${i}" aria-expanded="false" aria-label="${esc(links[i - 1].label)}: show how these two mix" title="${esc(links[i - 1].label)} · ${esc(links[i - 1].detail)}"></button>
+        <div class="link ${links[i - 1].cls}" data-lmore="${i}" hidden><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
         <span class="link-acts">${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button>` : ""}<button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></span></div>
-        <div class="gap-box" data-gapbox="${i}" hidden></div>` : ""}
+        <div class="gap-box" data-gapbox="${i}" hidden></div></div>` : ""}
       <div class="set-card">
         <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
         <button type="button" class="cover set-play" data-setplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)} by ${esc(t.artist)}">
@@ -3079,7 +3099,7 @@ $("#set-list").addEventListener("pointerdown", e => {
   if (!item) return;
   const grip = e.target.closest(".grip");
   if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId, e.clientX, e.clientY); return; }
-  if (e.target.closest("button, a, input, .gap-box, .link") || !e.target.closest(".set-card")) return;
+  if (e.target.closest("button, a, input, .gap-box, .link, .link-dot") || !e.target.closest(".set-card")) return;
   const card = e.target.closest(".set-card");
   pendingDrag = { item, card, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
   if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
