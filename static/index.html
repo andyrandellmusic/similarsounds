@@ -246,11 +246,15 @@
   /* "Now playing" bar: stays at the bottom while a preview or the video plays, so you can pause from anywhere */
   .nowbar { position: fixed; left: 50%; bottom: calc(14px + env(safe-area-inset-bottom)); transform: translate(-50%, 140%); z-index: 39;
     width: min(460px, calc(100% - 24px)); display: grid; grid-template-columns: 44px 1fr auto auto; gap: 10px; align-items: center;
-    /* the original bar, but see-through: the page shows faintly behind it */
-    background: rgba(20,20,27,.62); border: 1px solid rgba(198,255,61,.5); border-radius: 14px; padding: 7px 8px 7px 7px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.45); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    /* frosted glass: a pale, milky tint over a heavy blur, with a fine frost grain and a thin green edge */
+    background-color: rgba(150,155,170,.16); border: 1px solid rgba(198,255,61,.45); border-radius: 14px; padding: 7px 8px 7px 7px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.18), 0 12px 40px rgba(0,0,0,.45);
+    backdrop-filter: blur(24px) saturate(120%) brightness(.85); -webkit-backdrop-filter: blur(24px) saturate(120%) brightness(.85);
+    isolation: isolate; overflow: hidden;
     transition: transform .25s ease, opacity .25s ease; opacity: 0; pointer-events: none; }
-  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background: rgba(20,20,27,.9); } }
+  .nowbar::before { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .14; mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E"); }
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) { .nowbar { background-color: rgba(44,46,54,.94); } }
   .nowbar.show { transform: translate(-50%, 0); opacity: 1; pointer-events: auto; }
   .nowbar img, .nowbar .nb-logo { width: 44px; height: 44px; border-radius: 8px; object-fit: cover; display: block; background: var(--panel-2); }
   .nowbar .nb-logo { display: grid; place-items: center; } .nowbar .nb-logo svg { width: 26px; height: 26px; }
@@ -263,8 +267,8 @@
   .nowbar .nb-time { font: 600 10.5px "JetBrains Mono", monospace; color: var(--muted); flex: none; min-width: 30px; text-align: right; }
   /* the drag bar: a thin green line that fills as the track plays, with a dot to grab */
   .nb-range { -webkit-appearance: none; appearance: none; flex: 1; min-width: 0; height: 18px; margin: 0; background: transparent; cursor: pointer; --p: 0%; touch-action: none; }
-  .nb-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p) 100% no-repeat, #34343f; }
-  .nb-range::-moz-range-track { height: 4px; border-radius: 4px; background: #34343f; }
+  .nb-range::-webkit-slider-runnable-track { height: 4px; border-radius: 4px; background: linear-gradient(var(--accent), var(--accent)) 0 / var(--p) 100% no-repeat, rgba(255,255,255,.2); }
+  .nb-range::-moz-range-track { height: 4px; border-radius: 4px; background: rgba(255,255,255,.2); }
   .nb-range::-moz-range-progress { height: 4px; border-radius: 4px; background: var(--accent); }
   .nb-range::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; margin-top: -4.5px; border-radius: 50%; background: var(--accent); border: 0; box-shadow: 0 0 0 3px rgba(198,255,61,.2); }
   .nb-range::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--accent); border: 0; }
