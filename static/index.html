@@ -115,7 +115,8 @@
   .brand-divider { height: 1px; margin-top: 26px; border-radius: 1px; background: var(--accent); }
   .sub { color: var(--muted); margin: 0 0 24px; max-width: 620px; }
 
-  form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid var(--accent); border-radius: 14px; padding: 6px; }   /* always outlined green */
+  form.search { display: flex; gap: 8px; background: var(--panel); border: 1px solid rgba(198,255,61,.6); border-radius: 14px; padding: 6px; }   /* always outlined green, a fine line */
+  @media (min-resolution: 2dppx) { form.search { border-width: .5px; border-color: rgba(198,255,61,.85); } }
   form.search input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--text); font: inherit; font-size: 16px; padding: 12px 12px; outline: none; }
   button { font: inherit; cursor: pointer; }
   /* Scrolling promo banner along the very top: Set builder and Plan my gig */
@@ -184,7 +185,8 @@
     border-radius: 11px 11px 0 0; padding: 9px 15px 8px; margin-bottom: 0; font: 700 13px Inter, sans-serif; cursor: pointer; }
   .search-tabs button:hover { color: var(--text); }
   .search-tabs button.on { background: var(--panel); border-color: var(--line); color: var(--accent); }
-  .search-tabs button.on { border-color: var(--accent); }   /* the open tab joins the green outline */
+  .search-tabs button.on { border-color: rgba(198,255,61,.6); }   /* the open tab joins the green outline */
+  @media (min-resolution: 2dppx) { .search-tabs button.on { border-width: .5px; border-color: rgba(198,255,61,.85); } }
   .search-wrap, .describe-wrap { position: relative; z-index: 1; }
   .search-wrap[hidden], .describe-wrap[hidden] { display: none; }
   .describe-wrap { position: relative; }
@@ -577,7 +579,7 @@
   /* clicked into: a thicker line, a green glow and a lighter box, so it's obvious you're typing in it */
   form.search { transition: box-shadow .18s ease, background-color .18s ease; }
   form.search:focus-within { border-color: var(--accent); background: #1b1d17;
-    box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 4px rgba(198,255,61,.2), 0 0 28px rgba(198,255,61,.16); }
+    box-shadow: 0 0 0 3px rgba(198,255,61,.18), 0 0 26px rgba(198,255,61,.16); }
   form.search:focus-within input::placeholder { color: #6f7368; }
   form.search input:focus-visible { outline: none; }
   /* Close / clear X buttons everywhere: green X, no green box around it (a soft background shows keyboard focus) */
