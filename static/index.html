@@ -1492,6 +1492,42 @@
   #set-panel .set-row2 .plan-wide b { font: inherit; }
   #set-panel .set-row2 .plan-wide:hover, #set-panel .set-row2 .share-mini:hover:not(:disabled) { border-color: var(--accent); }
   #set-panel .set-row2 svg { width: 16px; height: 16px; color: var(--accent); }
+
+  /* Set builder: "Fresh for your set" in the top right corner, four small tracks rotating */
+  @media (min-width: 1001px) {
+    #set-panel .set-head { display: grid; grid-template-columns: minmax(0, 1fr) 430px; column-gap: 32px; align-items: start; padding-right: 64px; }
+    #set-panel .set-head > * { grid-column: 1; }
+    #set-panel .set-head > .set-fresh { grid-column: 2; grid-row: 1 / span 6; }
+    #set-panel #set-close { position: fixed; top: 16px; right: 18px; z-index: 6; }
+    #set-panel .set-head .row1 { justify-content: flex-start; }
+  }
+  .set-fresh { border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 10px 10px 8px; }
+  .set-fresh[hidden] { display: none; }
+  .sf-head { display: flex; align-items: baseline; gap: 8px; margin: 0 2px 8px; min-width: 0; }
+  .sf-head b { font: 800 10.5px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+  .sf-head span { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sf-list { display: grid; gap: 5px; }
+  .sf-item { display: flex; align-items: center; gap: 9px; padding: 5px 6px; border-radius: 9px; background: var(--panel-2); border: 1px solid transparent; min-width: 0; }
+  .sf-item:hover { border-color: var(--line); }
+  .sf-txt { flex: 1; min-width: 0; display: grid; gap: 1px; text-align: left; background: none; border: 0; padding: 0; color: var(--text); cursor: pointer; }
+  .sf-txt .tt { font-size: 12.5px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sf-a { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sf-txt:hover .tt { color: var(--accent); }
+  .sf-m { display: flex; align-items: center; gap: 4px; flex: none; }
+  .sf-m .tk { font: 800 10px "JetBrains Mono", monospace; color: #0b0b0f; padding: 2px 5px; border-radius: 5px; }
+  .sf-m .tb { font: 700 10px "JetBrains Mono", monospace; color: var(--muted); }
+  .sf-add { flex: none; width: 28px; height: 28px; border-radius: 8px; border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.08); color: var(--accent);
+    font: 700 16px/1 Inter, sans-serif; cursor: pointer; display: grid; place-items: center; padding: 0; }
+  .sf-add:hover { background: rgba(198,255,61,.18); }
+  .sf-add.added { background: var(--accent); color: var(--accent-ink); font-size: 13px; }
+  .sf-dots { display: flex; justify-content: center; gap: 6px; margin-top: 7px; min-height: 6px; }
+  .sf-dots button { width: 6px; height: 6px; padding: 0; border: 0; border-radius: 99px; background: #3a3a48; cursor: pointer; transition: width .25s, background .25s; position: relative; }
+  .sf-dots button::after { content: ""; position: absolute; inset: -7px -3px; }
+  .sf-dots button.on { width: 16px; background: var(--accent); }
+  .sf-list.leaving > * { animation: fresh-out .38s cubic-bezier(.4, 0, .2, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
+  .sf-list.entering > * { animation: fresh-in .6s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+  @media (prefers-reduced-motion: reduce) { .sf-list.leaving > *, .sf-list.entering > * { animation: none; } }
+  @media (max-width: 1000px) { #set-panel .set-head { display: flex; flex-direction: column; } #set-panel .set-head > * { order: 1; } #set-panel .set-head > .set-fresh { order: 2; margin-top: 12px; max-width: 720px; } }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1617,6 +1653,11 @@
     <div class="set-head">
       <div class="row1"><h2>Your set</h2><button type="button" class="close" id="set-close" aria-label="Close">×</button></div>
       <div class="set-summary" id="set-summary"></div>
+      <div class="set-fresh" id="set-fresh" hidden>
+        <div class="sf-head"><b>Fresh for your set</b><span>New releases that mix with your tracks</span></div>
+        <div class="sf-list" id="sf-list"></div>
+        <div class="sf-dots" id="sf-dots"></div>
+      </div>
       <div class="flow" id="set-flow"></div>
       <div class="set-tools">
         <button type="button" class="icon smart" id="set-smart" title="Reorder for the smoothest mixes and a steady energy build">✦ Smart order</button>
@@ -3140,7 +3181,7 @@ function refreshAddButtons() {
   document.querySelectorAll("[data-add]").forEach(b => {
     const added = inSet(Number(b.dataset.add));
     b.classList.toggle("added", added);
-    b.textContent = added ? "✓ In set" : "Add to set";
+    b.textContent = b.classList.contains("sf-add") ? (added ? "✓" : "+") : added ? "✓ In set" : "Add to set";
   });
 }
 
@@ -3390,11 +3431,62 @@ function setRoles(list) {
   return roles;
 }
 let freshTimer = null;
-function syncFresh() {            // keep "Fresh for your set" on the front page in step with the set
-  if (!$("#fresh")) return;
-  if (!set.length) { $("#fresh").hidden = true; return; }
-  clearTimeout(freshTimer); freshTimer = setTimeout(loadFresh, 500);
+function syncFresh() {            // keep "Fresh for your set" (front page and set builder) in step with the set
+  if (!set.length) { if ($("#fresh")) $("#fresh").hidden = true; $("#set-fresh").hidden = true; return; }
+  clearTimeout(freshTimer); freshTimer = setTimeout(() => { loadFresh(); loadSetFresh(); }, 500);
 }
+/* Set builder: "Fresh for your set" in the top corner, four small tracks at a time, changing every 6 seconds
+   (the same lift-away and arrive as New releases), pausing while the mouse or a finger is on it */
+let sfSets = [], sfIdx = 0, sfHold = false;
+async function loadSetFresh() {
+  const box = $("#set-fresh"); if (!box) return;
+  if (!set.length) { box.hidden = true; return; }
+  try {
+    const d = await (await fetch("/api/fresh", { method: "POST", headers: { "Content-Type": "application/json" },
+                                               body: JSON.stringify({ ids: set.map(t => t.deezer_id) }) })).json();
+    const list = (d.results || []).filter(t => !inSet(t.deezer_id)).slice(0, 16);
+    list.forEach(t => { trackCache[t.deezer_id] = t; });
+    sfSets = []; for (let i = 0; i + 4 <= list.length; i += 4) sfSets.push(list.slice(i, i + 4));
+    if (!sfSets.length && list.length) sfSets = [list];
+    box.hidden = !sfSets.length; sfIdx = 0;
+    $("#sf-dots").innerHTML = sfSets.length > 1 ? sfSets.map((_, i) => `<button type="button" data-sf="${i}" aria-label="Set ${i + 1} of ${sfSets.length}"></button>`).join("") : "";
+    paintSetFresh();
+  } catch {}
+}
+function sfItem(t) {
+  return `<div class="sf-item">${artPlay(t.deezer_id, t.cover, t.title, "art-sm")}
+    <button type="button" class="sf-txt" data-try="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find tracks that mix with ${esc(t.title)}">
+      <span class="tt">${esc(t.title)}</span><span class="sf-a">${esc(t.artist)}</span></button>
+    <span class="sf-m">${t.camelot ? `<span class="tk" style="background:${camelotColor(t.camelot)}">${esc(t.camelot)}</span>` : ""}<span class="tb">${Math.round(t.bpm || 0)}</span></span>
+    <button type="button" class="sf-add${inSet(t.deezer_id) ? " added" : ""}" data-add="${t.deezer_id}" aria-label="Add ${esc(t.title)} to your set" title="Add to your set">${inSet(t.deezer_id) ? "✓" : "+"}</button></div>`;
+}
+function paintSetFresh() {
+  $("#sf-list").innerHTML = (sfSets[sfIdx] || []).map(sfItem).join("");
+  [...$("#sf-list").children].forEach((c, k) => c.style.setProperty("--i", k));
+  $("#sf-dots").querySelectorAll("button").forEach((b, i) => b.classList.toggle("on", i === sfIdx));
+}
+function showSetFresh(i) {
+  const box = $("#sf-list"); if (sfSets.length < 2 || box.classList.contains("leaving")) return;
+  sfIdx = (i + sfSets.length) % sfSets.length;
+  box.style.minHeight = box.offsetHeight + "px";
+  box.classList.remove("entering"); box.classList.add("leaving");
+  setTimeout(() => {
+    paintSetFresh();
+    box.classList.remove("leaving"); box.classList.add("entering");
+    setTimeout(() => { box.classList.remove("entering"); box.style.minHeight = ""; }, 900);
+  }, 560);
+}
+document.addEventListener("click", e => { const d = e.target.closest("[data-sf]"); if (d) { showSetFresh(Number(d.dataset.sf)); clearInterval(sfRotate); sfRotate = setInterval(sfTick, 6000); } });
+// tapping a fresh track's name searches it: leave the set page first so the results show
+document.addEventListener("click", e => { if (e.target.closest("#set-fresh [data-try]")) openSet(false); }, true);
+["pointerenter", "focusin", "touchstart"].forEach(ev => $("#set-fresh").addEventListener(ev, () => { sfHold = true; }, { passive: true }));
+["pointerleave", "focusout"].forEach(ev => $("#set-fresh").addEventListener(ev, () => { sfHold = false; }));
+$("#set-fresh").addEventListener("touchend", () => setTimeout(() => { sfHold = false; }, 2500), { passive: true });
+function sfTick() {
+  if (sfHold || document.hidden || !$("#set-panel").classList.contains("open") || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  showSetFresh(sfIdx + 1);
+}
+let sfRotate = setInterval(sfTick, 6000);
 let setInstant = false;      // true right after a drop: redraw without the columns growing in again
 function renderSet() {
   syncFresh();
