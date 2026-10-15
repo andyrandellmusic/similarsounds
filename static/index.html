@@ -1558,6 +1558,39 @@
   .sg-dots { display: flex; gap: 5px; }
   .sg-dots em { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--c); box-shadow: 0 0 6px var(--c); }
   .sg-dots .good { --c: var(--good); } .sg-dots .ok { --c: var(--ok); } .sg-dots .bad { --c: var(--bad); }
+
+  /* the mix details under the set: one neat row, full width */
+  #set-panel .set-detail { max-width: none; margin: 6px 0 0; padding: 12px 14px; border-radius: 14px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--c); }
+  .set-detail.sd-good { --c: var(--good); } .set-detail.sd-ok { --c: var(--ok); } .set-detail.sd-bad { --c: var(--bad); }
+  .sd-row { display: flex; align-items: center; gap: 14px 22px; flex-wrap: wrap; }
+  .sd-pair { display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1 1 320px; }
+  .sd-badge { flex: none; padding: 5px 11px; border-radius: 99px; font: 800 11px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; color: var(--c);
+    background: color-mix(in srgb, var(--c) 12%, transparent); border: 1px solid color-mix(in srgb, var(--c) 55%, transparent); }
+  .sd-names { display: flex; align-items: center; gap: 8px; min-width: 0; font-size: 13px; }
+  .sd-names b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .sd-names i { font-style: normal; color: var(--muted); flex: none; }
+  .sd-stats { display: flex; gap: 6px; flex: none; }
+  .sd-stats span { display: grid; justify-items: center; gap: 1px; padding: 4px 10px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid var(--line); }
+  .sd-stats small { font: 700 8.5px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .sd-stats b { font: 700 12px "JetBrains Mono", monospace; color: var(--text); white-space: nowrap; }
+  .sd-acts { display: flex; gap: 6px; flex: none; margin-left: auto; }
+  .sd-btn { height: 32px; padding: 0 14px; border-radius: 9px; border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.08); color: var(--accent);
+    font: 700 12px Inter, sans-serif; cursor: pointer; white-space: nowrap; margin: 0; display: inline-flex; align-items: center; }
+  .sd-btn:hover { background: rgba(198,255,61,.16); }
+  .sd-btn.hear.on { background: var(--accent); color: var(--accent-ink); }
+  #set-panel .set-detail .gap-box { margin: 12px 0 0; padding: 10px 0 0; border: 0; border-top: 1px solid var(--line); border-radius: 0;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  #set-panel .set-detail .gap-box > p { grid-column: 1 / -1; }
+  #set-panel .set-detail .gap-box .mini-load { grid-column: 1 / -1; }
+  #set-panel .set-detail .gap-item { padding: 8px; border-radius: 10px; background: var(--panel-2); border: 1px solid var(--line); }
+  @media (max-width: 900px) { #set-panel .set-detail .gap-box { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) {
+    #set-panel .set-detail { margin: 6px 16px 0; }
+    .sd-row { gap: 10px; }
+    .sd-pair { flex-wrap: wrap; gap: 8px; flex-basis: 100%; }
+    .sd-stats { flex: 1; } .sd-stats span { flex: 1; padding: 4px 4px; }
+    .sd-acts { width: 100%; margin: 0; } .sd-acts .sd-btn { flex: 1; justify-content: center; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -3285,9 +3318,20 @@ document.addEventListener("click", e => {
   if (wasOpen) return;
   const more = document.querySelector(`[data-lmore="${i}"]`), gap = document.querySelector(`[data-gapbox="${i}"]`);
   if (!more) return;
-  const a = set[i - 1], b = set[i];
-  box.innerHTML = `<div class="sd-title">Between <b>${i}. ${esc(a?.title || "")}</b> and <b>${Number(i) + 1}. ${esc(b?.title || "")}</b></div>`;
-  box.append(more); if (gap) box.append(gap);
+  const a = set[i - 1], b = set[i]; if (!a || !b) return;
+  const tr = transition(a, b), ba = Math.round(a.bpm), bb = Math.round(b.bpm), de = (Number(b.energy) || 0) - (Number(a.energy) || 0);
+  box.className = `set-detail sd-${tr.cls}`;
+  box.innerHTML = `<div class="sd-row">
+      <div class="sd-pair"><span class="sd-badge">${tr.label}</span>
+        <span class="sd-names"><b>${i}. ${esc(a.title)}</b><i>→</i><b>${Number(i) + 1}. ${esc(b.title)}</b></span></div>
+      <div class="sd-stats">
+        <span><small>Key</small><b>${esc(a.camelot)} → ${esc(b.camelot)}</b></span>
+        <span><small>BPM</small><b>${ba === bb ? bb : `${ba} → ${bb}`}</b></span>
+        <span><small>Energy</small><b>${de > 0 ? "+" + de : de < 0 ? "−" + -de : "same"}</b></span></div>
+      <div class="sd-acts">${tr.score < 2 ? `<button type="button" class="sd-btn" data-gap="${i}">Fix this gap</button>` : ""}
+        <button type="button" class="sd-btn hear" data-hear-a="${a.deezer_id}" data-hear-b="${b.deezer_id}" data-la="${esc(a.title)}" data-lb="${esc(b.title)}">▶ Hear it</button></div>
+    </div>`;
+  if (gap) box.append(gap);
   box.hidden = false; d.setAttribute("aria-expanded", "true");
 });
 function linkChips(a, b) {
