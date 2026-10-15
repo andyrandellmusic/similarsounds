@@ -1245,6 +1245,92 @@
     .menu-btn { width: 36px; height: 36px; }
     .rrow .chips { flex-wrap: wrap; }
   }
+
+  /* ================= Set builder: a whole page, the set laid out left to right =================
+     Each track stands in its slot with its energy column above it; a coloured line between two tracks
+     shows how they mix (tap it for the details underneath). Drag a track sideways to move it. */
+  #set-panel { width: 100%; background: var(--bg); border-left: 0; transform: none; opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s .18s; }
+  #set-panel.open { box-shadow: none; opacity: 1; visibility: visible; transition: opacity .18s ease; }
+  #set-panel .set-head, #set-panel .set-body { width: 100%; max-width: 1280px; margin: 0 auto; box-sizing: border-box; }
+  #set-panel .set-head { padding: 22px 24px 14px; border-bottom: 0; }
+  #set-panel .set-head h2 { font-size: 26px; letter-spacing: -.01em; }
+  #set-panel .set-summary { font-size: 13.5px; }
+  #set-panel .set-summary .ef { color: var(--text); font-weight: 600; }
+  #set-panel .set-summary .ef b { color: #ff8a3d; }
+  #set-panel #set-flow { display: none; }
+  #set-panel .set-tools { max-width: 720px; }
+  #set-panel .set-row2 { max-width: 720px; }
+  #set-panel .set-body { padding: 4px 24px 40px; }
+  #set-panel .set-hint { margin: 6px 0 12px; }
+  .set-stage { position: relative; display: flex; align-items: flex-start; overflow-x: auto; overflow-y: hidden; padding: 6px 2px 18px;
+    scrollbar-width: thin; scrollbar-color: #3a3a48 transparent; overscroll-behavior-x: contain; }
+  .set-stage .set-list { display: flex; align-items: flex-start; gap: 0; flex: none; }
+  #set-panel .set-item { display: flex; align-items: flex-start; flex: none; margin: 0 !important; }
+  .st-unit { width: 172px; flex: none; position: relative; }
+  /* the energy column for this track, standing right over it */
+  .st-col { height: 132px; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 22px;
+    border-bottom: 1px solid var(--line); margin-bottom: 10px; }
+  .st-e { font: 800 13px "JetBrains Mono", monospace; color: var(--text); margin-bottom: 4px; }
+  .st-bar { width: 100%; border-radius: 9px 9px 2px 2px; display: flex; justify-content: center; padding-top: 7px; box-sizing: border-box; min-height: 22px;
+    background: linear-gradient(180deg, #a9d24e, #4c6a1f); box-shadow: 0 0 18px rgba(169,210,78,.18); animation: st-grow .5s cubic-bezier(.16,1,.3,1) both; transform-origin: bottom; }
+  .st-bar.end { background: linear-gradient(180deg, #e2ff86, #86c21a); box-shadow: 0 0 18px rgba(198,255,61,.25); }
+  .st-bar.pk { background: linear-gradient(180deg, #ffc08a, #e9581a); box-shadow: 0 0 20px rgba(255,138,61,.3); }
+  .st-bar.pk + * , .st-e.pk { color: #ffb37a; }
+  .st-role { font: 800 9px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: rgba(11,11,15,.78); white-space: nowrap; }
+  @keyframes st-grow { from { transform: scaleY(.15); opacity: 0; } to { transform: none; opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .st-bar { animation: none; } }
+  /* the track card under its column */
+  #set-panel .set-card { display: flex; flex-direction: column; gap: 8px; padding: 10px; border-radius: 14px; align-items: stretch; }
+  #set-panel .st-top { display: flex; align-items: center; justify-content: space-between; height: 18px; }
+  #set-panel .grip { display: flex; align-items: center; gap: 6px; padding: 0; font-size: 15px; }
+  #set-panel .grip .num { font: 800 12px "JetBrains Mono", monospace; color: var(--accent); }
+  #set-panel .set-card .set-play { width: 100%; height: auto; aspect-ratio: 1; border-radius: 10px; }
+  #set-panel .set-card img { border-radius: 10px; }
+  #set-panel .sc-meta { gap: 3px; }
+  #set-panel .set-card .sc-meta .t { font-size: 13.5px; }
+  #set-panel .sc-line { flex-wrap: wrap; gap: 4px; }
+  #set-panel .item-btns { display: flex !important; flex-direction: row; justify-content: space-between; gap: 4px; margin-top: 2px; }
+  #set-panel .item-btns .mini.nx { flex: 2; font: 700 11px Inter, sans-serif; white-space: nowrap; }
+  #set-panel .item-btns .mini { flex: 1; height: 30px; border-radius: 8px; background: rgba(255,255,255,.04); font-size: 12px; }
+  #set-panel .item-btns .mini:hover { background: var(--line); }
+  #set-panel .last-next { display: none; }      /* every card has its own Next → */
+  /* the mix line between two tracks, level with the artwork */
+  #set-panel .link-dot { width: 40px; flex: none; min-height: 0; height: 0; margin-top: 230px; padding: 0 !important; }
+  #set-panel .link-dot .ld { width: 30px; height: 4px; top: 0; }
+  #set-panel .link-dot .ld:hover, #set-panel .link-dot .ld[aria-expanded="true"] { height: 6px; width: 34px; }
+  #set-panel .link-dot .link, #set-panel .link-dot .gap-box { display: none !important; }
+  /* the details of the chosen line, under the set */
+  .set-detail { max-width: 720px; margin: 4px 0 0; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); }
+  .set-detail[hidden] { display: none; }
+  .set-detail .sd-title { font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .set-detail .sd-title b { color: var(--text); }
+  .set-detail .link { margin: 0; }
+  .set-detail .link[hidden] { display: flex !important; }
+  .set-detail .gap-box { margin: 10px 0 0; }
+  /* a dashed slot at the end to add more */
+  .st-add { flex: none; width: 150px; height: 230px; margin: 142px 0 0 40px; border: 1.5px dashed #3a3a48; border-radius: 14px; background: none;
+    color: var(--muted); font: 700 13px Inter, sans-serif; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; cursor: pointer; }
+  .st-add span { font-size: 28px; font-weight: 400; color: var(--accent); line-height: 1; }
+  .st-add:hover { border-color: var(--accent); color: var(--text); }
+  .st-add[hidden] { display: none; }
+  /* dragging sideways */
+  #set-panel .set-item.drag-slot .st-unit { border-radius: 14px; background: rgba(198,255,61,.05); outline: 1.5px dashed rgba(198,255,61,.55); outline-offset: -1px; }
+  #set-panel .set-item.drag-slot .st-unit > * { visibility: hidden; }
+  .drag-ghost.st-unit { background: var(--bg); border-radius: 14px; }
+  @media (max-width: 640px) {
+    #set-panel .set-head { padding: 16px 16px 10px; }
+    #set-panel .set-head h2 { font-size: 22px; }
+    #set-panel .set-body { padding: 4px 0 32px; }
+    #set-panel .set-hint, #set-panel .set-detail { margin-left: 16px; margin-right: 16px; }
+    .set-stage { padding: 6px 16px 16px; scroll-padding: 0 16px; }
+    .st-unit { width: 134px; }
+    .st-col { height: 108px; padding: 0 18px; }
+    #set-panel .link-dot { width: 26px; margin-top: 186px; }
+    #set-panel .link-dot .ld { width: 18px; }
+    #set-panel .item-btns .mini { height: 34px; }
+    #set-panel .item-btns .mini.nx { font-size: 10.5px; }
+    .st-add { width: 120px; height: 200px; margin: 118px 16px 0 30px; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1387,8 +1473,12 @@
       </div>
     </div>
     <div class="set-body">
-      <p class="set-hint" id="set-hint" hidden>Tip: hold a track, then drag it to move it.</p>
-      <ol class="set-list" id="set-list"></ol>
+      <p class="set-hint" id="set-hint" hidden>Drag a track left or right to move it (on a phone, hold it first). Tap a coloured line to see how two tracks mix.</p>
+      <div class="set-stage" id="set-stage">
+        <ol class="set-list" id="set-list"></ol>
+        <button type="button" class="st-add" id="st-add" hidden><span>+</span>Add tracks</button>
+      </div>
+      <div class="set-detail" id="set-detail" hidden></div>
       <div class="set-empty" id="set-empty">
         <div class="empty-flow" aria-hidden="true"><span class="ef-tag">Preview</span><div id="empty-flow-svg"></div></div>
         <div class="empty-title">Your set is empty</div>
@@ -2932,11 +3022,25 @@ function energyMix(a, b) {
   return [0, `energy jump ${s}`];
 }
 // short chips for the line between two tracks in the set: key change, BPM, energy change
+// Tap a line: its details (why, Hear it, Fix this gap) open in the panel under the set; tap again to close
 document.addEventListener("click", e => {
   const d = e.target.closest("[data-ld]"); if (!d) return;
-  const more = document.querySelector(`[data-lmore="${d.dataset.ld}"]`); if (!more) return;
-  more.hidden = !more.hidden; d.setAttribute("aria-expanded", String(!more.hidden));
-  if (more.hidden) document.querySelector(`[data-gapbox="${d.dataset.ld}"]`)?.setAttribute("hidden", "");
+  const i = d.dataset.ld, box = $("#set-detail");
+  const wasOpen = d.getAttribute("aria-expanded") === "true";
+  document.querySelectorAll("[data-ld][aria-expanded='true']").forEach(x => x.setAttribute("aria-expanded", "false"));
+  // put any details already shown back where they came from
+  box.querySelectorAll("[data-lmore], [data-gapbox]").forEach(el => {
+    const home = document.querySelector(`[data-ld="${el.dataset.lmore || el.dataset.gapbox}"]`)?.parentElement;
+    if (home) home.appendChild(el); else el.remove();
+  });
+  box.hidden = true; box.innerHTML = "";
+  if (wasOpen) return;
+  const more = document.querySelector(`[data-lmore="${i}"]`), gap = document.querySelector(`[data-gapbox="${i}"]`);
+  if (!more) return;
+  const a = set[i - 1], b = set[i];
+  box.innerHTML = `<div class="sd-title">Between <b>${i}. ${esc(a?.title || "")}</b> and <b>${Number(i) + 1}. ${esc(b?.title || "")}</b></div>`;
+  box.append(more); if (gap) box.append(gap);
+  box.hidden = false; d.setAttribute("aria-expanded", "true");
 });
 function linkChips(a, b) {
   const ba = Math.round(a.bpm), bb = Math.round(b.bpm), de = (Number(b.energy) || 0) - (Number(a.energy) || 0);
@@ -3134,14 +3238,21 @@ function renderSet() {
   $("#fab-open").setAttribute("aria-label", `Open your set: ${set.length} track${set.length === 1 ? "" : "s"}${clashes ? `, ${clashes} clash${clashes > 1 ? "es" : ""}` : ""}`);
   $("#set-empty").style.display = set.length ? "none" : "";
   if (!set.length) emptyFlow();
-  $("#set-flow").innerHTML = energyFlow();
+  $("#set-flow").innerHTML = "";
+  $("#set-detail").hidden = true; $("#set-detail").innerHTML = "";
+  $("#st-add").hidden = !set.length;
   const links = set.slice(1).map((t, i) => transition(set[i], t));
   const rough = links.filter(l => l.score === 0).length, workable = links.filter(l => l.score === 1).length;
   $("#set-summary").textContent = set.length
     ? `${set.length} track${set.length > 1 ? "s" : ""}` + (links.length
       ? ` · ${links.length - rough - workable} smooth, ${workable} workable, ${rough} clashing` : "")
     : "Nothing here yet.";
+  if (set.length > 1) {
+    const es = set.map(t => Math.max(1, Math.min(10, Number(t.energy) || 1)));
+    $("#set-summary").insertAdjacentHTML("beforeend", ` · <span class="ef">Energy ${es[0]} → <b>${Math.max(...es)} peak</b> → ${es.at(-1)}</span>`);
+  }
   const roles = setRoles(set);
+  const barKind = i => roles[i] === "Peak track" ? "pk" : (i === 0 || i === set.length - 1) ? "end" : "mid";
   $("#set-hint").hidden = set.length < 2;
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
@@ -3150,8 +3261,14 @@ function renderSet() {
         <div class="link ${links[i - 1].cls}" data-lmore="${i}" hidden><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
         <span class="link-acts">${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button>` : ""}<button type="button" class="hear hear-sm" data-hear-a="${set[i - 1].deezer_id}" data-hear-b="${t.deezer_id}" data-la="${esc(set[i - 1].title)}" data-lb="${esc(t.title)}">Hear it</button></span></div>
         <div class="gap-box" data-gapbox="${i}" hidden></div></div>` : ""}
+      <div class="st-unit">
+      <div class="st-col" aria-hidden="true">
+        <span class="st-e${barKind(i) === "pk" ? " pk" : ""}">${Math.max(1, Math.min(10, Number(t.energy) || 1))}</span>
+        <div class="st-bar ${barKind(i)}" style="height:${Math.max(1, Math.min(10, Number(t.energy) || 1)) * 10}%;animation-delay:${(i * 0.04).toFixed(2)}s"><span class="st-role">${(ROLE_SHORT[roles[i]] || [roles[i]])[0]}</span></div>
+      </div>
       <div class="set-card">
-        <div class="grip" title="Drag to reorder" aria-hidden="true">⠿<div class="num">${i + 1}</div></div>
+        <div class="st-top"><div class="grip" title="Drag to move" aria-hidden="true">⠿<span class="num">${i + 1}</span></div>
+          <button type="button" class="mini rm" data-remove aria-label="Remove ${esc(t.title)}" title="Remove">✕</button></div>
         <button type="button" class="cover set-play" data-setplay="${t.deezer_id}" aria-label="Play a preview of ${esc(t.title)} by ${esc(t.artist)}">
           <img src="${esc(t.cover)}" alt=""><span class="play-ico" aria-hidden="true"></span>
         </button>
@@ -3162,14 +3279,14 @@ function renderSet() {
             <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
             <span class="chip">${esc(t.bpm)} BPM</span>
             <span class="chip e-chip" title="Track energy ${esc(t.energy)} of 10">⚡ ${esc(t.energy)}</span>
-            <button type="button" class="next-ico" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">→</button>
           </div>
         </div>
         <div class="item-btns">
-          <button type="button" class="mini up" data-move="-1" aria-label="Move up" ${i === 0 ? "disabled" : ""}>▲</button>
-          <button type="button" class="mini rm" data-remove aria-label="Remove">✕</button>
-          <button type="button" class="mini down" data-move="1" aria-label="Move down" ${i === set.length - 1 ? "disabled" : ""}>▼</button>
+          <button type="button" class="mini up" data-move="-1" aria-label="Move earlier" title="Move earlier" ${i === 0 ? "disabled" : ""}>◀</button>
+          <button type="button" class="mini nx" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">Next →</button>
+          <button type="button" class="mini down" data-move="1" aria-label="Move later" title="Move later" ${i === set.length - 1 ? "disabled" : ""}>▶</button>
         </div>
+      </div>
       </div>
       ${i === set.length - 1 ? `<button type="button" class="next-btn last-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>` : ""}
     </li>`).join("");
@@ -3211,30 +3328,15 @@ let pendingDrag = null;
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function startDrag(item, el, pointerId, x, y) {
   pendingDrag = null;
-  const card = item.querySelector(".set-card"), r = card.getBoundingClientRect();
-  const ghost = card.cloneNode(true);
+  const unit = item.querySelector(".st-unit"), r = unit.getBoundingClientRect();
+  const ghost = unit.cloneNode(true);
   ghost.classList.add("drag-ghost");
-  // glued to the finger / cursor at the exact point you grabbed it, moving freely in both directions
+  // glued to the finger / cursor at the exact point you grabbed it
   Object.assign(ghost.style, { left: "0px", top: "0px", width: r.width + "px", height: r.height + "px",
                                transform: `translate3d(${r.left}px, ${r.top}px, 0)` });
   document.body.appendChild(ghost);
-  drag = { item, ghost, ox: x - r.left, oy: y - r.top, h: r.height };
+  drag = { item, ghost, ox: x - r.left, oy: y - r.top, w: r.width };
   item.classList.add("drag-slot");
-  // The list closes up when dragging starts (the transition lines hide). Keep the slot exactly under the
-  // finger: pad the bottom so the panel can't jump, then scroll by however far the slot moved.
-  const list = $("#set-list"), sb = document.querySelector(".set-body");
-  const scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
-  const h0 = list.offsetHeight, top0 = scroller.scrollTop;
-  list.classList.add("is-dragging");
-  list.style.paddingBottom = Math.max(0, h0 - list.offsetHeight) + "px";
-  scroller.scrollTop += card.getBoundingClientRect().top - r.top;
-  // if the panel couldn't scroll far enough (a short set, or a computer), don't close the list up at all,
-  // so the green slot stays exactly under the card you're holding
-  if (Math.abs(card.getBoundingClientRect().top - r.top) > 0.5) {     // couldn't: keep the list as it was
-    list.classList.remove("is-dragging"); list.style.paddingBottom = ""; scroller.scrollTop = top0;
-  }
-  drag.scroller = scroller;
-  drag.shift = list.getBoundingClientRect().top + item.offsetTop - list.offsetTop + item.offsetHeight / 2 - (r.top + r.height / 2);
   try { el.setPointerCapture(pointerId); } catch {}
   navigator.vibrate?.(12);
   requestAnimationFrame(() => ghost.classList.add("lifted"));
@@ -3244,10 +3346,10 @@ $("#set-list").addEventListener("pointerdown", e => {
   if (!item) return;
   const grip = e.target.closest(".grip");
   if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId, e.clientX, e.clientY); return; }
-  if (e.target.closest("button, a, input, .gap-box, .link, .link-dot") || !e.target.closest(".set-card")) return;
-  const card = e.target.closest(".set-card");
-  pendingDrag = { item, card, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
-  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
+  if (e.target.closest("button, a, input, .gap-box, .link, .link-dot") || !e.target.closest(".st-unit")) return;
+  const unit = e.target.closest(".st-unit");
+  pendingDrag = { item, card: unit, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
+  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, unit, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
 });
 addEventListener("pointermove", e => {
   if (pendingDrag && !drag) {
@@ -3258,32 +3360,29 @@ addEventListener("pointermove", e => {
   }
   if (!drag) return;
   drag.ghost.style.transform = `translate3d(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px, 0)`;
-  // where would it land? A neighbour moves out of the way once the dragged card is about halfway over it:
-  // the slot steps down when the card's middle passes the halfway point between the slot and the next
-  // track (and the same going up). Uses layout positions, so tracks still sliding don't confuse it.
-  const list = $("#set-list"), lr = list.getBoundingClientRect();
-  const mid = el => lr.top + el.offsetTop - list.offsetTop + el.offsetHeight / 2;
-  const gMid = e.clientY - drag.oy + drag.h / 2 + drag.shift;
-  const before = new Map([...list.querySelectorAll(".set-item")].map(el => [el, el.getBoundingClientRect().top]));
+  // where would it land? A neighbour steps aside once the dragged track's middle passes the halfway point
+  // between the two slots. Uses layout positions, so tracks still sliding don't confuse it.
+  const list = $("#set-list"), stage = $("#set-stage"), sr = stage.getBoundingClientRect();
+  const unitMid = el => { const u = el.querySelector(".st-unit"); return sr.left - stage.scrollLeft + el.offsetLeft + u.offsetLeft + u.offsetWidth / 2; };
+  const gMid = e.clientX - drag.ox + drag.w / 2;
+  const before = new Map([...list.querySelectorAll(".set-item")].map(el => [el, el.getBoundingClientRect().left]));
   let moved = false;
   for (let guard = 0; guard < 60; guard++) {
     const next = drag.item.nextElementSibling, prev = drag.item.previousElementSibling;
-    if (next && gMid > (mid(drag.item) + mid(next)) / 2) { list.insertBefore(next, drag.item); moved = true; continue; }
-    if (prev && gMid < (mid(prev) + mid(drag.item)) / 2) { list.insertBefore(drag.item, prev); moved = true; continue; }
+    if (next && gMid > (unitMid(drag.item) + unitMid(next)) / 2) { list.insertBefore(next, drag.item); moved = true; continue; }
+    if (prev && gMid < (unitMid(prev) + unitMid(drag.item)) / 2) { list.insertBefore(drag.item, prev); moved = true; continue; }
     break;
   }
-  if (moved && !reduceMotion()) before.forEach((top, el) => {      // slide the others into their new places
+  if (moved && !reduceMotion()) before.forEach((left, el) => {      // slide the others into their new places
     if (el === drag.item) return;
-    const d = top - el.getBoundingClientRect().top;
+    const d = left - el.getBoundingClientRect().left;
     if (!d) return;
-    el.style.transition = "none"; el.style.transform = `translateY(${d}px)`;
-    requestAnimationFrame(() => { el.style.transition = "transform .13s ease-out"; el.style.transform = ""; });
+    el.style.transition = "none"; el.style.transform = `translateX(${d}px)`;
+    requestAnimationFrame(() => { el.style.transition = "transform .16s ease-out"; el.style.transform = ""; });
   });
-  // auto-scroll near the edges (on phones the whole panel scrolls; on bigger screens just the list)
-  const sb = document.querySelector(".set-body"), scroller = sb.scrollHeight > sb.clientHeight + 1 ? sb : $("#set-panel");
-  const box = scroller.getBoundingClientRect();
-  if (e.clientY < Math.max(box.top, 0) + 40) scroller.scrollTop -= 12;
-  if (e.clientY > Math.min(box.bottom, innerHeight) - 40) scroller.scrollTop += 12;
+  // near the left or right edge: the set scrolls along
+  if (e.clientX < sr.left + 60) stage.scrollLeft -= 14;
+  if (e.clientX > sr.right - 60) stage.scrollLeft += 14;
 });
 ["pointerup", "pointercancel"].forEach(t => addEventListener(t, () => { if (pendingDrag) { clearTimeout(pendingDrag.timer); pendingDrag = null; } }));
 document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });   // the finger moves the track, not the page
@@ -3303,7 +3402,7 @@ function endDrag() {
     saveSet(); renderSet();
   };
   if (reduceMotion()) return finish();
-  const r = item.querySelector(".set-card").getBoundingClientRect();      // glide into the slot
+  const r = item.querySelector(".st-unit").getBoundingClientRect();      // glide into the slot
   ghost.classList.add("landing");
   ghost.style.transform = `translate3d(${r.left}px, ${r.top}px, 0)`;
   setTimeout(finish, 170);
@@ -4009,6 +4108,7 @@ $("#cc-yes").onclick = () => { $("#clear-confirm").hidden = true; clearSet(); };
 $("#clear-confirm").addEventListener("click", e => { if (e.target.id === "clear-confirm") closeClearConfirm(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#clear-confirm").hidden) { e.stopPropagation(); closeClearConfirm(); } }, true);
 // Empty set: "Add tracks" closes the panel and puts you in the search box
+$("#st-add").onclick = () => $("#add-tracks").onclick();
 $("#add-tracks").onclick = () => {
   openSet(false);
   scrollTo({ top: 0, behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
