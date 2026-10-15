@@ -2724,14 +2724,24 @@ box.addEventListener("click", e => {
 });
 
 /* ================= Phones: light up the match you touch ================= */
-// Lights the moment the finger lands (finger touches, not clicks: iPhones don't send a click for a tap on the
-// plain parts of a box). Touching another match moves the light; touching anywhere else turns it off.
-document.addEventListener("touchstart", e => {
-  if (e.touches.length !== 1) return;
+// Lights the moment the finger lands anywhere on the card, buttons included (caught before anything else
+// handles the touch; finger touches, not clicks, as iPhones don't send a click for plain parts of a box).
+// The light follows the track, so it stays on when a button (Add to set, heart, Hear the mix) redraws its card.
+let touchedId = null;
+function paintTouched() {
+  document.querySelectorAll("#list .row").forEach(r => r.classList.toggle("tapped", touchedId != null && r.dataset.id === touchedId));
+}
+function touchRow(e) {
+  if (e.type === "pointerdown" && e.pointerType !== "touch") return;
+  if (e.touches && e.touches.length !== 1) return;
   const row = e.target.closest?.("#list .row");
-  document.querySelectorAll("#list .row.tapped").forEach(r => { if (r !== row) r.classList.remove("tapped"); });
-  row?.classList.add("tapped");
-}, { passive: true });
+  const id = row?.dataset.id ?? null;
+  if (id !== touchedId) { touchedId = id; paintTouched(); }
+}
+document.addEventListener("touchstart", touchRow, { capture: true, passive: true });
+document.addEventListener("pointerdown", touchRow, { capture: true, passive: true });
+new MutationObserver(() => { if (touchedId != null && !document.querySelector("#list .row.tapped")) paintTouched(); })
+  .observe(document.getElementById("out"), { childList: true, subtree: true });
 
 /* ================= Home link + ☰ menu ================= */
 const menu = $("#menu"), menuBtn = $("#menu-btn");
