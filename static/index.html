@@ -1423,6 +1423,45 @@
   .sg-x { color: var(--accent); font-size: 14px; }
   @media (max-width: 1000px) { .sg-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px) { .set-guide { margin: 14px 16px 0; } .sg-grid { grid-template-columns: 1fr; gap: 10px; } }
+
+  /* ================= Phones: the set runs top to bottom, full screen =================
+     one track per row with its energy column beside it; the mix line and its play button between rows;
+     hold a track, then drag it up or down */
+  @media (max-width: 640px) {
+    .set-stage { display: block; overflow: visible; padding: 4px 16px 8px; container-type: normal; }
+    .set-stage .set-list { flex-direction: column; align-items: stretch; width: 100%; }
+    #set-panel .set-item { flex-direction: column; align-items: stretch; }
+    .st-unit { width: 100% !important; display: flex; align-items: stretch; gap: 8px; }
+    .st-col { width: 38px; height: auto; flex: none; padding: 0; margin: 0; border-bottom: 0; border-right: 1px solid var(--line); padding-right: 8px; }
+    .st-e { font-size: 11px; margin-bottom: 3px; }
+    .st-bar { border-radius: 7px 7px 2px 2px; min-height: 14px; padding-top: 0; }
+    .st-role { display: none; }
+    #set-panel .set-card { flex: 1; min-width: 0; display: grid; grid-template-columns: 72px 1fr auto; grid-template-areas: "art meta x" "art info info" "next next next";
+      gap: 6px 10px; align-items: start; padding: 9px; }
+    #set-panel .st-top { display: contents; }
+    #set-panel .grip { position: absolute; left: 9px; top: 9px; z-index: 2; background: rgba(11,11,15,.75); border-radius: 6px; padding: 2px 5px; font-size: 12px; }
+    #set-panel .set-card { position: relative; }
+    #set-panel .set-card.drag-ghost { position: fixed; }       /* the card you're holding follows your finger */
+    #set-panel .set-card .rm { grid-area: x; height: 26px; }
+    #set-panel .set-card .set-play { grid-area: art; width: 72px; height: 72px; }
+    #set-panel .sc-meta { grid-area: meta; padding-top: 2px; }
+    #set-panel .set-card .sc-meta .t { font-size: 14px; }
+    #set-panel .set-card .sc-meta .a { font-size: 12px; }
+    #set-panel .set-card .role { font-size: 9px; }
+    .st-info { grid-area: info; display: flex; gap: 5px; align-self: end; min-width: 0; }
+    .st-key { flex: 1 1 auto; min-width: 0; padding: 3px 5px; }
+    .st-nums { display: flex; flex: none; gap: 5px; }
+    .st-nums span { width: 44px; padding: 2px 0 3px; }
+    .st-next { grid-area: next; height: 28px; font-size: 11.5px; }
+    /* the mix line runs across between two rows, its play button in the middle */
+    #set-panel .link-dot { width: auto; height: 34px; margin: 0 0 0 46px; }
+    #set-panel .link-dot .ld { width: 70%; height: 3px; }
+    #set-panel .link-dot .ld:hover, #set-panel .link-dot .ld[aria-expanded="true"] { width: 74%; height: 5px; }
+    #set-panel .link-dot .st-hear { width: 28px; height: 28px; }
+    #set-panel .link-dot .st-hear svg { width: 10px; height: 10px; }
+    .st-add { width: auto !important; height: 64px; margin: 12px 0 0 46px; flex-direction: row; }
+    .st-add span { font-size: 22px; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -3438,7 +3477,7 @@ function startDrag(item, el, pointerId, x, y) {
   const card = item.querySelector(".set-card"), r = card.getBoundingClientRect();
   const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
   // where each slot's card sits, measured along the whole set (so it still works as the set scrolls)
-  const slots = items.map(el => { const c = el.querySelector(".set-card").getBoundingClientRect(); return { x: c.left - sr.left + stage.scrollLeft, y: c.top - sr.top, w: c.width, h: c.height }; });
+  const slots = items.map(el => { const c = el.querySelector(".set-card").getBoundingClientRect(); return { x: c.left - sr.left + stage.scrollLeft, y: c.top - sr.top + stage.scrollTop, w: c.width, h: c.height }; });
   const ghost = card.cloneNode(true);
   ghost.classList.add("drag-ghost");
   Object.assign(ghost.style, { left: "0px", top: "0px", width: r.width + "px", height: r.height + "px",
@@ -3447,7 +3486,7 @@ function startDrag(item, el, pointerId, x, y) {
   const ph = document.createElement("div"); ph.className = "st-ph";       // the dashed slot it will land in
   Object.assign(ph.style, { left: slots[from].x + "px", top: slots[from].y + "px", width: slots[from].w + "px", height: slots[from].h + "px" });
   stage.appendChild(ph);
-  drag = { item, ghost, ph, items, from, to: from, slots, ox: x - r.left, oy: y - r.top, w: r.width };
+  drag = { item, ghost, ph, items, from, to: from, slots, ox: x - r.left, oy: y - r.top, w: r.width, h: r.height };
   item.classList.add("drag-slot");
   $("#set-list").classList.add("is-dragging");
   try { el.setPointerCapture(pointerId); } catch {}
@@ -3473,11 +3512,11 @@ addEventListener("pointermove", e => {
   }
   if (!drag) return;
   drag.ghost.style.transform = `translate3d(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px, 0)`;
-  // which slot is the card over? the one whose middle is nearest the card's middle
+  // which slot is the card over? the one whose middle is nearest the card's middle (sideways or up/down)
   const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
-  const gx = e.clientX - drag.ox + drag.w / 2 - sr.left + stage.scrollLeft;
+  const gx = e.clientX - drag.ox + drag.w / 2 - sr.left + stage.scrollLeft, gy = e.clientY - drag.oy + drag.h / 2 - sr.top + stage.scrollTop;
   let to = 0, best = Infinity;
-  drag.slots.forEach((s, i) => { const d = Math.abs(s.x + s.w / 2 - gx); if (d < best) { best = d; to = i; } });
+  drag.slots.forEach((s, i) => { const d = Math.hypot(s.x + s.w / 2 - gx, s.y + s.h / 2 - gy); if (d < best) { best = d; to = i; } });
   if (to !== drag.to) {
     drag.to = to;
     const { from, slots } = drag;
@@ -3485,13 +3524,19 @@ addEventListener("pointermove", e => {
     drag.items.forEach((el, i) => {
       if (i === from) return;
       const j = from < to && i > from && i <= to ? i - 1 : to < from && i >= to && i < from ? i + 1 : i;
-      el.querySelector(".set-card").style.transform = j === i ? "" : `translateX(${slots[j].x - slots[i].x}px)`;
+      el.querySelector(".set-card").style.transform = j === i ? "" : `translate(${slots[j].x - slots[i].x}px, ${slots[j].y - slots[i].y}px)`;
     });
     Object.assign(drag.ph.style, { left: slots[to].x + "px", top: slots[to].y + "px" });
   }
-  // near the left or right edge: the set scrolls along
-  if (e.clientX < sr.left + 60) stage.scrollLeft -= 14;
-  if (e.clientX > sr.right - 60) stage.scrollLeft += 14;
+  // near an edge: the set scrolls along (sideways on computers; the page up or down on phones)
+  if (stage.scrollWidth > stage.clientWidth + 1) {
+    if (e.clientX < sr.left + 60) stage.scrollLeft -= 14;
+    if (e.clientX > sr.right - 60) stage.scrollLeft += 14;
+  } else {
+    const pane = $("#set-panel");
+    if (e.clientY < 90) pane.scrollTop -= 14;
+    if (e.clientY > innerHeight - 90) pane.scrollTop += 14;
+  }
 });
 ["pointerup", "pointercancel"].forEach(t => addEventListener(t, () => { if (pendingDrag) { clearTimeout(pendingDrag.timer); pendingDrag = null; } }));
 document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });   // the finger moves the track, not the page
@@ -3513,7 +3558,7 @@ function endDrag() {
   // glide into the slot, then snap
   const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
   ghost.classList.add("landing");
-  ghost.style.transform = `translate3d(${slots[to].x + sr.left - stage.scrollLeft}px, ${slots[to].y + sr.top}px, 0)`;
+  ghost.style.transform = `translate3d(${slots[to].x + sr.left - stage.scrollLeft}px, ${slots[to].y + sr.top - stage.scrollTop}px, 0)`;
   setTimeout(finish, 200);
 }
 addEventListener("pointerup", endDrag);
