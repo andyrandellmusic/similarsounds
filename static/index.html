@@ -3576,6 +3576,23 @@ function placeSetFab() {
   f.style.top = Math.round(room ? menuTop + mr.height / 2 - fh / 2 : menuTop + mr.height + 4) + "px";
 }
 addEventListener("resize", placeSetFab);
+// Phones: the three step boxes line up exactly with the row of buttons above them (sign-in / tokens on the left,
+// menu on the right), keeping room for the SET tab when there is one
+function alignSteps() {
+  const steps = document.querySelector(".steps"), tools = document.querySelector(".top-tools"); if (!steps || !tools) return;
+  if (!matchMedia("(max-width: 640px)").matches) { steps.style.marginLeft = steps.style.marginRight = ""; return; }
+  steps.style.marginLeft = steps.style.marginRight = "";
+  const p = steps.getBoundingClientRect(), t = tools.getBoundingClientRect();
+  if (t.width < p.width * 0.7) return;               // a short row (no sign-in button): keep the boxes full width
+  const hasSet = document.documentElement.classList.contains("has-set");
+  steps.style.marginLeft = Math.max(0, Math.round(t.left - p.left)) + "px";
+  steps.style.marginRight = Math.max(hasSet ? 44 : 0, Math.round(p.right - t.right)) + "px";
+  placeSetFab();
+}
+addEventListener("resize", alignSteps);
+addEventListener("load", alignSteps);
+document.fonts?.ready.then(alignSteps);
+if (window.ResizeObserver) new ResizeObserver(alignSteps).observe(document.querySelector(".top-tools"));
 addEventListener("load", placeSetFab);
 document.fonts?.ready.then(placeSetFab);
 // "Your set" bar on phones: hide while scrolling down, show again on scrolling up or near the top / bottom
@@ -3695,6 +3712,7 @@ function renderSet() {
   $("#fab-count").textContent = set.length;
   $("#set-fab").hidden = !set.length;
   document.documentElement.classList.toggle("has-set", !!set.length);
+  if (typeof alignSteps === "function") alignSteps();
   placeSetFab();
   const clashes = set.slice(1).filter((t, i) => transition(set[i], t).score === 0).length;
   $("#fab-sub").textContent = set.length < 2 ? "" : clashes ? `${clashes} clash${clashes > 1 ? "es" : ""}` : "no clashes";
