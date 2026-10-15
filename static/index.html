@@ -1639,6 +1639,10 @@
 
 <script>
 const $ = s => document.querySelector(s);
+// Opening or refreshing the page always starts at the top (browsers otherwise jump back to where you'd scrolled)
+if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+scrollTo(0, 0);
+addEventListener("pageshow", e => { if (!e.persisted) scrollTo(0, 0); });
 const startHTML = document.getElementById("out").innerHTML;
 // Opened from a shared results link (e.g. ?t=393116082)? Say so, so the filled-in box isn't a surprise.
 // "You're viewing a shared search" only for links from someone else: not when you refresh or reopen
