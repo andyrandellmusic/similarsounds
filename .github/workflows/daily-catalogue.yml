@@ -3,8 +3,11 @@
 name: Daily catalogue update
 
 on:
+  # 6am UK time every day, summer or winter: GitHub only knows UTC, so it wakes at 05:00 and 06:00 UTC
+  # and the "gate" job below lets through only the one that is 6am in London (BST = 05 UTC, GMT = 06 UTC)
   schedule:
-    - cron: "0 5 * * *"   # 05:00 UTC daily
+    - cron: "0 5 * * *"
+    - cron: "0 6 * * *"
   workflow_dispatch:       # "Run workflow" button in the Actions tab
 
 permissions:
@@ -12,7 +15,23 @@ permissions:
   issues: write      # to raise a "something went wrong" notice (GitHub emails it to the owner)
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      go: ${{ steps.uk.outputs.go }}
+    steps:
+      - id: uk
+        # which wake-up fired, against whether the UK is on summer time (+0100) or winter time (+0000);
+        # going by the schedule rather than the clock, so a late start (GitHub can be 30+ min late) still runs
+        run: |
+          off=$(TZ=Europe/London date +%z)
+          want="0 6 * * *"; [ "$off" = "+0100" ] && want="0 5 * * *"
+          if [ "${{ github.event_name }}" != "schedule" ] || [ "${{ github.event.schedule }}" = "$want" ]; then go=true; else go=false; fi
+          echo "go=$go" >> "$GITHUB_OUTPUT"
+          echo "UK offset $off, fired by '${{ github.event.schedule }}', run: $go"
   update:
+    needs: gate
+    if: needs.gate.outputs.go == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 240
     env:
