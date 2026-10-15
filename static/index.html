@@ -1548,6 +1548,16 @@
     .sc-c .st-bar { transition: height .32s cubic-bezier(.2, .8, .2, 1), border-color .32s ease, background-color .32s ease, box-shadow .32s ease; }
     .sc-c .st-e { transition: color .32s ease; }
   }
+
+  /* no lines between tracks any more: just the play button, in the mix colour */
+  #set-panel .link-dot .ld { opacity: 0; pointer-events: none; }
+  #set-panel .link-dot .st-hear { width: 28px; height: 28px; border-width: 2px; }
+  #set-panel .link-dot .st-hear svg { width: 10px; height: 10px; }
+  .dk-btn { display: block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--c); box-shadow: 0 0 10px color-mix(in srgb, var(--c) 45%, transparent); margin: 4px 0 4px; position: relative; }
+  .dk-btn::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-35%, -50%); border-left: 7px solid var(--c); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
+  .sg-dots { display: flex; gap: 5px; }
+  .sg-dots em { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--c); box-shadow: 0 0 6px var(--c); }
+  .sg-dots .good { --c: var(--good); } .sg-dots .ok { --c: var(--ok); } .sg-dots .bad { --c: var(--bad); }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1674,7 +1684,7 @@
       <div class="row1"><h2>Your set</h2><button type="button" class="close" id="set-close" aria-label="Close">×</button></div>
       <div class="set-summary" id="set-summary"></div>
       <div class="set-fresh" id="set-fresh" hidden>
-        <div class="sf-head"><b>Fresh for your set</b><span>New releases that mix with your tracks</span></div>
+        <div class="sf-head"><b>For your set</b><span>New releases that mix with the tracks in your set</span></div>
         <div class="sf-list" id="sf-list"></div>
         <div class="sf-dots" id="sf-dots"></div>
       </div>
@@ -1707,8 +1717,8 @@
         <div class="sg-grid">
           <div class="sg"><span class="sg-v"><i class="sg-col"></i></span><span><b>Energy column</b><small>How hard each track hits, 1 to 10. The orange one is your peak.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-role">BUILD</i></span><span><b>Role</b><small>The job each track does: intro, warm-up, build, peak, cool down, end.</small></span></div>
-          <div class="sg"><span class="sg-v"><i class="sg-lines"><em class="good"></em><em class="ok"></em><em class="bad"></em></i></span><span><b>Mix line</b><small>Green mixes well, amber is workable, red will clash. Tap a line to see why.</small></span></div>
-          <div class="sg"><span class="sg-v"><i class="sg-play"></i></span><span><b>Hear the transition</b><small>Plays the two tracks mixed together, right where the line is.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-dots"><em class="good"></em><em class="ok"></em><em class="bad"></em></i></span><span><b>Mix colour</b><small>The play button between two tracks is green if they mix well, amber if it's workable, red if they'll clash.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-play"></i></span><span><b>Hear the transition</b><small>Tap a play button to hear those two tracks mixed, and see why they fit (or how to fix the gap).</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-key">8A</i></span><span><b>Key</b><small>Same number, or one either side, mixes smoothly.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-grip">⠿</i></span><span><b>Move a track</b><small>Drag it left or right into its new slot (on a phone, hold it first).</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-next">Next →</i></span><span><b>Mixes next</b><small>Finds new tracks that mix straight after this one.</small></span></div>
@@ -1727,13 +1737,13 @@
           <button type="button" class="icon import-empty" data-import>Import a tracklist</button>
         </div>
         <div class="dot-key">
-          <div class="dk-title">Between every two tracks, a line shows how well they mix</div>
+          <div class="dk-title">Between every two tracks, a play button's colour shows how well they mix</div>
           <div class="dk-row">
-            <span class="dk good"><span class="dk-line"></span><b>Mixes well</b><small>Keys, BPM and energy all fit</small></span>
-            <span class="dk ok"><span class="dk-line"></span><b>Workable</b><small>Mixable with a bit of care</small></span>
-            <span class="dk bad"><span class="dk-line"></span><b>Will clash</b><small>Try another track between</small></span>
+            <span class="dk good"><span class="dk-btn"></span><b>Mixes well</b><small>Keys, BPM and energy all fit</small></span>
+            <span class="dk ok"><span class="dk-btn"></span><b>Workable</b><small>Mixable with a bit of care</small></span>
+            <span class="dk bad"><span class="dk-btn"></span><b>Will clash</b><small>Try another track between</small></span>
           </div>
-          <div class="dk-tip">Tap a line to see why, and to hear the two tracks mixed.</div>
+          <div class="dk-tip">Tap it to hear the two tracks mixed and see why.</div>
         </div>
       </div>
     </div>
@@ -3258,9 +3268,11 @@ function energyMix(a, b) {
   return [0, `energy jump ${s}`];
 }
 // short chips for the line between two tracks in the set: key change, BPM, energy change
-// Tap a line: its details (why, Hear it, Fix this gap) open in the panel under the set; tap again to close
+// Tap a mix button (or its line): the details (why, Fix this gap) open in the panel under the set; tap again to close
 document.addEventListener("click", e => {
-  const d = e.target.closest("[data-ld]"); if (!d) return;
+  const h = e.target.closest(".st-hear");
+  if (h && h.parentElement.querySelector("[data-ld]")?.getAttribute("aria-expanded") === "true") return;   // already showing: just play / stop
+  const d = h ? h.parentElement.querySelector("[data-ld]") : e.target.closest("[data-ld]"); if (!d) return;
   const i = d.dataset.ld, box = $("#set-detail");
   const wasOpen = d.getAttribute("aria-expanded") === "true";
   document.querySelectorAll("[data-ld][aria-expanded='true']").forEach(x => x.setAttribute("aria-expanded", "false"));
