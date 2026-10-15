@@ -582,8 +582,8 @@
   @media (hover: hover) { .query .row:hover, #list .row:hover { border-color: var(--accent); } }
   /* the 30 matches: the one under the mouse also gets the search bar's green glow */
   @media (hover: hover) { #list .row:hover { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
-  /* phones (no mouse): the match you tap (anywhere in its box) gets the same glow, until you tap another */
-  #list .row.tapped { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); }
+  /* phones (no mouse): the match you touch (anywhere in its box) gets the same glow straight away, until you touch another */
+  #list .row.tapped { transition: none; border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); }
   .query .row.playing, #list .row.playing, .query .row:has(.cover.play.on), #list .row:has(.cover.play.on) { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
   /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
@@ -2719,14 +2719,11 @@ box.addEventListener("click", e => {
   closeSuggest(); toast("Recent searches cleared");
 });
 
-/* ================= Phones: light up the match you tap ================= */
-// Finger touches, not clicks: iPhones don't send a click for a tap on the plain parts of a box.
-// A touch that moves (a scroll) doesn't count; touching anywhere else turns the light off again.
-let tapStart = null;
-document.addEventListener("touchstart", e => { const t = e.touches[0]; tapStart = e.touches.length === 1 ? { x: t.clientX, y: t.clientY } : null; }, { passive: true });
-document.addEventListener("touchend", e => {
-  const t = e.changedTouches[0];
-  if (!tapStart || !t || Math.hypot(t.clientX - tapStart.x, t.clientY - tapStart.y) > 10) return;
+/* ================= Phones: light up the match you touch ================= */
+// Lights the moment the finger lands (finger touches, not clicks: iPhones don't send a click for a tap on the
+// plain parts of a box). Touching another match moves the light; touching anywhere else turns it off.
+document.addEventListener("touchstart", e => {
+  if (e.touches.length !== 1) return;
   const row = e.target.closest?.("#list .row");
   document.querySelectorAll("#list .row.tapped").forEach(r => { if (r !== row) r.classList.remove("tapped"); });
   row?.classList.add("tapped");
