@@ -582,8 +582,8 @@
   @media (hover: hover) { .query .row:hover, #list .row:hover { border-color: var(--accent); } }
   /* the 30 matches: the one under the mouse also gets the search bar's green glow */
   @media (hover: hover) { #list .row:hover { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
-  /* phones have no mouse: the match you tap to play gets the glow instead */
-  @media (hover: none) { #list .row.playing, #list .row:has(.cover.play.on) { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
+  /* phones (no mouse): the match nearest the middle of the screen gets the glow, moving onto the next as you scroll */
+  @media (hover: none) { #list .row.centered { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
   .query .row.playing, #list .row.playing, .query .row:has(.cover.play.on), #list .row:has(.cover.play.on) { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
   /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
@@ -2678,6 +2678,27 @@ box.addEventListener("click", e => {
   try { localStorage.removeItem("ss_recent"); } catch {}
   closeSuggest(); toast("Recent searches cleared");
 });
+
+/* ================= Phones: light up the match in the middle of the screen ================= */
+let centerRaf = 0, centered = null;
+function markCentered() {
+  centerRaf = 0;
+  if (!matchMedia("(hover: none)").matches) return;                // desktops light the one under the mouse instead
+  const mid = innerHeight / 2;
+  let best = null, bestDist = Infinity;
+  for (const r of document.querySelectorAll("#list .row")) {
+    const b = r.getBoundingClientRect();
+    if (b.bottom < 0 || b.top > innerHeight) continue;          // off screen
+    const d = b.top <= mid && b.bottom >= mid ? 0 : Math.min(Math.abs(b.top - mid), Math.abs(b.bottom - mid));
+    if (d < bestDist) { bestDist = d; best = r; }
+  }
+  if (best !== centered) { centered?.classList.remove("centered"); best?.classList.add("centered"); centered = best; }
+}
+const queueCentered = () => { if (!centerRaf) centerRaf = requestAnimationFrame(markCentered); };
+addEventListener("scroll", queueCentered, { passive: true });
+addEventListener("resize", queueCentered);
+// results re-render without scrolling - re-check whenever the list changes
+new MutationObserver(queueCentered).observe(document.getElementById("out"), { childList: true, subtree: true });
 
 /* ================= Home link + ☰ menu ================= */
 const menu = $("#menu"), menuBtn = $("#menu-btn");
