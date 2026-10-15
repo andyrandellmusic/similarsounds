@@ -230,13 +230,13 @@
   .try-wrap .try-item { width: 100%; height: 100%; border: 0; border-radius: 0; background: transparent; transform: none; }
   .try-wrap .add { justify-self: stretch; justify-content: center; height: 36px; border: 0; border-top: 1px solid var(--line); border-radius: 0; background: rgba(255,255,255,.02); }
   .try-wrap .add:hover { background: rgba(198,255,61,.08); }
-  #try.leaving > * { animation: fresh-out .38s cubic-bezier(.4, 0, .2, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
-  #try.entering > * { animation: fresh-in .6s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
-  #try.entering > * img { animation: fresh-art .7s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 80ms + 60ms); }
+  #try.leaving > *, #most.leaving > * { animation: fresh-out .38s cubic-bezier(.4, 0, .2, 1) both; animation-delay: calc(var(--i, 0) * 55ms); }
+  #try.entering > *, #most.entering > * { animation: fresh-in .6s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 80ms); }
+  #try.entering > * img, #most.entering > * img { animation: fresh-art .7s cubic-bezier(.16, 1, .3, 1) both; animation-delay: calc(var(--i, 0) * 80ms + 60ms); }
   @keyframes fresh-out { to { opacity: 0; transform: translateY(-12px) scale(.96); filter: blur(5px); } }
   @keyframes fresh-in { from { opacity: 0; transform: translateY(16px) scale(.96); filter: blur(6px); } 60% { filter: blur(0); } to { opacity: 1; transform: none; filter: none; } }
   @keyframes fresh-art { from { transform: scale(.7) rotate(-6deg); opacity: 0; } to { transform: none; opacity: 1; } }
-  @media (prefers-reduced-motion: reduce) { #try.leaving > *, #try.entering > *, #try.entering > * img { animation: none; } }
+  @media (prefers-reduced-motion: reduce) { #try.leaving > *, #try.entering > *, #try.entering > * img, #most.leaving > *, #most.entering > *, #most.entering > * img { animation: none; } }
   /* home page: fresh releases and most played, each in its own box, side by side on computers */
   .home-pair { display: grid; grid-template-columns: 1fr; gap: 14px; }
   .home-pair:has(#most-box:not([hidden])) { grid-template-columns: 1fr 1fr; }
@@ -252,7 +252,7 @@
   .try-dots button { width: 8px; height: 8px; padding: 0; border-radius: 99px; border: 0; background: #3a3a48; cursor: pointer; transition: width .25s, background .25s; position: relative; }
   .try-dots button::after { content: ""; position: absolute; inset: -8px -4px; }
   .try-dots button.on { width: 22px; background: var(--accent); }
-  @media (max-width: 640px) { .try-dots { display: none; } }      /* phones rotate one track at a time: too many to dot */
+  @media (max-width: 640px) { #try-dots { display: none; } }      /* phones rotate one track at a time: too many to dot */
   .nudge { animation: nudge .38s ease; }
   @keyframes nudge { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
   @media (prefers-reduced-motion: reduce) { .nudge { animation: none; } }
@@ -1722,15 +1722,55 @@ fetch("/api/stats").then(r => r.json()).then(s => {
   loadFresh(); freshDots(); fitHome();
 });
 let examplesCache = [];
-/* "Most played this week": the tracks visitors have played most (counted on the server) */
-let mostPlayed = [];
+/* "Most played": the 12 tracks visitors have played most (counted on the server), four at a time in rotation */
+let mostPlayed = [], mostSets = [], mostIdx = 0, mostHold = false;
 function showMost() {
   const box = $("#most"), wrap = $("#most-box"); if (!box || !wrap) return;
   wrap.hidden = !mostPlayed.length;
   mostPlayed.forEach(t => { trackCache[t.deezer_id] = trackCache[t.deezer_id] || t; });
-  box.innerHTML = examplesHtml(mostPlayed);
-  box.querySelectorAll(".try-item").forEach((el, i) => el.insertAdjacentHTML("afterbegin", `<span class="rank">${i + 1}</span>`));
+  mostSets = []; for (let i = 0; i < mostPlayed.length; i += 4) mostSets.push(mostPlayed.slice(i, i + 4));
+  if (mostSets.length > 1 && mostSets.at(-1).length < 4) mostSets.pop();       // only full fours rotate
+  mostIdx = 0; paintMost();
+  if (mostSets.length > 1 && !$("#most-dots")) {
+    box.insertAdjacentHTML("afterend", `<div class="try-dots" id="most-dots" role="tablist" aria-label="Most played sets">${mostSets.map((_, i) =>
+      `<button type="button" role="tab" data-most="${i}" aria-label="Set ${i + 1} of ${mostSets.length}"></button>`).join("")}</div>`);
+    ["pointerenter", "focusin", "touchstart"].forEach(ev => box.addEventListener(ev, () => { mostHold = true; }, { passive: true }));
+    ["pointerleave", "focusout"].forEach(ev => box.addEventListener(ev, () => { mostHold = false; }));
+    box.addEventListener("touchend", () => setTimeout(() => { mostHold = false; }, 2500), { passive: true });
+  }
+  mostDots();
 }
+function paintMost() {
+  const box = $("#most"), list = mostSets[mostIdx] || [];
+  box.innerHTML = examplesHtml(list);
+  box.querySelectorAll(".try-item").forEach((el, i) => { el.style.setProperty("--i", i); el.insertAdjacentHTML("afterbegin", `<span class="rank">${mostIdx * 4 + i + 1}</span>`); });
+}
+function mostDots() {
+  $("#most-dots")?.querySelectorAll("button").forEach((b, i) => { b.classList.toggle("on", i === mostIdx); b.setAttribute("aria-selected", i === mostIdx); });
+}
+// the same lift-away and arrive animation as New releases
+function showMostSet(i) {
+  const box = $("#most"); if (!box || mostSets.length < 2 || box.classList.contains("leaving")) return;
+  mostIdx = (i + mostSets.length) % mostSets.length; mostDots();
+  box.style.minHeight = box.offsetHeight + "px";
+  [...box.children].forEach((c, k) => c.style.setProperty("--i", k));
+  box.classList.remove("entering"); box.classList.add("leaving");
+  setTimeout(() => {
+    paintMost();
+    box.classList.remove("leaving"); box.classList.add("entering");
+    setTimeout(() => { box.classList.remove("entering"); box.style.minHeight = ""; }, 900);
+  }, 560);
+}
+document.addEventListener("click", e => { const d = e.target.closest("[data-most]"); if (d) { showMostSet(Number(d.dataset.most)); startMostTimer(); } });
+let mostRotate = null;
+function startMostTimer() { clearInterval(mostRotate); mostRotate = setInterval(mostTick, 6000); }
+function mostTick() {
+  const box = $("#most");
+  if (!box || mostHold || document.hidden || mostSets.length < 2 || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const r = box.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) return;
+  showMostSet(mostIdx + 1);
+}
+startMostTimer();
 // every preview played on the site counts once per visit towards "Most played"
 const playedCounted = new Set();
 function countForMost(id) {

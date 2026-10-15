@@ -412,7 +412,7 @@ def stats():
         sets.append(group)
     examples = sets[0] if sets else examples
     return {"tracks": len(rows), "last_12_months": recent, "styles": list(STYLES), "examples": examples,
-            "fresh_sets": sets, "most_played": most_played()}
+            "fresh_sets": sets, "most_played": most_played(12)}
 
 
 _top_cache = {"at": 0.0, "rows": []}
