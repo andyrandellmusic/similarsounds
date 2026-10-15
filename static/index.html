@@ -1331,6 +1331,33 @@
     #set-panel .item-btns .mini.nx { font-size: 10.5px; }
     .st-add { width: 120px; height: 200px; margin: 118px 16px 0 30px; }
   }
+
+  /* ten tracks across the page: each slot is a tenth of the width (less the thin gaps), lines stand upright between */
+  #set-panel .set-head, #set-panel .set-body { max-width: 1400px; }
+  .set-stage { container-type: inline-size; padding-left: 0; padding-right: 0; }
+  .st-unit { width: max(104px, calc((100cqw - 9 * 14px) / 10)); }
+  .st-col { height: 118px; padding: 0 12%; }
+  #set-panel .set-item { align-items: stretch; }
+  #set-panel .link-dot { width: 14px; height: auto; margin-top: 128px; position: relative; }
+  #set-panel .link-dot .ld { left: 50%; top: 50%; transform: translate(-50%, -50%); width: 3px; height: 72px; }
+  #set-panel .link-dot .ld:hover, #set-panel .link-dot .ld[aria-expanded="true"] { width: 5px; height: 84px; }
+  #set-panel .link-dot .ld::after { inset: -6px -6px; }
+  #set-panel .set-card { padding: 8px; gap: 6px; border-radius: 12px; }
+  #set-panel .set-card .sc-meta .t { font-size: 12.5px; }
+  #set-panel .set-card .sc-meta .a { font-size: 10.5px; }
+  #set-panel .sc-line .chip { font-size: 9.5px; padding: 2px 4px; }
+  #set-panel .item-btns .mini { height: 26px; font-size: 11px; padding: 0; }
+  #set-panel .item-btns .mini.nx { flex: 1; font-size: 13px; }
+  .st-role { font-size: 8px; letter-spacing: .06em; }
+  .st-add { width: max(104px, calc((100cqw - 9 * 14px) / 10)); height: 200px; margin: 128px 0 0 14px; }
+  @media (max-width: 640px) {
+    .set-stage { padding: 6px 16px 16px; }
+    .st-unit, .st-add { width: 118px; }
+    .st-col { height: 100px; }
+    #set-panel .link-dot { width: 14px; margin-top: 110px; }
+    #set-panel .link-dot .ld { width: 3px; height: 60px; }
+    .st-add { height: 190px; margin: 110px 16px 0 14px; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -3283,7 +3310,7 @@ function renderSet() {
         </div>
         <div class="item-btns">
           <button type="button" class="mini up" data-move="-1" aria-label="Move earlier" title="Move earlier" ${i === 0 ? "disabled" : ""}>◀</button>
-          <button type="button" class="mini nx" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">Next →</button>
+          <button type="button" class="mini nx" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">→</button>
           <button type="button" class="mini down" data-move="1" aria-label="Move later" title="Move later" ${i === set.length - 1 ? "disabled" : ""}>▶</button>
         </div>
       </div>
