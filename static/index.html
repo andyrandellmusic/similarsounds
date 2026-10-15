@@ -1385,6 +1385,44 @@
   #set-panel .link-dot .st-hear.on svg { margin-left: 0; }
   #set-panel .link-dot .st-hear::after { content: ""; position: absolute; inset: -6px; }
   #set-panel .set-list.is-dragging .link-dot .st-hear { opacity: 0; pointer-events: none; transition: opacity .12s; }
+
+  /* the card's key, tempo and energy, easy to read at a glance */
+  #set-panel .set-card .role { font-size: 8.5px; margin: 1px 0 0; }
+  .st-info { display: grid; gap: 5px; }
+  .st-key { display: flex; align-items: center; gap: 6px; padding: 4px 6px; border-radius: 8px; background: color-mix(in srgb, var(--k) 16%, transparent);
+    border: 1px solid color-mix(in srgb, var(--k) 45%, transparent); min-width: 0; }
+  .st-key b { flex: none; padding: 2px 6px; border-radius: 6px; background: var(--k); color: #0b0b0f; font: 800 11px "JetBrains Mono", monospace; }
+  .st-key span { font-size: 10.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .st-nums { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; }
+  .st-nums span { display: grid; justify-items: center; padding: 3px 0 4px; border-radius: 8px; background: rgba(255,255,255,.04); border: 1px solid var(--line);
+    font: 700 8px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .st-nums b { font: 800 13px "JetBrains Mono", monospace; color: var(--text); letter-spacing: 0; }
+  .st-nums span:last-child b { color: var(--accent); }
+  .st-next { height: 26px; border: 0; border-radius: 8px; background: rgba(198,255,61,.08); color: var(--accent); font: 700 10.5px Inter, sans-serif; cursor: pointer; white-space: nowrap; }
+  .st-next:hover { background: rgba(198,255,61,.16); }
+  #set-panel .set-item.drag-slot .set-card { visibility: hidden; }
+  /* what everything does, under the set */
+  .set-guide { margin-top: 18px; padding: 14px 16px 16px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel-2); }
+  .set-guide[hidden] { display: none; }
+  .sg-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 18px; }
+  .sg { display: flex; align-items: flex-start; gap: 10px; min-width: 0; }
+  .sg b { display: block; font-size: 12.5px; color: var(--text); margin-bottom: 1px; }
+  .sg small { display: block; font-size: 11.5px; line-height: 1.35; color: var(--muted); }
+  .sg-v { flex: none; width: 46px; height: 34px; display: grid; place-items: center; }
+  .sg-v i { font-style: normal; }
+  .sg-col { width: 16px; height: 30px; border-radius: 5px 5px 2px 2px; background: linear-gradient(180deg, #a9d24e, #4c6a1f); }
+  .sg-role { font: 800 8px Inter, sans-serif; letter-spacing: .08em; color: #0b0b0f; background: #a9d24e; padding: 3px 5px; border-radius: 4px; }
+  .sg-lines { display: flex; gap: 6px; }
+  .sg-lines em { width: 3px; height: 26px; border-radius: 3px; background: var(--c); box-shadow: 0 0 6px var(--c); }
+  .sg-lines .good { --c: var(--good); } .sg-lines .ok { --c: var(--ok); } .sg-lines .bad { --c: var(--bad); }
+  .sg-play { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--good); box-shadow: 0 0 8px rgba(80,220,120,.35); display: grid; place-items: center; }
+  .sg-play::before { content: ""; border-left: 7px solid var(--good); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; margin-left: 2px; }
+  .sg-key { font: 800 11px "JetBrains Mono", monospace; color: #0b0b0f; background: #7fd6f0; padding: 3px 6px; border-radius: 6px; }
+  .sg-grip { font-size: 18px; color: var(--muted); }
+  .sg-next { font: 700 9px Inter, sans-serif; color: var(--accent); background: rgba(198,255,61,.08); padding: 4px 5px; border-radius: 6px; white-space: nowrap; }
+  .sg-x { color: var(--accent); font-size: 14px; }
+  @media (max-width: 1000px) { .sg-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .set-guide { margin: 14px 16px 0; } .sg-grid { grid-template-columns: 1fr; gap: 10px; } }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1527,12 +1565,25 @@
       </div>
     </div>
     <div class="set-body">
-      <p class="set-hint" id="set-hint" hidden>Drag a track left or right to move it (on a phone, hold it first). Tap a coloured line to see how two tracks mix.</p>
+      <p class="set-hint" id="set-hint" hidden></p>
       <div class="set-stage" id="set-stage">
         <ol class="set-list" id="set-list"></ol>
         <button type="button" class="st-add" id="st-add" hidden><span>+</span>Add tracks</button>
       </div>
       <div class="set-detail" id="set-detail" hidden></div>
+      <div class="set-guide" id="set-guide" hidden>
+        <div class="dk-title">What everything does</div>
+        <div class="sg-grid">
+          <div class="sg"><span class="sg-v"><i class="sg-col"></i></span><span><b>Energy column</b><small>How hard each track hits, 1 to 10. The orange one is your peak.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-role">BUILD</i></span><span><b>Role</b><small>The job each track does: intro, warm-up, build, peak, cool down, end.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-lines"><em class="good"></em><em class="ok"></em><em class="bad"></em></i></span><span><b>Mix line</b><small>Green mixes well, amber is workable, red will clash. Tap a line to see why.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-play"></i></span><span><b>Hear the transition</b><small>Plays the two tracks mixed together, right where the line is.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-key">8A</i></span><span><b>Key</b><small>Same number, or one either side, mixes smoothly.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-grip">⠿</i></span><span><b>Move a track</b><small>Drag it left or right into its new slot (on a phone, hold it first).</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-next">Next →</i></span><span><b>Mixes next</b><small>Finds new tracks that mix straight after this one.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-x">✕</i></span><span><b>Remove</b><small>Takes the track out of your set.</small></span></div>
+        </div>
+      </div>
       <div class="set-empty" id="set-empty">
         <div class="empty-flow" aria-hidden="true"><span class="ef-tag">Preview</span><div id="empty-flow-svg"></div></div>
         <div class="empty-title">Your set is empty</div>
@@ -3296,6 +3347,7 @@ function renderSet() {
   $("#set-flow").innerHTML = "";
   $("#set-detail").hidden = true; $("#set-detail").innerHTML = "";
   $("#st-add").hidden = !set.length;
+  $("#set-guide").hidden = !set.length;
   const links = set.slice(1).map((t, i) => transition(set[i], t));
   const rough = links.filter(l => l.score === 0).length, workable = links.filter(l => l.score === 1).length;
   $("#set-summary").textContent = set.length
@@ -3330,19 +3382,15 @@ function renderSet() {
           <img src="${esc(t.cover)}" alt=""><span class="play-ico" aria-hidden="true"></span>
         </button>
         <div class="sc-meta">
-          <div class="t">${esc(t.title)}</div>
-          <div class="a"><span class="role role-${roles[i].split(" ")[0].toLowerCase()}">${roles[i]}</span> · ${esc(t.artist)}</div>
-          <div class="sc-line">
-            <span class="chip cam" style="background:${camelotColor(t.camelot)}" title="${esc(t.key)}">${esc(t.camelot)}</span>
-            <span class="chip">${esc(t.bpm)} BPM</span>
-            <span class="chip e-chip" title="Track energy ${esc(t.energy)} of 10">⚡ ${esc(t.energy)}</span>
-          </div>
+          <div class="t" title="${esc(t.title)}">${esc(t.title)}</div>
+          <div class="a" title="${esc(t.artist)}">${esc(t.artist)}</div>
+          <div class="role role-${roles[i].split(" ")[0].toLowerCase()}">${roles[i]}</div>
         </div>
-        <div class="item-btns">
-          <button type="button" class="mini up" data-move="-1" aria-label="Move earlier" title="Move earlier" ${i === 0 ? "disabled" : ""}>◀</button>
-          <button type="button" class="mini nx" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find what mixes next" aria-label="Find what mixes after ${esc(t.title)}">→</button>
-          <button type="button" class="mini down" data-move="1" aria-label="Move later" title="Move later" ${i === set.length - 1 ? "disabled" : ""}>▶</button>
+        <div class="st-info">
+          <div class="st-key" style="--k:${camelotColor(t.camelot)}" title="Key: ${esc(t.key || t.camelot)}"><b>${esc(t.camelot)}</b>${t.key ? `<span>${esc(String(t.key).replace("major", "maj").replace("minor", "min"))}</span>` : ""}</div>
+          <div class="st-nums"><span title="Tempo"><b>${Math.round(t.bpm)}</b>BPM</span><span title="Track energy ${esc(t.energy)} of 10"><b>${esc(t.energy)}</b>Energy</span></div>
         </div>
+        <button type="button" class="st-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find tracks that mix after this one" aria-label="Find what mixes after ${esc(t.title)}">Mixes next →</button>
       </div>
       </div>
       ${i === set.length - 1 ? `<button type="button" class="next-btn last-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>` : ""}
