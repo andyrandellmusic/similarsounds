@@ -3467,7 +3467,7 @@ function syncFresh() {            // keep "Fresh for your set" (front page and s
   if (!set.length) { if ($("#fresh")) $("#fresh").hidden = true; $("#set-fresh").hidden = true; return; }
   clearTimeout(freshTimer); freshTimer = setTimeout(() => { loadFresh(); loadSetFresh(); }, 500);
 }
-/* Set builder: "Fresh for your set" in the top corner, four small tracks at a time, changing every 6 seconds
+/* Set builder: "For your set" in the top corner, two small tracks at a time (four turns), changing every 6 seconds
    (the same lift-away and arrive as New releases), pausing while the mouse or a finger is on it */
 let sfSets = [], sfIdx = 0, sfHold = false;
 async function loadSetFresh() {
@@ -3476,9 +3476,9 @@ async function loadSetFresh() {
   try {
     const d = await (await fetch("/api/fresh", { method: "POST", headers: { "Content-Type": "application/json" },
                                                body: JSON.stringify({ ids: set.map(t => t.deezer_id) }) })).json();
-    const list = (d.results || []).filter(t => !inSet(t.deezer_id)).slice(0, 16);
+    const list = (d.results || []).filter(t => !inSet(t.deezer_id)).slice(0, 8);      // two at a time, four turns
     list.forEach(t => { trackCache[t.deezer_id] = t; });
-    sfSets = []; for (let i = 0; i + 4 <= list.length; i += 4) sfSets.push(list.slice(i, i + 4));
+    sfSets = []; for (let i = 0; i + 2 <= list.length; i += 2) sfSets.push(list.slice(i, i + 2));
     if (!sfSets.length && list.length) sfSets = [list];
     box.hidden = !sfSets.length; sfIdx = 0;
     $("#sf-dots").innerHTML = sfSets.length > 1 ? sfSets.map((_, i) => `<button type="button" data-sf="${i}" aria-label="Set ${i + 1} of ${sfSets.length}"></button>`).join("") : "";
