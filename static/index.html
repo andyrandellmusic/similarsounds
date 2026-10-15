@@ -582,6 +582,8 @@
   @media (hover: hover) { .query .row:hover, #list .row:hover { border-color: var(--accent); } }
   /* the 30 matches: the one under the mouse also gets the search bar's green glow */
   @media (hover: hover) { #list .row:hover { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
+  /* phones have no mouse: the match you tap to play gets the glow instead */
+  @media (hover: none) { #list .row.playing, #list .row:has(.cover.play.on) { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
   .query .row.playing, #list .row.playing, .query .row:has(.cover.play.on), #list .row:has(.cover.play.on) { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
   /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
@@ -3525,12 +3527,12 @@ addEventListener("blur", () => setTimeout(() => {
   if (f && f.tagName === "IFRAME") stopAllPlayers(f.closest(".row") ? "row" : "", f);
 }, 0));
 
-/* ---------- Favourites: a heart on every track; the list is kept on this device */
+/* ---------- Favourites: a heart on every track; kept on this device, and in the account when signed in */
 const FAV_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.5s-7.5-4.6-9.3-9.2C1.4 8 3.4 4.5 7 4.5c2 0 3.6 1.1 5 3 1.4-1.9 3-3 5-3 3.6 0 5.6 3.5 4.3 6.8-1.8 4.6-9.3 9.2-9.3 9.2z"/></svg>';
 function loadFavs() { try { const a = JSON.parse(localStorage.getItem("ss_favs") || "[]"); return Array.isArray(a) ? a : []; } catch { return []; } }
 let favs = loadFavs();
 const isFav = id => favs.some(t => String(t.deezer_id) === String(id));
-function saveFavs() { try { localStorage.setItem("ss_favs", JSON.stringify(favs.slice(0, 500))); } catch {} }
+function saveFavs() { try { localStorage.setItem("ss_favs", JSON.stringify(favs.slice(0, 500))); } catch {} window.dispatchEvent(new Event("ss:saved")); }   // a signed-in account keeps a copy
 function favButton(t, cls = "") {
   const on = isFav(t.deezer_id);
   return `<button type="button" class="fav ${cls}${on ? " on" : ""}" data-fav="${t.deezer_id}" aria-pressed="${on}" aria-label="${on ? "Remove from" : "Add to"} favourites" title="${on ? "Remove from" : "Add to"} favourites">${FAV_SVG}</button>`;
@@ -3978,7 +3980,7 @@ emptyBars();
 addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
-<script src="/static/account.js?v=12" defer></script>
+<script src="/static/account.js?v=13" defer></script>
 <script src="/static/i18n.js?v=63"></script>
 </body>
 </html>

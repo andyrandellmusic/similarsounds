@@ -306,31 +306,55 @@
     await sb.auth.signOut(); close(); say("Your account and saved data have been deleted");
   });
 
-  /* ---------- keeping the set + recent searches in the account */
-  const byId = (list, key) => { const seen = new Set(); return list.filter(t => { const k = t[key]; if (seen.has(k)) return false; seen.add(k); return true; }); };
-  async function pull() {
+  /* ---------- keeping the set, favourites + recent searches in the account, on every device */
+  // The account's copy wins, so a track removed on one device stays removed on the others. Two exceptions:
+  // the first time this device syncs with this account (its own tracks are added in, nothing is lost), and
+  // changes made here that haven't reached the account yet (sent up first).
+  const byId = (list, key) => { const seen = new Set(); return list.filter(t => { const k = t?.[key]; if (k == null || seen.has(k)) return false; seen.add(k); return true; }); };
+  const DIRTY = "ss_sync_dirty", SYNCED = "ss_sync_uid";
+  const flag = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch {} };
+  const flagged = k => { try { return localStorage.getItem(k); } catch { return null; } };
+  function showLocal() {        // the page shows whatever is now on this device
+    try { set = read("ss_set"); renderSet(); } catch {}
+    try { favs = read("ss_favs"); paintFavs(); if ($("#fav-panel")?.classList.contains("open")) renderFavs(); } catch {}
+  }
+  let pulling = null;
+  function pull() { return pulling ||= doPull().finally(() => { pulling = null; }); }
+  async function doPull() {
+    if (!user) return;
     syncing = true;
     try {
-      const { data, error } = await sb.from("user_data").select("set_tracks, recent").eq("user_id", user.id).maybeSingle();
+      if (flagged(DIRTY) === user.id) { clearTimeout(saveTimer); await push(); return; }   // this device has newer changes
+      const { data, error } = await sb.from("user_data").select("set_tracks, recent, favs").eq("user_id", user.id).maybeSingle();
       if (error) throw error;
-      const localSet = read("ss_set"), localRecent = read("ss_recent");
-      const mergedSet = byId([...(data?.set_tracks || []), ...localSet], "deezer_id");
-      const mergedRecent = byId([...localRecent, ...(data?.recent || [])], "id").slice(0, 6);
-      write("ss_set", mergedSet); write("ss_recent", mergedRecent);
-      try { set = mergedSet; renderSet(); } catch {}
-      if (!data || mergedSet.length !== (data.set_tracks || []).length || mergedRecent.length !== (data.recent || []).length) await push();
+      const first = flagged(SYNCED) !== user.id;
+      const acct = { set: data?.set_tracks || [], favs: data?.favs || [], recent: data?.recent || [] };
+      const mergedSet = first ? byId([...acct.set, ...read("ss_set")], "deezer_id") : acct.set;
+      const mergedFavs = first ? byId([...read("ss_favs"), ...acct.favs], "deezer_id").slice(0, 500) : acct.favs;
+      const mergedRecent = byId([...read("ss_recent"), ...acct.recent], "id").slice(0, 6);
+      write("ss_set", mergedSet); write("ss_favs", mergedFavs); write("ss_recent", mergedRecent);
+      showLocal();
+      const same = (a, b) => JSON.stringify(a.map(t => t.deezer_id ?? t.id)) === JSON.stringify(b.map(t => t.deezer_id ?? t.id));
+      if (!data || !same(mergedSet, acct.set) || !same(mergedFavs, acct.favs) || !same(mergedRecent, acct.recent)) await push();
+      flag(SYNCED, user.id);
     } catch { /* offline: keep using this device's copy */ }
-    syncing = false;
+    finally { syncing = false; }
   }
   async function push() {
     if (!user) return;
-    await sb.from("user_data").upsert({ user_id: user.id, set_tracks: read("ss_set"), recent: read("ss_recent"),
-                                         updated_at: new Date().toISOString() });
+    const { error } = await sb.from("user_data").upsert({ user_id: user.id, set_tracks: read("ss_set"), favs: read("ss_favs"),
+                                                          recent: read("ss_recent"), updated_at: new Date().toISOString() });
+    if (error) throw error;
+    flag(DIRTY, null); flag(SYNCED, user.id);
   }
   window.addEventListener("ss:saved", () => {
     if (!user || syncing) return;
+    flag(DIRTY, user.id);
     clearTimeout(saveTimer); saveTimer = setTimeout(() => push().catch(() => {}), 800);
   });
+  // coming back to the site (another tab, the phone unlocked, a different device used meanwhile): fetch the latest
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible" && user) pull(); });
+  addEventListener("pageshow", e => { if (e.persisted && user) pull(); });
 
   /* ---------- header + menu */
   const nameOf = u => (u?.user_metadata?.name || u?.user_metadata?.full_name || "").trim() || (u?.email || "").split("@")[0];
