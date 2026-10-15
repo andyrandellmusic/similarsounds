@@ -55,7 +55,8 @@ async def main():
         await ctx.add_init_script(CURSOR)
         # filming: the page's own scrolls jump instantly (so the camera locks straight onto your track)
         await ctx.add_init_script("{ const st = window.scrollTo.bind(window); window.scrollTo = (a, b) => (a && typeof a === 'object') ? st({ ...a, behavior: 'instant' }) : st(a, b); }")
-        await ctx.add_init_script("addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.textContent = '#how-video, .set-hint { display: none !important; } .set-panel { width: 620px !important; max-width: 620px !important; } .wrap { max-width: 1040px !important; padding-left: 16px !important; padding-right: 16px !important; }'; document.head.append(st); });")
+        # filming: no player bars (the mix plays silently in the video), no phone tips
+        await ctx.add_init_script("addEventListener('DOMContentLoaded', () => { const st = document.createElement('style'); st.textContent = '#how-video, .set-hint, #mixbar, .mixbar, #nowbar, .rotate-tip { display: none !important; } .wrap { max-width: 1040px !important; padding-left: 16px !important; padding-right: 16px !important; }'; document.head.append(st); });")
         pg = await ctx.new_page()
         await pg.goto("http://localhost:8001/", wait_until="networkidle")
         await pg.evaluate("localStorage.clear(); sessionStorage.clear()")
@@ -161,12 +162,11 @@ async def main():
                   await pg.evaluate("document.querySelector('#set-fab').outerHTML.slice(0,120)"), await h.inner_text())
             ev("fab", await box("#fab-open"))
 
-        # 3. open the set
+        # 3. open the set builder (a whole page now)
         await asyncio.sleep(0.4)
         for _ in range(4):
             await pg.mouse.wheel(0, -40); await asyncio.sleep(0.06)
         await asyncio.sleep(0.5)
-        print("CLS:", await pg.evaluate("document.documentElement.className"))
         fb = await box("#fab-open")
         await move(W - 9, fb[1] + fb[3] / 2, 1000)
         await asyncio.sleep(0.12)
@@ -174,98 +174,89 @@ async def main():
         ev("open_set", fb)
         await pg.mouse.down(); await asyncio.sleep(0.07); await pg.mouse.up()
         await pg.wait_for_selector("#set-panel.open", timeout=5000)
-        await asyncio.sleep(1.4)
-        ev("panel", await box("#set-panel"))
-        ev("flow", await box("#set-flow"))
+        await asyncio.sleep(1.6)
+        ev("panel", [0, 0, W, H])
         ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
 
+        order = lambda: pg.evaluate("[...document.querySelectorAll('#set-list .set-item .t')].map(e=>e.textContent).join(' | ')")
+
         async def drag(frm, to):
+            """Grab a track by its grip and slide it sideways into another slot: the cards glide aside, it snaps in."""
             items = await pg.query_selector_all("#set-list .set-item")
             g = await items[frm].query_selector(".grip")
             gb = await g.bounding_box()
-            tb = await items[to].bounding_box()
             sx, sy = gb["x"] + gb["width"] / 2, gb["y"] + gb["height"] / 2
             await move(sx, sy, 700)
-            ev("grab", await box(items[frm]))
+            ev("grab", await box(await items[frm].query_selector(".set-card")))
             await pg.mouse.down(); await asyncio.sleep(0.25)
-            did = await items[frm].get_attribute("data-id")
-            grab_off = sy - (await (await items[frm].query_selector(".set-card")).bounding_box())["y"]   # offset within the card itself
-            idx = lambda: pg.evaluate("id => [...document.querySelectorAll('#set-list .set-item')].findIndex(e => e.dataset.id === id)", did)
             dirn = 1 if to > frm else -1
-            y, v = sy, 0.0
-            for k in range(600):             # ease up to a steady glide until the track takes its new slot
-                v = min(4.5, v + 0.12); y += dirn * v
-                await pg.mouse.move(sx, y); mouse.update(x=sx, y=y)
+            x, v = sx, 0.0
+            for k in range(600):             # ease up to a steady glide until the dashed slot is where we want it
+                v = min(5.0, v + 0.14); x += dirn * v
+                await pg.mouse.move(x, sy); mouse.update(x=x, y=sy)
                 await asyncio.sleep(0.016)
-                if await idx() == to:
+                if await pg.evaluate("drag ? drag.to : -1") == to:
                     break
-            for k in range(14):              # keep drifting while the other tracks slide out of the way
-                v *= 0.8; y += dirn * v
-                await pg.mouse.move(sx, y); mouse.update(x=sx, y=y)
-                await asyncio.sleep(0.016)
-            # then steer the floating card onto the green slot: each frame close part of the gap between them,
-            # so it glides in even while the slot is still sliding into place
-            gap = "() => { const g = document.querySelector('.drag-ghost'), s = document.querySelector('#set-list .set-item.drag-slot .set-card'); return g && s ? s.getBoundingClientRect().top - g.getBoundingClientRect().top : 0 }"
-            calm = 0
+            # steer the floating card onto the dashed slot, closing part of the gap each frame
+            # (aim at where the slot ends up, not where it is mid-slide)
+            gapjs = """() => { const g = document.querySelector('.drag-ghost'); if (!g || !drag) return [0, 0];
+                const st = document.querySelector('#set-stage'), sr = st.getBoundingClientRect(), s = drag.slots[drag.to], r = g.getBoundingClientRect();
+                return [sr.left - st.scrollLeft + s.x - r.left, sr.top - st.scrollTop + s.y - r.top] }"""
+            y, calm = sy, 0
             for k in range(240):
-                dy = await pg.evaluate(gap)
-                if abs(dy) < 0.8:
+                dx, dy = await pg.evaluate(gapjs)
+                if abs(dx) < 0.8 and abs(dy) < 0.8:
                     calm += 1
                     if calm >= 6: break
                 else:
                     calm = 0
-                y += max(-5.0, min(5.0, dy * 0.14))
-                await pg.mouse.move(sx, y); mouse.update(x=sx, y=y)
+                x += max(-6.0, min(6.0, dx * 0.16)); y += max(-6.0, min(6.0, dy * 0.16))
+                await pg.mouse.move(x, y); mouse.update(x=x, y=y)
                 await asyncio.sleep(0.016)
-            ty = y
-            await asyncio.sleep(0.3)
+            await asyncio.sleep(0.25)
             await pg.mouse.up()
-            ev("drop", [sx - 20, ty - 60, 440, 120])
-            await asyncio.sleep(0.5)
-            ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
-            print("   ", await pg.evaluate("[...document.querySelectorAll('#set-list .set-item .t')].map(e=>e.textContent).join(' | ')"))
+            ev("drop", [x - 80, y - 120, 160, 300])
+            await asyncio.sleep(0.6)
+            print("   ", await order())
 
-        # the whole set builder, top to bottom
-        await move(W - 260, H * 0.55, 500)
-        content_bottom = await pg.evaluate("(() => { const l = document.querySelector('#set-list'); return l.getBoundingClientRect().bottom })()")
-        print("    set content bottom:", round(content_bottom), "of", H)
-        ev("list", await box("#set-list"))
+        await move(W * 0.5, H * 0.62, 500)
+        ev("list", await box("#set-stage"))
         await asyncio.sleep(0.5)
         await drag(3, 2)          # move a couple of tracks around
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.9)
         await drag(0, 1)
-        await asyncio.sleep(1.0)
+        await asyncio.sleep(0.9)
         ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
 
-        # tap the orange "Workable" line between two tracks, then "Fix this gap", then insert a suggestion
-        line = await pg.query_selector("#set-list .link-dot.ok .ld") or await pg.query_selector("#set-list .link-dot.bad .ld")
-        print("    line:", await line.evaluate("e => e.closest('.link-dot').className"))
-        await click(line, 900, "line")
-        await asyncio.sleep(0.9)
-        gap = await pg.query_selector("#set-list .link:not([hidden]) .gap-btn")
-        gb = await box(gap)
-        await click(gap, 800, "gap_btn")
-        await pg.wait_for_selector(".gap-box:not([hidden]) .gap-item", timeout=60000)
+        # tap the coloured play button between two tracks that don't quite mix: it plays the transition
+        # (no player bar in the video) and the details for that pair open under the set
+        hb = await pg.query_selector("#set-list .link-dot.ok .st-hear") or await pg.query_selector("#set-list .link-dot.bad .st-hear")
+        print("    play button:", await hb.evaluate("e => e.closest('.link-dot').className"))
+        await click(hb, 900, "hear")
+        await asyncio.sleep(2.2)
+        await pg.evaluate("stopMix && stopMix()")
+        ev("detail", await box("#set-detail"))
+        await asyncio.sleep(0.6)
+
+        # Fix this gap, then pick a track to fill it
+        gap = await pg.query_selector("#set-detail [data-gap]")
+        await click(gap, 900, "gap_btn")
+        await pg.wait_for_selector("#set-detail .gap-box:not([hidden]) .gap-item", timeout=60000)
         await asyncio.sleep(1.0)
-        ev("gap_box", await box(".gap-box:not([hidden])"))
-        ins = await pg.query_selector(".gap-box:not([hidden]) .gap-item button")
+        ev("gap_box", await box("#set-detail .gap-box"))
+        ins = await pg.query_selector("#set-detail .gap-item .ins")
         await asyncio.sleep(0.6)
         await click(ins, 800, "insert")
         await asyncio.sleep(1.4)
         ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
-        print("    after insert:", await pg.evaluate("[...document.querySelectorAll('#set-list .set-item .t')].map(e=>e.textContent).join(' | ')"))
+        print("    after insert:", await order())
 
-        # top half: columns and Smart order
+        # Smart order
         await asyncio.sleep(0.6)
-        ev("flow", await box("#set-flow"))
         await click("#set-smart", 1000, "smart")
         await asyncio.sleep(1.8)
-        ev("summary", await box("#set-summary"), text=await pg.inner_text("#set-summary"))
-        print("    smart:", await pg.evaluate("[...document.querySelectorAll('#set-list .set-item .t')].map(e=>e.textContent).join(' | ')"))
+        print("    smart:", await order())
         await asyncio.sleep(1.2)
-        ev("flow", await box("#set-flow"))
-        await move(W - 120, H * 0.85, 600)
-        await asyncio.sleep(2.5)
         ev("end", [0, 0, W, H])
         await asyncio.sleep(0.5)
         await cdp.send("Page.stopScreencast")

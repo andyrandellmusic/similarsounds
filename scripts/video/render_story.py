@@ -35,9 +35,11 @@ ANCH = [(st - 0.35, 0), (st + 1.2, 1.4),                                        
 for i, (r, a) in enumerate(zip(rows, adds)):
     ANCH += [(r["t"], 1.6 if i == 0 else 1.4), (a["t"], 0.8), (a["t"] + 1.0, 0.6)]
 ANCH += [(T("open_set") - 1.6, 1.4), (T("open_set"), 1.3), (T("panel"), 0.9),   # out to 100%, into the SET tab
-         (T("list"), 0.6), (T("grab", 0), 0.9), (T("drop", 0), 1.6), (T("grab", 1), 1.1), (T("drop", 1), 1.6),
-         (S(3), 0.6), (T("line"), 1.3), (T("line") + 0.9, 0.9), (T("gap_btn"), 0.9), (T("gap_box"), 1.0), (T("insert"), 1.4), (S(4), 0.8),
-         (F(1), 1.0), (T("smart"), 1.5), (T("smart") + 0.25, 0.3)]                # click Smart order, then straight to the logo
+         (T("list"), 0.8), (T("grab", 0), 1.0), (T("drop", 0), 1.6), (T("grab", 1), 1.1), (T("drop", 1), 1.6),
+         (S(1), 0.6), (T("hear"), 1.3), (T("hear") + 1.3, 1.3),                    # into the play button between two tracks
+         (T("detail"), 0.8), (T("gap_btn"), 1.2),                                   # back out, Fix this gap
+         (T("gap_box"), 1.0), (T("insert"), 1.5), (S(2), 0.8),                      # into the tracks that fill it, pick one
+         (T("smart"), 1.6), (T("smart") + 1.0, 1.0)]                                # Smart order, then a second later the logo
 TIME, acc = [], 0.0
 SLOW = 1.1                                       # 10% slower than the last version
 for r, d in ANCH:
@@ -47,7 +49,7 @@ for r, d in ANCH:
 sb = B("search")
 LIST_Z = 1.45                                    # just wide enough for a whole track box (1008px)
 LY = 310                                         # list view: the searched track shows at the top, Add buttons stay in frame
-gb, ib, fb, lb = B("gap_btn"), B("insert"), B("open_set"), B("line")
+fb = B("open_set")
 CAM = [(st - 0.35, 800, 450, 1.0), (st + 1.2, 800, 450, 1.0),
        (T("search"), sb[0] + 330, sb[1] + 24, 2.3), (T("type"), sb[0] + 290, sb[1] + 24, 2.5),
        (T("type") + 0.9, sb[0] + 300, sb[1] + 24, 2.6),
@@ -61,23 +63,23 @@ for r, a in zip(rows, adds):
 CAM += [(T("open_set") - 1.6, 800, 450, 1.0), (T("open_set") - 1.0, 800, 450, 1.0),   # 100%
         (T("open_set"), fb[0] + fb[2] / 2, fb[1] + fb[3] / 2, 3.0),                   # into the SET tab
         ]
-pn = B("panel"); PZ = 1.3; PX = 1600 - 1600 / PZ / 2          # zoomed onto the set builder, right edge to right edge
-g0, g1 = B("grab", 0), B("grab", 1)
-CAM += [(T("panel"), PX, 346, PZ), (T("list"), PX, 346, PZ),                                  # top: columns + first tracks
-        (T("grab", 0) - 0.4, PX, 554, PZ), (T("drop", 0) + 0.6, PX, 554, PZ),                  # follow the first move
-        (T("grab", 1) - 0.4, PX, 400, PZ), (S(3), PX, 420, PZ),                                # and the second
-        (T("line") - 0.1, lb[0] + lb[2] / 2, lb[1] + 20, 2.6),                                 # onto the orange "Workable" line
-        (T("line") + 0.9, (lb[0] + gb[0] + gb[2]) / 2, lb[1] + 20, 2.4),                        # its details open
-        (T("gap_btn") - 0.1, gb[0] + gb[2] / 2, gb[1] + gb[3] / 2, 2.8),                       # into "Fix this gap"
-        (T("gap_box") - 0.2, PX, 470, PZ), (S(4), PX, 470, PZ),                                # back out, pick a track
-        (F(1), 1600 - 340, 192, 2.35), (F(2) + 1.6, 1600 - 340, 192, 2.35)]                    # top half: columns + Smart order
+# the set builder is a whole page now: mostly shown in full, zooming only onto the play button and the fill-in tracks
+hb, ib = B("hear"), B("insert")
+HX, HY = hb[0] + hb[2] / 2, hb[1] + hb[3] / 2
+IX, IY = ib[0] - 160, ib[1] + ib[3] / 2
+SX, SY, SZ = 800, 390, 1.15                     # the set page, nearly all of it
+CAM += [(T("panel"), SX, SY, SZ), (S(1), SX, SY, SZ),
+        (T("hear") - 0.15, HX, HY - 40, 2.6), (T("hear") + 1.3, HX, HY - 40, 2.6),           # in on the play button
+        (T("detail"), SX, SY, SZ), (T("gap_btn") + 0.1, SX, SY, SZ),                          # out, Fix this gap
+        (T("gap_box") + 0.1, IX, IY, 2.0), (T("insert") + 0.35, IX, IY, 2.0),                 # in on the tracks that fill the gap
+        (S(2), SX, SY, SZ), (T("smart") + 1.0, SX, SY, SZ)]                                   # out: Smart order
 CAM.sort()
 
 END_VIDEO = TIME[-1][1]
 FADE_OUT, CARD_IN, CARD_HOLD, CARD_OUT = 0.7, 0.7, 3.0, 0.7
 TOTAL = END_VIDEO + FADE_OUT + CARD_IN + CARD_HOLD + CARD_OUT
-LOGO_AT = END_VIDEO + FADE_OUT + CARD_IN          # the moment the logo has landed
-print(f"logo lands at {LOGO_AT:.2f}s of {TOTAL:.2f}s", flush=True)
+LOGO_AT = END_VIDEO + FADE_OUT                    # the moment the logo starts coming up (the music drop lands here)
+print(f"logo comes up at {LOGO_AT:.2f}s of {TOTAL:.2f}s", flush=True)
 BG = (11, 11, 15)
 
 
