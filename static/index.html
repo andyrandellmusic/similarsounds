@@ -583,7 +583,7 @@
   /* the 30 matches: the one under the mouse also gets the search bar's green glow */
   @media (hover: hover) { #list .row:hover { box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
   /* phones (no mouse): the match you tap (anywhere in its box) gets the same glow, until you tap another */
-  @media (hover: none) { #list .row.tapped { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); } }
+  #list .row.tapped { border-color: var(--accent) !important; box-shadow: 0 0 0 1px var(--accent), 0 0 22px rgba(198,255,61,.55), 0 0 44px rgba(198,255,61,.18); }
   .query .row.playing, #list .row.playing, .query .row:has(.cover.play.on), #list .row:has(.cover.play.on) { border-color: var(--accent); }
   @media (min-resolution: 2dppx) { .query .row, #list .row { border-width: 1px; } }
   /* Already played this visit: a quiet "Played" tag by the title and slightly dimmed artwork */
@@ -2720,12 +2720,17 @@ box.addEventListener("click", e => {
 });
 
 /* ================= Phones: light up the match you tap ================= */
-document.addEventListener("click", e => {          // a tap, not a scroll; caught first so buttons in the box count too
-  if (!matchMedia("(hover: none)").matches) return;                // desktops light the one under the mouse instead
+// Finger touches, not clicks: iPhones don't send a click for a tap on the plain parts of a box.
+// A touch that moves (a scroll) doesn't count; touching anywhere else turns the light off again.
+let tapStart = null;
+document.addEventListener("touchstart", e => { const t = e.touches[0]; tapStart = e.touches.length === 1 ? { x: t.clientX, y: t.clientY } : null; }, { passive: true });
+document.addEventListener("touchend", e => {
+  const t = e.changedTouches[0];
+  if (!tapStart || !t || Math.hypot(t.clientX - tapStart.x, t.clientY - tapStart.y) > 10) return;
   const row = e.target.closest?.("#list .row");
   document.querySelectorAll("#list .row.tapped").forEach(r => { if (r !== row) r.classList.remove("tapped"); });
   row?.classList.add("tapped");
-}, true);
+}, { passive: true });
 
 /* ================= Home link + ☰ menu ================= */
 const menu = $("#menu"), menuBtn = $("#menu-btn");
