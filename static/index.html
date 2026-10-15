@@ -1774,11 +1774,6 @@
 
   <div id="out">
     <section class="start" id="start">
-      <div class="fresh" id="fresh" hidden>
-        <div class="start-label fresh-label"><span class="fresh-title">Fresh for your set</span> <span class="badge-new">NEW</span></div>
-        <p class="fresh-sub" id="fresh-sub"></p>
-        <div class="try" id="fresh-list"></div>
-      </div>
       <div class="home-pair">
         <div class="home-box">
           <div class="start-label">New releases</div>
@@ -2296,7 +2291,7 @@ function freshTick() {
 }
 startFreshTimer();
 /* "Fresh for your set": the newest releases that mix with what's already in your set (start screen) */
-async function loadFresh() {
+async function loadFresh() {          // the front page no longer shows it: "For your set" lives in the set builder
   const box = $("#fresh"); if (!box) return;
   if (!set.length) { box.hidden = true; return; }
   try {
