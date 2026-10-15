@@ -1600,6 +1600,76 @@
   .sg b.c-good { color: var(--good); } .sg b.c-ok { color: var(--ok); } .sg b.c-bad { color: var(--bad); }
   @media (max-width: 1000px) { .sg-grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 640px) { .sg-grid { grid-template-columns: 1fr; } }
+
+  /* ================= Phones: a more compact set (each track one tidy row) ================= */
+  @media (max-width: 640px) {
+    #set-panel .set-card { grid-template-columns: 52px minmax(0, 1fr) auto 42px; grid-template-areas: "art meta meta grip" "art info next grip"; gap: 4px 9px; padding: 6px 0 6px 6px; border-radius: 12px; }
+    #set-panel .set-card .set-play { width: 52px; height: 52px; border-radius: 8px; }
+    #set-panel .set-card img { border-radius: 8px; }
+    #set-panel .grip { margin: -6px 0; font-size: 20px; gap: 2px; }
+    #set-panel .set-card .rm { top: 4px; right: 46px; width: 24px; height: 24px; }
+    #set-panel .sc-meta { gap: 0; padding-right: 26px; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 6px; }
+    #set-panel .set-card .sc-meta .t { width: 100%; font-size: 13.5px; }
+    #set-panel .set-card .sc-meta .a { font-size: 11px; max-width: 60%; }
+    #set-panel .set-card .role { font-size: 8.5px; }
+    .st-info { gap: 4px; }
+    .st-key { padding: 2px 4px; gap: 4px; }
+    .st-key b { font-size: 10px; padding: 1px 5px; }
+    .st-key span { font-size: 10px; }
+    .st-nums span { width: auto; min-width: 38px; padding: 1px 4px 2px; font-size: 7px; }
+    .st-nums b { font-size: 11.5px; }
+    .st-next { grid-area: next; align-self: end; width: 30px; height: 30px; padding: 0; font-size: 0; border-radius: 8px; }
+    .st-next::after { content: "→"; font-size: 15px; }
+    #set-panel .link-dot { height: 26px; }
+    #set-panel .link-dot .st-hear { width: 24px; height: 24px; }
+    #set-panel .link-dot .st-hear svg { width: 9px; height: 9px; }
+    .set-cols { height: 82px; padding-top: 8px; }
+    #set-panel .set-head { padding: 14px 16px 6px; }
+    #set-panel .set-head h2 { font-size: 20px; }
+    #set-panel .set-tools { margin-top: 8px; } #set-panel .set-row2 { margin-top: 6px; }
+    #set-panel .set-row2 .plan-wide, #set-panel .set-row2 .share-mini { height: 36px; }
+  }
+  /* the tip to turn the phone sideways */
+  .rotate-tip { position: fixed; left: 50%; bottom: 22px; transform: translateX(-50%); z-index: 8; width: min(340px, calc(100% - 32px)); box-sizing: border-box;
+    display: flex; align-items: center; gap: 12px; padding: 12px 12px 12px 14px; border-radius: 16px; background: rgba(20,20,27,.96); border: 1px solid rgba(198,255,61,.45);
+    box-shadow: 0 12px 40px rgba(0,0,0,.6), 0 0 18px rgba(198,255,61,.15); animation: rt-in .35s cubic-bezier(.16,1,.3,1) both; }
+  .rotate-tip[hidden] { display: none; }
+  .rt-phone { flex: none; width: 18px; height: 30px; border: 2px solid var(--accent); border-radius: 4px; position: relative; animation: rt-turn 2.2s ease-in-out infinite; }
+  .rt-phone::after { content: ""; position: absolute; left: 50%; bottom: 2px; width: 4px; height: 2px; margin-left: -2px; border-radius: 2px; background: var(--accent); }
+  .rt-txt { flex: 1; min-width: 0; display: grid; gap: 1px; }
+  .rt-txt b { font-size: 13.5px; color: var(--text); }
+  .rt-txt small { font-size: 11.5px; color: var(--muted); line-height: 1.3; }
+  .rt-x { flex: none; background: none; border: 0; color: var(--accent); font-size: 22px; line-height: 1; padding: 4px 6px; cursor: pointer; }
+  @keyframes rt-turn { 0%, 25% { transform: rotate(0); } 50%, 75% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
+  @keyframes rt-in { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
+  @media (prefers-reduced-motion: reduce) { .rt-phone, .rotate-tip { animation: none; } }
+  /* ================= Phones turned sideways: a smaller version of the desktop set ================= */
+  @media (orientation: landscape) and (max-height: 520px) {
+    #set-panel { overflow-y: auto; }
+    #set-panel .set-body { flex: none; overflow: visible; }
+    #set-panel .set-head { display: flex !important; flex-direction: row !important; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px 10px; padding: 10px 56px 6px 16px; max-width: none; }
+    #set-panel .set-head > * { order: 0 !important; }
+    #set-panel .set-head .row1 { flex: none; }
+    #set-panel .set-head h2 { font-size: 18px; }
+    #set-panel .set-summary { flex: 1 1 280px; margin: 0; font-size: 11.5px; }
+    #set-panel .set-tools, #set-panel .set-row2 { margin: 0; flex: 1 1 340px; max-width: none; }
+    #set-panel .set-tools .icon { height: 30px; font-size: 11px; }
+    #set-panel .set-row2 .plan-wide, #set-panel .set-row2 .share-mini { height: 30px; font-size: 12px; }
+    #set-panel .set-fresh { display: none; }
+    #set-panel #set-close { position: fixed; top: 8px; right: 10px; z-index: 6; }
+    #set-panel .set-body { padding: 2px 16px 24px; }
+    .st-col { height: 74px; margin-bottom: 6px; }
+    .st-e { font-size: 11px; margin-bottom: 2px; }
+    .st-role { font-size: 7px; }
+    #set-panel .link-dot { margin-top: 80px; }
+    .st-add { margin-top: 80px; height: 170px; }
+    #set-panel .set-card { padding: 6px; gap: 5px; }
+    #set-panel .set-card .set-play { width: 70%; margin: 0 auto; }
+    #set-panel .set-card .sc-meta .t { font-size: 11.5px; }
+    .st-nums b { font-size: 11px; }
+    .st-next { height: 24px; font-size: 10px; }
+    .rotate-tip { display: none !important; }
+  }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1749,6 +1819,11 @@
     <div class="set-body">
       <p class="set-hint" id="set-hint" hidden></p>
       <div class="set-cols" id="set-cols" aria-hidden="true"></div>
+      <div class="rotate-tip" id="rotate-tip" role="status" hidden>
+        <span class="rt-phone" aria-hidden="true"></span>
+        <span class="rt-txt"><b>Turn your phone sideways</b><small>to see your set laid out like the desktop view</small></span>
+        <button type="button" class="rt-x" id="rotate-x" aria-label="Close">×</button>
+      </div>
       <div class="set-stage" id="set-stage">
         <ol class="set-list" id="set-list"></ol>
         <button type="button" class="st-add" id="st-add" hidden><span>+</span>Add tracks</button>
@@ -3801,12 +3876,24 @@ function openSet(open) {
   if (open === panel.classList.contains("open")) return;
   if (open && $("#fav-panel")?.classList.contains("open")) openFavs(false);
   panel.classList.toggle("open", open);
+  rotateTip(open);
   $("#scrim").classList.toggle("open", open);
   panel.inert = !open;
   if (open) { setOpener = document.activeElement; $("#set-close").focus(); }
   else setOpener?.focus?.();
 }
 $("#fab-open").onclick = () => openSet(true);
+// Phones held upright: a short tip to turn sideways for the desktop-style set (it goes on its own after a few seconds)
+let rotateTimer = null;
+function rotateTip(show) {
+  const tip = $("#rotate-tip"); if (!tip) return;
+  clearTimeout(rotateTimer);
+  const upright = matchMedia("(max-width: 640px) and (orientation: portrait)").matches;
+  tip.hidden = !(show && upright && set.length);
+  if (!tip.hidden) rotateTimer = setTimeout(() => { tip.hidden = true; }, 5000);
+}
+$("#rotate-x").onclick = () => rotateTip(false);
+matchMedia("(orientation: landscape)").addEventListener?.("change", e => { if (e.matches) rotateTip(false); });
 
 $("#set-close").onclick = () => openSet(false);
 $("#scrim").onclick = () => openSet(false);
