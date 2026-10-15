@@ -1358,6 +1358,20 @@
     #set-panel .link-dot .ld { width: 3px; height: 60px; }
     .st-add { height: 190px; margin: 110px 16px 0 14px; }
   }
+
+  /* dragging: only the cards move, gliding smoothly; the dashed slot shows where it lands; lines hide meanwhile */
+  #set-panel .set-stage { position: relative; }
+  #set-panel .set-list.is-dragging .set-card { transition: transform .22s cubic-bezier(.2, .8, .2, 1); }
+  #set-panel .set-list.is-dragging .link-dot .ld { opacity: 0; transition: opacity .12s; }
+  #set-panel .set-item.drag-slot .st-unit { outline: 0; background: none; }
+  #set-panel .set-item.drag-slot .st-unit > * { visibility: visible; }
+  #set-panel .set-item.drag-slot .set-card { visibility: hidden; }
+  .st-ph { position: absolute; border: 1.5px dashed rgba(198,255,61,.6); background: rgba(198,255,61,.05); border-radius: 12px; pointer-events: none;
+    box-sizing: border-box; transition: left .22s cubic-bezier(.2, .8, .2, 1); }
+  .drag-ghost.set-card { background: linear-gradient(180deg, #1c1d26, #16161d); border: 1px solid var(--accent); border-radius: 12px; padding: 8px;
+    display: flex; flex-direction: column; gap: 6px; }
+  .drag-ghost.landing { transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s ease; }
+  .set-list.st-now .st-bar { animation: none; }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -3247,6 +3261,7 @@ function syncFresh() {            // keep "Fresh for your set" on the front page
   if (!set.length) { $("#fresh").hidden = true; return; }
   clearTimeout(freshTimer); freshTimer = setTimeout(loadFresh, 500);
 }
+let setInstant = false;      // true right after a drop: redraw without the columns growing in again
 function renderSet() {
   syncFresh();
   $("#set-share").disabled = !set.length;
@@ -3281,6 +3296,7 @@ function renderSet() {
   const roles = setRoles(set);
   const barKind = i => roles[i] === "Peak track" ? "pk" : (i === 0 || i === set.length - 1) ? "end" : "mid";
   $("#set-hint").hidden = set.length < 2;
+  $("#set-list").classList.toggle("st-now", setInstant);
   $("#set-list").innerHTML = set.map((t, i) => `
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link-dot ${links[i - 1].cls}">
@@ -3343,7 +3359,7 @@ $("#set-list").addEventListener("click", e => {
     if (j < 0 || j >= set.length) return;
     [set[i], set[j]] = [set[j], set[i]];
   }
-  if (e.target.closest("[data-remove], [data-move]")) { saveSet(); renderSet(); refreshAddButtons(); }
+  if (e.target.closest("[data-remove], [data-move]")) { saveSet(); setInstant = true; renderSet(); setInstant = false; refreshAddButtons(); }
 });
 
 /* Drag to reorder (pointer events: works with mouse and touch) */
@@ -3354,16 +3370,24 @@ let drag = null;
 let pendingDrag = null;
 const reduceMotion = () => matchMedia("(prefers-reduced-motion: reduce)").matches;
 function startDrag(item, el, pointerId, x, y) {
+  // Only the track cards move: the energy columns stay in their slots and change once the track is dropped.
   pendingDrag = null;
-  const unit = item.querySelector(".st-unit"), r = unit.getBoundingClientRect();
-  const ghost = unit.cloneNode(true);
+  const items = [...$("#set-list").querySelectorAll(".set-item")], from = items.indexOf(item);
+  const card = item.querySelector(".set-card"), r = card.getBoundingClientRect();
+  const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
+  // where each slot's card sits, measured along the whole set (so it still works as the set scrolls)
+  const slots = items.map(el => { const c = el.querySelector(".set-card").getBoundingClientRect(); return { x: c.left - sr.left + stage.scrollLeft, y: c.top - sr.top, w: c.width, h: c.height }; });
+  const ghost = card.cloneNode(true);
   ghost.classList.add("drag-ghost");
-  // glued to the finger / cursor at the exact point you grabbed it
   Object.assign(ghost.style, { left: "0px", top: "0px", width: r.width + "px", height: r.height + "px",
                                transform: `translate3d(${r.left}px, ${r.top}px, 0)` });
-  document.body.appendChild(ghost);
-  drag = { item, ghost, ox: x - r.left, oy: y - r.top, w: r.width };
+  $("#set-panel").appendChild(ghost);      // inside the set page, so it keeps the card's look
+  const ph = document.createElement("div"); ph.className = "st-ph";       // the dashed slot it will land in
+  Object.assign(ph.style, { left: slots[from].x + "px", top: slots[from].y + "px", width: slots[from].w + "px", height: slots[from].h + "px" });
+  stage.appendChild(ph);
+  drag = { item, ghost, ph, items, from, to: from, slots, ox: x - r.left, oy: y - r.top, w: r.width };
   item.classList.add("drag-slot");
+  $("#set-list").classList.add("is-dragging");
   try { el.setPointerCapture(pointerId); } catch {}
   navigator.vibrate?.(12);
   requestAnimationFrame(() => ghost.classList.add("lifted"));
@@ -3373,10 +3397,10 @@ $("#set-list").addEventListener("pointerdown", e => {
   if (!item) return;
   const grip = e.target.closest(".grip");
   if (grip) { e.preventDefault(); startDrag(item, grip, e.pointerId, e.clientX, e.clientY); return; }
-  if (e.target.closest("button, a, input, .gap-box, .link, .link-dot") || !e.target.closest(".st-unit")) return;
-  const unit = e.target.closest(".st-unit");
-  pendingDrag = { item, card: unit, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
-  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, unit, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
+  if (e.target.closest("button, a, input, .gap-box, .link, .link-dot") || !e.target.closest(".set-card")) return;
+  const card = e.target.closest(".set-card");
+  pendingDrag = { item, card, x: e.clientX, y: e.clientY, id: e.pointerId, mouse: e.pointerType === "mouse" };
+  if (!pendingDrag.mouse) pendingDrag.timer = setTimeout(() => pendingDrag && startDrag(item, card, e.pointerId, pendingDrag.x, pendingDrag.y), 280);
 });
 addEventListener("pointermove", e => {
   if (pendingDrag && !drag) {
@@ -3387,26 +3411,22 @@ addEventListener("pointermove", e => {
   }
   if (!drag) return;
   drag.ghost.style.transform = `translate3d(${e.clientX - drag.ox}px, ${e.clientY - drag.oy}px, 0)`;
-  // where would it land? A neighbour steps aside once the dragged track's middle passes the halfway point
-  // between the two slots. Uses layout positions, so tracks still sliding don't confuse it.
-  const list = $("#set-list"), stage = $("#set-stage"), sr = stage.getBoundingClientRect();
-  const unitMid = el => { const u = el.querySelector(".st-unit"); return sr.left - stage.scrollLeft + el.offsetLeft + u.offsetLeft + u.offsetWidth / 2; };
-  const gMid = e.clientX - drag.ox + drag.w / 2;
-  const before = new Map([...list.querySelectorAll(".set-item")].map(el => [el, el.getBoundingClientRect().left]));
-  let moved = false;
-  for (let guard = 0; guard < 60; guard++) {
-    const next = drag.item.nextElementSibling, prev = drag.item.previousElementSibling;
-    if (next && gMid > (unitMid(drag.item) + unitMid(next)) / 2) { list.insertBefore(next, drag.item); moved = true; continue; }
-    if (prev && gMid < (unitMid(prev) + unitMid(drag.item)) / 2) { list.insertBefore(drag.item, prev); moved = true; continue; }
-    break;
+  // which slot is the card over? the one whose middle is nearest the card's middle
+  const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
+  const gx = e.clientX - drag.ox + drag.w / 2 - sr.left + stage.scrollLeft;
+  let to = 0, best = Infinity;
+  drag.slots.forEach((s, i) => { const d = Math.abs(s.x + s.w / 2 - gx); if (d < best) { best = d; to = i; } });
+  if (to !== drag.to) {
+    drag.to = to;
+    const { from, slots } = drag;
+    // the cards in between glide one slot along to make room
+    drag.items.forEach((el, i) => {
+      if (i === from) return;
+      const j = from < to && i > from && i <= to ? i - 1 : to < from && i >= to && i < from ? i + 1 : i;
+      el.querySelector(".set-card").style.transform = j === i ? "" : `translateX(${slots[j].x - slots[i].x}px)`;
+    });
+    Object.assign(drag.ph.style, { left: slots[to].x + "px", top: slots[to].y + "px" });
   }
-  if (moved && !reduceMotion()) before.forEach((left, el) => {      // slide the others into their new places
-    if (el === drag.item) return;
-    const d = left - el.getBoundingClientRect().left;
-    if (!d) return;
-    el.style.transition = "none"; el.style.transform = `translateX(${d}px)`;
-    requestAnimationFrame(() => { el.style.transition = "transform .16s ease-out"; el.style.transform = ""; });
-  });
   // near the left or right edge: the set scrolls along
   if (e.clientX < sr.left + 60) stage.scrollLeft -= 14;
   if (e.clientX > sr.right - 60) stage.scrollLeft += 14;
@@ -3416,23 +3436,23 @@ document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, {
 $("#set-list").addEventListener("contextmenu", e => { if (drag || pendingDrag) e.preventDefault(); });
 function endDrag() {
   if (!drag) return;
-  const { item, ghost } = drag;
+  const { item, ghost, ph, from, to, slots } = drag;
   drag = null;
   const finish = () => {
-    ghost.remove();
+    ghost.remove(); ph.remove();
     item.classList.remove("drag-slot");
-    $("#set-list").querySelectorAll(".set-item").forEach(el => { el.style.transition = ""; el.style.transform = ""; });
-    const order = [...$("#set-list").querySelectorAll(".set-item")].map(el => Number(el.dataset.id));
-    set = order.map(id => set.find(t => t.deezer_id === id));
-    $("#set-list").classList.remove("is-dragging");
-    $("#set-list").style.paddingBottom = "";
-    saveSet(); renderSet();
+    const list = $("#set-list");
+    list.querySelectorAll(".set-card").forEach(c => { c.style.transform = ""; });
+    list.classList.remove("is-dragging");
+    if (to !== from) { const [t] = set.splice(from, 1); set.splice(to, 0, t); saveSet(); }
+    setInstant = true; renderSet(); setInstant = false;          // the columns change straight away, no regrowing
   };
   if (reduceMotion()) return finish();
-  const r = item.querySelector(".st-unit").getBoundingClientRect();      // glide into the slot
+  // glide into the slot, then snap
+  const stage = $("#set-stage"), sr = stage.getBoundingClientRect();
   ghost.classList.add("landing");
-  ghost.style.transform = `translate3d(${r.left}px, ${r.top}px, 0)`;
-  setTimeout(finish, 170);
+  ghost.style.transform = `translate3d(${slots[to].x + sr.left - stage.scrollLeft}px, ${slots[to].y + sr.top}px, 0)`;
+  setTimeout(finish, 200);
 }
 addEventListener("pointerup", endDrag);
 addEventListener("pointercancel", endDrag);
