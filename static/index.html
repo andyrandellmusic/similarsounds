@@ -1670,6 +1670,18 @@
     .st-next { height: 24px; font-size: 10px; }
     .rotate-tip { display: none !important; }
   }
+
+  /* the turn-sideways sign: just a phone turning, with arrows going round it, in the middle of the screen */
+  .rotate-tip { left: 50%; top: 50%; bottom: auto; width: 150px; height: 150px; padding: 0; transform: translate(-50%, -50%); display: grid; place-items: center;
+    border-radius: 32px; background: rgba(11,11,15,.88); border: 1px solid rgba(198,255,61,.4); color: var(--accent); cursor: pointer;
+    box-shadow: 0 20px 60px rgba(0,0,0,.7), 0 0 30px rgba(198,255,61,.18); animation: rt-pop .35s cubic-bezier(.16,1,.3,1) both; backdrop-filter: blur(4px); }
+  .rotate-tip svg { width: 104px; height: 104px; filter: drop-shadow(0 0 8px rgba(198,255,61,.45)); }
+  .rotate-tip .rt-phone { transform-origin: 60px 60px; animation: rt-turn 2.4s ease-in-out infinite; width: auto; height: auto; border: 0; }
+  .rotate-tip .rt-phone::after { content: none; }
+  .rotate-tip .rt-arrows { transform-origin: 60px 60px; animation: rt-spin 2.4s ease-in-out infinite; }
+  @keyframes rt-spin { 0%, 20% { transform: rotate(0); } 55%, 100% { transform: rotate(-90deg); } }
+  @keyframes rt-pop { from { opacity: 0; transform: translate(-50%, -50%) scale(.85); } to { opacity: 1; transform: translate(-50%, -50%) scale(1); } }
+  @media (prefers-reduced-motion: reduce) { .rotate-tip .rt-phone, .rotate-tip .rt-arrows { animation: none; } }
 </style>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "What is SimilarSounds?", "acceptedAnswer": {"@type": "Answer", "text": "A free tool for DJs. Paste a track and it finds new house music that sounds like it and mixes with it, newest releases first."}}, {"@type": "Question", "name": "How does it decide what mixes?", "acceptedAnswer": {"@type": "Answer", "text": "Every track is analysed for its sound, musical key (shown in Camelot, like 8A), BPM and energy. Matches are ranked by how close they sound, then checked for key, tempo and energy so you can see at a glance what will blend."}}, {"@type": "Question", "name": "What can I paste in?", "acceptedAnswer": {"@type": "Answer", "text": "A YouTube, SoundCloud, Beatport, Bandcamp or Deezer link, or just start typing an artist and pick the track from the list."}}, {"@type": "Question", "name": "Is it free? Do I need an account?", "acceptedAnswer": {"@type": "Answer", "text": "It's completely free, with no ads and no tracking, and you don't need an account. If you like, create a free one to keep your set and recent searches on every device."}}, {"@type": "Question", "name": "Why only house music?", "acceptedAnswer": {"@type": "Answer", "text": "Doing one genre properly beats doing everything badly. Every track in the catalogue is house - House, Deep House, Tech House, Minimal / Deep Tech and Funky / Disco House - so matches stay usable in a house set."}}, {"@type": "Question", "name": "How accurate are the key and BPM?", "acceptedAnswer": {"@type": "Answer", "text": "They're worked out automatically from 30-second previews, so they're good estimates rather than guarantees. Always trust your ears before you mix."}}, {"@type": "Question", "name": "Can I download the tracks?", "acceptedAnswer": {"@type": "Answer", "text": "No. SimilarSounds doesn't host or sell music. Each match links to Beatport, Traxsource, Bandcamp, SoundCloud and YouTube so you can buy or stream it from the artist."}}, {"@type": "Question", "name": "How do I build a set?", "acceptedAnswer": {"@type": "Answer", "text": "Tap Add to set on any track you like, then open Your set. Drag tracks into order or press Smart order, and every transition is coloured green, amber or red so you can spot clashes. Share the set with a link."}}]}</script>
 </head>
@@ -1819,11 +1831,16 @@
     <div class="set-body">
       <p class="set-hint" id="set-hint" hidden></p>
       <div class="set-cols" id="set-cols" aria-hidden="true"></div>
-      <div class="rotate-tip" id="rotate-tip" role="status" hidden>
-        <span class="rt-phone" aria-hidden="true"></span>
-        <span class="rt-txt"><b>Turn your phone sideways</b><small>to see your set laid out like the desktop view</small></span>
-        <button type="button" class="rt-x" id="rotate-x" aria-label="Close">×</button>
-      </div>
+      <button type="button" class="rotate-tip" id="rotate-tip" hidden aria-label="Turn your phone sideways to see your set laid out like the desktop view. Tap to close.">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <g class="rt-arrows" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M24 46A40 40 0 0 1 82 25"/><path d="M76 16l7 9-11 4"/>
+            <path d="M96 74A40 40 0 0 1 38 95"/><path d="M44 104l-7-9 11-4"/>
+          </g>
+          <g class="rt-phone"><rect x="45" y="34" width="30" height="52" rx="6" fill="rgba(198,255,61,.08)" stroke="currentColor" stroke-width="4"/>
+            <line x1="56" y1="78" x2="64" y2="78" stroke="currentColor" stroke-width="3.5" stroke-linecap="round"/></g>
+        </svg>
+      </button>
       <div class="set-stage" id="set-stage">
         <ol class="set-list" id="set-list"></ol>
         <button type="button" class="st-add" id="st-add" hidden><span>+</span>Add tracks</button>
@@ -3892,7 +3909,7 @@ function rotateTip(show) {
   tip.hidden = !(show && upright && set.length);
   if (!tip.hidden) rotateTimer = setTimeout(() => { tip.hidden = true; }, 5000);
 }
-$("#rotate-x").onclick = () => rotateTip(false);
+$("#rotate-tip").onclick = () => rotateTip(false);
 matchMedia("(orientation: landscape)").addEventListener?.("change", e => { if (e.matches) rotateTip(false); });
 
 $("#set-close").onclick = () => openSet(false);
