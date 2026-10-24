@@ -34,7 +34,12 @@ def genres(deezer_id: int) -> list[str] | None:
         return None   # couldn't check: keep it
 
 
+EDITS = re.compile(r"\b(slowed|sped up|nightcore)\b", re.I)   # TikTok-style speed edits, not DJ versions
+
+
 def verdict(bpm: float, g: list[str] | None, title: str = "") -> str | None:
+    if EDITS.search(title):
+        return "speed edit"
     if not BPM_MIN <= bpm <= BPM_MAX:
         return f"tempo {round(bpm)} BPM"
     if g is None or not g:
