@@ -1523,7 +1523,7 @@
   .cdj-plat img:not([src]) { display: none; }
   .cdj-plat i { position: absolute; left: 50%; top: 3%; width: 3px; height: 15%; margin-left: -1.5px; border-radius: 2px; background: var(--accent); box-shadow: 0 0 6px rgba(198,255,61,.8); }
   .cdj-tempo, .dk-fader { writing-mode: vertical-lr; width: 14px; height: 100%; min-height: 60px; margin: 0; padding: 0; accent-color: var(--accent); cursor: pointer; }
-  .dk-fader { direction: rtl; }          /* channel faders: up is louder */
+  .dk-fader { direction: rtl; height: 46px; min-height: 0; }          /* channel faders: up is louder */
   .cdj-btns { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
   .cdj-btns button { height: 30px; padding: 0; border-radius: 8px; border: 1px solid #34353f; background: #1d1e26; color: var(--text);
     font: 800 9.5px Inter, sans-serif; letter-spacing: .06em; cursor: pointer; display: grid; place-items: center; }
@@ -1533,8 +1533,8 @@
   .cdj-play { color: var(--accent) !important; border-color: rgba(198,255,61,.45) !important; }
   .cdj.playing .cdj-play { background: var(--accent); color: var(--accent-ink) !important; }
   .cdj-sync.on { background: rgba(198,255,61,.16); border-color: var(--accent); color: var(--accent); }
-  /* the mixer between the decks: a bass knob and a volume fader for each side */
-  .dk-mix { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto 1fr auto; gap: 5px 2px; justify-items: center;
+  /* the mixer between the decks: Hi, Mid and Low knobs and a small volume fader for each side */
+  .dk-mix { display: grid; grid-template-columns: 1fr 1fr; align-content: space-between; gap: 4px 2px; justify-items: center;
     padding: 8px 2px; border-radius: 10px; background: #121218; border: 1px solid #2a2a36; }
   .dk-mix .lbl { grid-column: 1 / -1; font: 800 7.5px Inter, sans-serif; letter-spacing: .1em; color: var(--muted); }
   .dk-knob { width: 20px; height: 20px; border-radius: 50%; position: relative; cursor: ns-resize; touch-action: none;
@@ -1542,7 +1542,18 @@
   .dk-knob::after { content: ""; position: absolute; left: 50%; top: 2px; width: 2px; height: 6px; margin-left: -1px; border-radius: 1px; background: var(--accent); }
   .dk-knob:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   .dk-xf { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; font: 800 10px "JetBrains Mono", monospace; color: var(--muted); }
-  .dk-xf input { width: min(220px, 55%); margin: 0; accent-color: var(--accent); cursor: pointer; }
+  .dk-xfw { position: relative; display: grid; width: min(220px, 55%); }
+  .dk-xf input { position: relative; z-index: 1; width: 100%; margin: 0; accent-color: var(--accent); cursor: pointer; }
+  /* centre marks: a bright line where the slider sits in the middle, faint lines every 10% */
+  .cdj-tempo-w { position: relative; display: grid; align-self: stretch; }
+  .cdj-tempo-w .cdj-tempo { position: relative; z-index: 1; }
+  .cdj-tempo-w::before, .dk-xfw::before { content: ""; position: absolute; pointer-events: none; background: var(--accent); border-radius: 1px; box-shadow: 0 0 5px rgba(198,255,61,.6); }
+  .cdj-tempo-w::before { left: -4px; right: -4px; top: 50%; height: 2px; margin-top: -1px; }
+  .dk-xfw::before { top: -4px; bottom: -4px; left: 50%; width: 2px; margin-left: -1px; }
+  .cdj-tempo-w::after, .dk-xfw::after { content: ""; position: absolute; pointer-events: none; opacity: .7; }
+  .cdj-tempo-w::after { left: -3px; right: -3px; top: 8px; bottom: 8px; background: repeating-linear-gradient(to bottom, #5a5b6a 0 1px, transparent 1px 10%); }
+  .dk-xfw::after { top: -2px; bottom: -2px; left: 8px; right: 8px; background: repeating-linear-gradient(to right, #5a5b6a 0 1px, transparent 1px 10%); }
+  .dk-xf-lbl { margin-top: 5px; font: 800 7.5px Inter, sans-serif; letter-spacing: .14em; color: var(--muted); text-align: center; }
   .dk-hint { min-height: 14px; margin: 6px 0 0; font-size: 11px; color: var(--muted); text-align: center; }
   @media (max-width: 1000px) { #set-panel .set-head { display: flex; flex-direction: column; } #set-panel .set-head > * { order: 1; } #set-panel .set-head > .decks { order: 2; margin-top: 12px; max-width: 720px; } }
   @media (max-width: 640px) { .dk-row { grid-template-columns: minmax(0, 1fr) 46px minmax(0, 1fr); gap: 5px; } .cdj-btns button { height: 34px; } .dk-head span { white-space: normal; } }
@@ -1822,7 +1833,8 @@
       <div class="decks" id="decks" hidden aria-label="DJ decks">
         <div class="dk-head"><b>Decks</b><span>Drag tracks from your set onto a deck</span></div>
         <div class="dk-row" id="dk-row"></div>
-        <div class="dk-xf"><span>A</span><input type="range" id="dk-xf" min="0" max="1" step="0.01" value="0.5" aria-label="Crossfader"><span>B</span></div>
+        <div class="dk-xf"><span>A</span><span class="dk-xfw"><input type="range" id="dk-xf" min="0" max="1" step="0.01" value="0.5" aria-label="Crossfader"></span><span>B</span></div>
+        <div class="dk-xf-lbl">CROSSFADER</div>
         <p class="dk-hint" id="dk-hint" role="status" aria-live="polite"></p>
       </div>
       <div class="flow" id="set-flow"></div>
@@ -4059,7 +4071,7 @@ $("#imp-btns").addEventListener("click", async e => {
 
 /* ---------- The decks: two CDJ-style players in the set builder. Drag a track from the set onto a deck (or tap
    the play button between two set tracks to load both), then play, nudge or scrub with the jog wheel, ride the
-   tempo, press Sync to match the other deck's tempo and beats, and blend with the crossfader and bass knobs. */
+   tempo, press Sync to match the other deck's tempo and beats, and blend with the crossfader and the Hi / Mid / Low knobs. */
 let mixCtx = null;
 const mixClips = new Map();
 const audioCtx = () => (mixCtx = mixCtx || new (window.AudioContext || window.webkitAudioContext)());
@@ -4081,19 +4093,25 @@ const cdjHTML = i => `<div class="cdj" data-deck="${i}">
     </div>
     <div class="cdj-mid">
       <div class="cdj-jog" title="Jog wheel: spin to nudge while playing, or to scrub while paused"><div class="cdj-plat"><img alt=""><i></i></div></div>
-      <input type="range" class="cdj-tempo" min="-10" max="10" step="0.05" value="0" aria-label="Tempo, deck ${"AB"[i]}" title="Tempo (double-click to reset)">
+      <span class="cdj-tempo-w"><input type="range" class="cdj-tempo" min="-10" max="10" step="0.05" value="0" aria-label="Tempo, deck ${"AB"[i]}" title="Tempo (double-click to reset)"></span>
     </div>
     <div class="cdj-btns"><button type="button" class="cdj-cue" disabled>CUE</button><button type="button" class="cdj-play" disabled aria-label="Play deck ${"AB"[i]}">${DK_PLAY}</button><button type="button" class="cdj-sync" disabled title="Match the other deck's tempo and beats">SYNC</button></div>
   </div>`;
 $("#dk-row").innerHTML = cdjHTML(0) + `<div class="dk-mix">
-    <span class="dk-knob" data-ch="0" role="slider" tabindex="0" aria-label="Bass, deck A" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Bass (double-click to reset)"></span>
-    <span class="dk-knob" data-ch="1" role="slider" tabindex="0" aria-label="Bass, deck B" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Bass (double-click to reset)"></span>
-    <span class="lbl">BASS</span>
+    <span class="dk-knob" data-ch="0" data-band="hi" role="slider" tabindex="0" aria-label="Hi, deck A" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Hi (double-click to reset)"></span>
+    <span class="dk-knob" data-ch="1" data-band="hi" role="slider" tabindex="0" aria-label="Hi, deck B" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Hi (double-click to reset)"></span>
+    <span class="lbl">HI</span>
+    <span class="dk-knob" data-ch="0" data-band="mid" role="slider" tabindex="0" aria-label="Mid, deck A" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Mid (double-click to reset)"></span>
+    <span class="dk-knob" data-ch="1" data-band="mid" role="slider" tabindex="0" aria-label="Mid, deck B" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Mid (double-click to reset)"></span>
+    <span class="lbl">MID</span>
+    <span class="dk-knob" data-ch="0" data-band="low" role="slider" tabindex="0" aria-label="Low, deck A" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Low (double-click to reset)"></span>
+    <span class="dk-knob" data-ch="1" data-band="low" role="slider" tabindex="0" aria-label="Low, deck B" aria-valuemin="-1" aria-valuemax="1" aria-valuenow="0" title="Low (double-click to reset)"></span>
+    <span class="lbl">LOW</span>
     <input type="range" class="dk-fader" data-ch="0" min="0" max="1" step="0.01" value="1" aria-label="Volume, deck A">
     <input type="range" class="dk-fader" data-ch="1" min="0" max="1" step="0.01" value="1" aria-label="Volume, deck B">
     <span class="lbl">VOL</span></div>` + cdjHTML(1);
 const decks = [0, 1].map(i => ({ i, el: $(`.cdj[data-deck="${i}"]`), t: null, buf: null, grid: null, peaks: null, src: null, nodes: null,
-                                  playing: false, off: 0, at: 0, rate: 1, bend: 1, cue: 0, vol: 1, bass: 0, synced: false, counted: false, run: 0 }));
+                                  playing: false, off: 0, at: 0, rate: 1, bend: 1, cue: 0, vol: 1, eqv: { hi: 0, mid: 0, low: 0 }, synced: false, counted: false, run: 0 }));
 let xfade = 0.5, dkRaf = 0, dkJog = null, dkHintTimer = null;
 const clampN = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 function dkHint(msg) { $("#dk-hint").textContent = msg; clearTimeout(dkHintTimer); dkHintTimer = setTimeout(() => { $("#dk-hint").textContent = ""; }, 3500); }
@@ -4102,16 +4120,21 @@ function applyMixer() {
     if (!d.nodes) return;
     const now = mixCtx.currentTime, x = d.i ? xfade : 1 - xfade;
     d.nodes.vol.gain.setTargetAtTime(d.vol * d.vol, now, 0.015);
-    d.nodes.eq.gain.setTargetAtTime(d.bass < 0 ? d.bass * 26 : d.bass * 6, now, 0.015);     // all the way left = bass gone
+    for (const b of ["low", "mid", "hi"]) {                                                 // all the way left = that band gone
+      const v = d.eqv[b]; d.nodes[b].gain.setTargetAtTime(v < 0 ? v * 26 : v * 6, now, 0.015);
+    }
     d.nodes.xf.gain.setTargetAtTime(Math.sin(x * Math.PI / 2), now, 0.015);                 // equal-power crossfade
   });
 }
 function deckNodes(d) {
   if (!d.nodes) {
-    const ctx = audioCtx(), eq = ctx.createBiquadFilter(), vol = ctx.createGain(), xf = ctx.createGain();
-    eq.type = "lowshelf"; eq.frequency.value = 180;
-    eq.connect(vol).connect(xf).connect(ctx.destination);
-    d.nodes = { eq, vol, xf }; applyMixer();
+    const ctx = audioCtx(), low = ctx.createBiquadFilter(), mid = ctx.createBiquadFilter(), hi = ctx.createBiquadFilter(),
+          vol = ctx.createGain(), xf = ctx.createGain();
+    low.type = "lowshelf"; low.frequency.value = 180;
+    mid.type = "peaking"; mid.frequency.value = 1000; mid.Q.value = 0.7;
+    hi.type = "highshelf"; hi.frequency.value = 3500;
+    low.connect(mid).connect(hi).connect(vol).connect(xf).connect(ctx.destination);
+    d.nodes = { eq: low, low, mid, hi, vol, xf }; applyMixer();
   }
   return d.nodes;
 }
@@ -4255,15 +4278,15 @@ $("#decks").addEventListener("dblclick", e => {
   if (t.classList.contains("dk-knob")) return setKnob(t, 0);
   t.value = t.id === "dk-xf" ? 0.5 : 0; t.dispatchEvent(new Event("input", { bubbles: true }));
 });
-// bass knobs: drag up or down (or arrow keys)
+// EQ knobs (Hi, Mid, Low): drag up or down (or arrow keys)
 function setKnob(k, v) {
-  const d = decks[k.dataset.ch]; d.bass = clampN(v, -1, 1);
-  k.style.setProperty("--r", d.bass * 135 + "deg"); k.setAttribute("aria-valuenow", d.bass.toFixed(2)); applyMixer();
+  const d = decks[k.dataset.ch], b = k.dataset.band; d.eqv[b] = clampN(v, -1, 1);
+  k.style.setProperty("--r", d.eqv[b] * 135 + "deg"); k.setAttribute("aria-valuenow", d.eqv[b].toFixed(2)); applyMixer();
 }
 let dkKnob = null;
 $("#decks").addEventListener("pointerdown", e => {
   const k = e.target.closest(".dk-knob");
-  if (k) { e.preventDefault(); dkKnob = { k, y: e.clientY, v: decks[k.dataset.ch].bass }; k.setPointerCapture(e.pointerId); return; }
+  if (k) { e.preventDefault(); dkKnob = { k, y: e.clientY, v: decks[k.dataset.ch].eqv[k.dataset.band] }; k.setPointerCapture(e.pointerId); return; }
   const jog = e.target.closest(".cdj-jog"); if (!jog) return;
   const d = decks[jog.closest(".cdj").dataset.deck]; if (!d.buf) return;
   e.preventDefault(); jog.setPointerCapture(e.pointerId);
@@ -4288,7 +4311,7 @@ $("#decks").addEventListener("pointermove", e => {
 $("#decks").addEventListener("keydown", e => {
   const k = e.target.closest(".dk-knob"); if (!k) return;
   const step = { ArrowUp: .1, ArrowRight: .1, ArrowDown: -.1, ArrowLeft: -.1 }[e.key];
-  if (step) { e.preventDefault(); setKnob(k, decks[k.dataset.ch].bass + step); }
+  if (step) { e.preventDefault(); setKnob(k, decks[k.dataset.ch].eqv[k.dataset.band] + step); }
 });
 // the play button between two set tracks (and "Load on decks"): the earlier track on deck A, the next on deck B
 document.addEventListener("click", e => {
