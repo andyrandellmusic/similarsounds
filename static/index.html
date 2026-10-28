@@ -1360,18 +1360,6 @@
   .drag-ghost.landing { transition: transform .2s cubic-bezier(.2, .8, .2, 1), box-shadow .2s ease; }
   .set-list.st-now .st-bar { animation: none; }
 
-  /* load the transition onto the decks: a small round play button sitting in the middle of each upright line */
-  #set-panel .link-dot .st-hear { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 3; margin: 0; padding: 0;
-    width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--bg); border: 1.5px solid var(--c);
-    color: var(--c); box-shadow: 0 0 10px color-mix(in srgb, var(--c) 40%, transparent); cursor: pointer; transition: transform .15s, box-shadow .15s, background .15s; }
-  #set-panel .link-dot .st-hear svg { width: 9px; height: 9px; fill: currentColor; margin-left: 1px; }
-  #set-panel .link-dot .st-hear .pa { display: none; }
-  #set-panel .link-dot .st-hear:hover { transform: translate(-50%, -50%) scale(1.12); box-shadow: 0 0 14px var(--c); }
-  #set-panel .link-dot .st-hear.on { background: var(--c); color: #0b0b0f; }
-  #set-panel .link-dot .st-hear.on .pl { display: none; } #set-panel .link-dot .st-hear.on .pa { display: inline; }
-  #set-panel .link-dot .st-hear.on svg { margin-left: 0; }
-  #set-panel .link-dot .st-hear::after { content: ""; position: absolute; inset: -6px; }
-  #set-panel .set-list.is-dragging .link-dot .st-hear { opacity: 0; pointer-events: none; transition: opacity .12s; }
 
   /* the card's key, tempo and energy, easy to read at a glance */
   #set-panel .set-card .role { font-size: 8.5px; margin: 1px 0 0; }
@@ -1444,8 +1432,6 @@
     #set-panel .link-dot { width: auto; height: 34px; margin: 0 0 0 46px; }
     #set-panel .link-dot .ld { width: 70%; height: 3px; }
     #set-panel .link-dot .ld:hover, #set-panel .link-dot .ld[aria-expanded="true"] { width: 74%; height: 5px; }
-    #set-panel .link-dot .st-hear { width: 28px; height: 28px; }
-    #set-panel .link-dot .st-hear svg { width: 10px; height: 10px; }
     .st-add { width: auto !important; height: 64px; margin: 12px 0 0 46px; flex-direction: row; }
     .st-add span { font-size: 22px; }
   }
@@ -1579,8 +1565,6 @@
 
   /* no lines between tracks any more: just the play button, in the mix colour */
   #set-panel .link-dot .ld { opacity: 0; pointer-events: none; }
-  #set-panel .link-dot .st-hear { width: 28px; height: 28px; border-width: 2px; }
-  #set-panel .link-dot .st-hear svg { width: 10px; height: 10px; }
   .dk-btn { display: block; width: 24px; height: 24px; border-radius: 50%; border: 2px solid var(--c); box-shadow: 0 0 10px color-mix(in srgb, var(--c) 45%, transparent); margin: 4px 0 4px; position: relative; }
   .dk-btn::before { content: ""; position: absolute; left: 50%; top: 50%; transform: translate(-35%, -50%); border-left: 7px solid var(--c); border-top: 4.5px solid transparent; border-bottom: 4.5px solid transparent; }
   .sg-dots { display: flex; gap: 5px; }
@@ -1649,8 +1633,6 @@
     .st-next { grid-area: next; align-self: end; width: 30px; height: 30px; padding: 0; font-size: 0; border-radius: 8px; }
     .st-next::after { content: "→"; font-size: 15px; }
     #set-panel .link-dot { height: 26px; }
-    #set-panel .link-dot .st-hear { width: 24px; height: 24px; }
-    #set-panel .link-dot .st-hear svg { width: 9px; height: 9px; }
     .set-cols { height: 82px; padding-top: 8px; }
     #set-panel .set-head { padding: 14px 16px 6px; }
     #set-panel .set-head h2 { font-size: 20px; }
@@ -3438,11 +3420,9 @@ function energyMix(a, b) {
   return [0, `energy jump ${s}`];
 }
 // short chips for the line between two tracks in the set: key change, BPM, energy change
-// Tap a mix button (or its line): the details (why, Fix this gap) open in the panel under the set; tap again to close
+// Tap the line between two tracks: the details (why, Fix this gap, Load on decks) open in the panel under the set; tap again to close
 document.addEventListener("click", e => {
-  const h = e.target.closest(".st-hear");
-  if (h && h.parentElement.querySelector("[data-ld]")?.getAttribute("aria-expanded") === "true") return;   // already showing: just load the decks
-  const d = h ? h.parentElement.querySelector("[data-ld]") : e.target.closest("[data-ld]"); if (!d) return;
+  const d = e.target.closest("[data-ld]"); if (!d) return;
   const i = d.dataset.ld, box = $("#set-detail");
   const wasOpen = d.getAttribute("aria-expanded") === "true";
   document.querySelectorAll("[data-ld][aria-expanded='true']").forEach(x => x.setAttribute("aria-expanded", "false"));
@@ -3729,7 +3709,6 @@ function renderSet() {
     <li class="set-item" data-id="${t.deezer_id}">
       ${i > 0 ? `<div class="link-dot ${links[i - 1].cls}">
         <button type="button" class="ld" data-ld="${i}" aria-expanded="false" aria-label="${esc(links[i - 1].label)}: show how these two mix" title="${esc(links[i - 1].label)} · ${esc(links[i - 1].detail)}"></button>
-        <button type="button" class="st-hear" data-deckpair="${set[i - 1].deezer_id},${t.deezer_id}" aria-label="Load ${esc(set[i - 1].title)} and ${esc(t.title)} onto the decks" title="Load these two onto the decks"><svg viewBox="0 0 10 10" aria-hidden="true"><path class="pl" d="M3 2l5 3-5 3z"/><path class="pa" d="M2.6 2h1.7v6H2.6zM5.7 2h1.7v6H5.7z"/></svg></button>
         <div class="link ${links[i - 1].cls}" data-lmore="${i}" hidden><span class="dot"></span><span class="lk-txt"><b>${links[i - 1].label}</b><span class="lk-chips">${linkChips(set[i - 1], t)}</span></span>
         <span class="link-acts">${links[i - 1].score < 2 ? `<button type="button" class="gap-btn" data-gap="${i}" title="Find a track to put in between">Fix this gap</button>` : ""}<button type="button" class="hear hear-sm" data-deckpair="${set[i - 1].deezer_id},${t.deezer_id}">Load on decks</button></span></div>
         <div class="gap-box" data-gapbox="${i}" hidden></div></div>` : ""}
