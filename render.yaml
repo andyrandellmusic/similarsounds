@@ -5,7 +5,9 @@ services:
     runtime: python
     plan: free
     region: frankfurt
-    buildCommand: pip install -r requirements.txt
+    # the catalogue is kept in the catalogue-data release, not in git: download it (checked against
+    # data/catalogue_version.json); if that fails the build fails and the current site stays up
+    buildCommand: pip install -r requirements.txt && python -m scripts.catalogue_store fetch
     startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT --workers 1
     healthCheckPath: /healthz
     autoDeploy: true

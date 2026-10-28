@@ -1,5 +1,5 @@
-# Adds the newest house releases to the catalogue every day, then commits it.
-# Render redeploys automatically when the commit lands.
+# Adds the newest house releases to the catalogue every day, uploads it to the "catalogue-data" release, and
+# commits the small version file; Render redeploys when that commit lands and downloads the new catalogue.
 name: Daily catalogue update
 
 on:
@@ -39,6 +39,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: astral-sh/setup-uv@v6
+      - name: Get the latest catalogue (kept in the catalogue-data release, not in git)
+        run: uv run python -m scripts.catalogue_store fetch
       - name: Note the start time
         run: echo "STARTED=$(date -u '+%Y-%m-%d %H:%M:%S')" >> "$GITHUB_ENV"
       # 120-minute budget: it stops searching at 48 min and analysing at 120, saving as it goes, so the run
@@ -72,15 +74,21 @@ jobs:
           uv run --no-project --python 3.10 --with laion-clap --with "torch<2.6" --with torchvision
           --with "transformers<4.45" --with librosa --with httpx --with soundfile --with "numpy<2" --with "setuptools<70"
           python -m scripts.clap_update --ckpt ~/clap/music.pt
-      - name: Commit updated catalogue
+      - name: Publish the catalogue (compact it, upload to the release)
         if: always()       # keep whatever was saved, even if a step above had trouble
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run python -m scripts.catalogue_store publish
+      - name: Commit the version file and follow-up lists (this redeploys the site)
+        if: always()
         run: |
           git config user.name "similarsounds-bot"
           git config user.email "similarsounds-bot@users.noreply.github.com"
-          git add data/catalogue.db data/clap.npz data/artist_follow.json data/label_follow.json data/outside_follow.json data/pending_candidates.json
+          git add data/catalogue_version.json data/catalogue_runs.json data/artist_follow.json data/label_follow.json data/outside_follow.json data/pending_candidates.json
+          [ -f data/removed_tracks.json ] && git add data/removed_tracks.json
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           # site changes may have landed while this ran: take them first, then push (a few tries)
-          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
+          for i in 1 2 3; do git pull --rebase --autostash -q origin main && git push && break; sleep 15; done
       - name: Raise a notice if anything went wrong
         if: failure() || steps.seed.outcome == 'failure'
         env:

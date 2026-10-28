@@ -1,12 +1,13 @@
 """What the daily catalogue update has pulled in over the last few days.
 
-Usage: python3 scripts/catalogue_report.py [DAYS]     (default 3; run `git pull` first for the latest catalogue)
+Usage: python3 scripts/catalogue_report.py [DAYS]     (default 3; get the latest catalogue first:
+       git pull, then python -m scripts.catalogue_store fetch - scripts/daily_check.py does both)
 
 Prints, for each daily run in the window: tracks added, removed (not house / duplicate versions) and the
 catalogue size; then the new tracks by sub-genre, release age and label, the newest releases, and any
 warnings worth a look (future release dates, titles that suggest non-house edits, missing keys).
 """
-import sqlite3, subprocess, sys, tempfile, os
+import json, sqlite3, sys, os
 from datetime import date, timedelta
 
 DAYS = int(sys.argv[1]) if len(sys.argv) > 1 else 3
@@ -16,24 +17,18 @@ db = sqlite3.connect(DB)
 q = lambda sql, *a: db.execute(sql, a).fetchall()
 
 
-def size_at(commit):
-    """Catalogue size in an older commit (the database is in git)."""
-    with tempfile.NamedTemporaryFile(suffix=".db") as f:
-        f.write(subprocess.run(["git", "show", f"{commit}:data/catalogue.db"], capture_output=True).stdout); f.flush()
-        try:
-            return sqlite3.connect(f.name).execute("select count(*) from tracks").fetchone()[0]
-        except sqlite3.Error:
-            return None
-
-
 print(f"Catalogue now: {q('select count(*) from tracks')[0][0]:,} tracks\n")
-runs = subprocess.run(["git", "log", f"--since={since} 00:00", "--format=%h|%ad|%s", "--date=format:%a %d %b %H:%M",
-                       "--", "data/catalogue.db"], capture_output=True, text=True).stdout.split("\n")
-runs = [r.split("|") for r in runs if "Daily catalogue update" in r]
+# catalogue size after each published run (written by scripts/catalogue_store.py publish)
+from datetime import datetime
+from zoneinfo import ZoneInfo
+log_file = os.path.join(os.path.dirname(__file__), "..", "data", "catalogue_runs.json")
+log = json.load(open(log_file)) if os.path.exists(log_file) else []
+runs = [(log[i - 1]["tracks"] if i else None, e) for i, e in enumerate(log) if e["at"][:10] >= since]
 print("Daily runs (UK time):")
-for h, when, subj in reversed(runs):
-    before, after = size_at(f"{h}~1"), size_at(h)
-    day = subj.rsplit(" ", 1)[-1]
+for before, e in runs:
+    after = e["tracks"]
+    t = datetime.fromisoformat(e["at"].replace("Z", "+00:00")).astimezone(ZoneInfo("Europe/London"))
+    when, day = t.strftime("%a %d %b %H:%M"), e["at"][:10]
     added = q("select count(*) from tracks where substr(added_at,1,10)=?", day)[0][0]
     gone = dict(q("select aside_kind, count(*) from set_aside where substr(aside_at,1,10)=? group by aside_kind", day))
     net = f"{after - before:+,}" if before is not None and after is not None else "?"

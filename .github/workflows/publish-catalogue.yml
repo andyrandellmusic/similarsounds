@@ -27,4 +27,4 @@ jobs:
           git add data/catalogue_version.json data/catalogue_runs.json
           [ -f data/removed_tracks.json ] && git add data/removed_tracks.json
           git diff --cached --quiet || git commit -m "Catalogue published to the catalogue-data release"
-          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
+          for i in 1 2 3; do git pull --rebase --autostash -q origin main && git push && break; sleep 15; done

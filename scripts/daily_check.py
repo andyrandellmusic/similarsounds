@@ -19,6 +19,10 @@ def get(url, timeout=60):
 
 
 run("git", "pull", "-q", "--rebase", "--autostash")
+# the catalogue itself is kept in the catalogue-data release, not git: get the latest copy
+_py = ROOT / ".venv" / "bin" / "python"
+subprocess.run([str(_py) if _py.exists() else sys.executable, "-m", "scripts.catalogue_store", "fetch"], cwd=ROOT,
+               capture_output=True, text=True)
 print("== Site ==")
 try:
     code, body, secs = get(SITE + "/")

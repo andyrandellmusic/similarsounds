@@ -28,6 +28,9 @@ from scripts.seed import STYLES
 STATIC = Path(__file__).resolve().parent.parent / "static"
 
 app = FastAPI(title="SimilarSounds")
+if not DB_PATH.exists():                 # normally downloaded during the build; if not, get it now
+    from scripts.catalogue_store import fetch
+    fetch()
 index = Index()
 suggester = Suggester(index)
 artists = Artists(index)
@@ -138,6 +141,8 @@ async def stripe_webhook(request: Request):
 
 @app.get("/healthz")
 def healthz():
+    if not index.rows:                   # no catalogue: fail, so Render keeps the previous version running
+        raise HTTPException(503, "No catalogue loaded")
     return {"ok": True, "tracks": len(index.rows)}
 
 

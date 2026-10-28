@@ -10,3 +10,7 @@ eval/results/*.npy
 eval/results/*.onnx
 eval/results/*.npz
 eval/results/*.log
+# kept in the catalogue-data release (scripts/catalogue_store.py), not in git
+data/catalogue.db
+data/clap.npz
+*.part
