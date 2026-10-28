@@ -2989,7 +2989,7 @@ $("#review").addEventListener("pointerover", e => { const s = e.target.closest("
 $("#review").addEventListener("pointerleave", () => lightStars(0));
 $("#review").addEventListener("focusin", e => { const s = e.target.closest(".star"); lightStars(s ? Number(s.dataset.stars) : 0); });
 $("#review").addEventListener("click", e => {
-  if (e.target.id === "review" || e.target.closest("#review-x")) {   // closed without rating: ask again after 60 more plays
+  if (e.target.closest("#review-x")) {   // closed without rating (only the ×: a tap outside the box doesn't close it): ask again after 60 more plays
     store.set("ss_review_at", plays() + REVIEW_AFTER); hideReview(); return;
   }
   const s = e.target.closest(".star"); if (!s) return;
@@ -3031,7 +3031,6 @@ $("#review").addEventListener("click", e => {
 })();
 document.addEventListener("keydown", e => {
   if ($("#review").hidden) return;
-  if (e.key === "Escape") { store.set("ss_review_at", plays() + REVIEW_AFTER); hideReview(); }
   if (e.key === "Tab") {   // keep focus inside the box
     const f = [...$("#review").querySelectorAll("button")].filter(b => b.offsetParent);
     if (e.shiftKey && document.activeElement === f[0]) { e.preventDefault(); f.at(-1).focus(); }
