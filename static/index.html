@@ -1498,7 +1498,7 @@
   .cdj:not(.loaded) .cdj-tt { color: var(--muted); font-weight: 600; }
   .cdj.loading .cdj-names { animation: dk-blink 1s ease-in-out infinite; }
   @keyframes dk-blink { 50% { opacity: .45; } }
-  .cdj-wave { display: block; width: 100%; height: 24px; }
+  .cdj-wave { display: block; width: 100%; height: 24px; cursor: pointer; touch-action: none; }
   .cdj-info { display: flex; justify-content: space-between; align-items: baseline; gap: 4px; font: 700 10.5px "JetBrains Mono", monospace; color: var(--text); white-space: nowrap; }
   .cdj-info small { font-size: 8.5px; font-weight: 600; color: var(--muted); }
   .cdj-mid { display: grid; grid-template-columns: minmax(0, 1fr) 14px; gap: 6px; align-items: center; }
@@ -4126,7 +4126,7 @@ const DK_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5v1
 const cdjHTML = i => `<div class="cdj" data-deck="${i}">
     <div class="cdj-screen">
       <div class="cdj-top"><span class="cdj-n">${"AB"[i]}</span><span class="cdj-names"><span class="cdj-tt" data-no-i18n></span><span class="cdj-ta" data-no-i18n></span></span></div>
-      <canvas class="cdj-wave" aria-hidden="true"></canvas>
+      <canvas class="cdj-wave" aria-hidden="true" title="Tap or drag to jump to that point"></canvas>
       <div class="cdj-info"><span class="cdj-time">-0:00</span><span><span class="cdj-bpm">---</span> <small class="cdj-pct">0.0%</small></span></div>
     </div>
     <div class="cdj-mid">
@@ -4379,8 +4379,21 @@ function setKnob(k, v) {
   const d = decks[k.dataset.ch], b = k.dataset.band; d.eqv[b] = clampN(v, -1, 1);
   k.style.setProperty("--r", d.eqv[b] * 135 + "deg"); k.setAttribute("aria-valuenow", d.eqv[b].toFixed(2)); applyMixer();
 }
-let dkKnob = null;
+let dkKnob = null, dkWave = null;
+// the waveform: tap or drag along it to jump straight to that point (while playing it carries on from there when you let go)
+function waveTo(e) {
+  const { d, el } = dkWave, r = el.getBoundingClientRect();
+  d.off = clampN((e.clientX - r.left) / r.width, 0, 1) * (d.buf.duration - 0.05); dkFrame();
+}
 $("#decks").addEventListener("pointerdown", e => {
+  const w = e.target.closest(".cdj-wave");
+  if (w) {
+    const d = decks[w.closest(".cdj").dataset.deck]; if (!d.buf) return;
+    e.preventDefault(); try { w.setPointerCapture(e.pointerId); } catch {}
+    dkWave = { d, el: w, wasPlaying: d.playing };
+    if (d.playing) { d.playing = false; stopSrc(d); }
+    waveTo(e); return;
+  }
   const k = e.target.closest(".dk-knob");
   if (k) { e.preventDefault(); dkKnob = { k, y: e.clientY, v: decks[k.dataset.ch].eqv[k.dataset.band] }; try { k.setPointerCapture(e.pointerId); } catch {} return; }
   const jog = e.target.closest(".cdj-jog"); if (!jog) return;
@@ -4390,6 +4403,7 @@ $("#decks").addEventListener("pointerdown", e => {
   dkJog = { d, cx: r.left + r.width / 2, cy: r.top + r.height / 2, a: null, ts: 0, timer: 0 }; dkLoop();
 });
 $("#decks").addEventListener("pointermove", e => {
+  if (dkWave) return waveTo(e);
   if (dkKnob) return setKnob(dkKnob.k, dkKnob.v + (dkKnob.y - e.clientY) / 70);
   if (!dkJog) return;
   const j = dkJog, d = j.d, a = Math.atan2(e.clientY - j.cy, e.clientX - j.cx) * 180 / Math.PI;
@@ -4405,6 +4419,15 @@ $("#decks").addEventListener("pointermove", e => {
   } else seekDeck(d, d.off + da / 360 * REV);     // paused: scrub through the track
 });
 ["pointerup", "pointercancel"].forEach(t => $("#decks").addEventListener(t, () => {
+  if (dkWave) {
+    const { d, wasPlaying } = dkWave; dkWave = null;
+    if (wasPlaying) {                                 // back in, from the new spot (still locked to the other deck if synced)
+      d.playing = true; startSrc(d);
+      if (d.synced) alignBeats(d); else if (decks[1 - d.i].synced) alignBeats(decks[1 - d.i]);
+      dkLoop();
+    }
+    paintDeck(d);
+  }
   dkKnob = null;
   if (dkJog) { clearTimeout(dkJog.timer); dkJog.d.bend = 1; setRate(dkJog.d); dkJog = null; }
 }));
