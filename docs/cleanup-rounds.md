@@ -97,3 +97,10 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 8 · M
 - Google has found ~15,000 pages and indexed 848: normal for a 3-week-old site; it indexes more as the site
   earns links and visits. Nothing blocks it (1 robots-blocked page is /stats, on purpose).
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5
+
+### Round 9: 8.5 → 8.6 (kept)
+- Decks on phones: the 20 px mixer knobs get an invisible 36 px touch area (a tap 5 px outside still grabs them).
+- Decks with a keyboard / screen reader: each waveform is a proper slider (Position, deck A/B): arrow keys skip
+  2 s, Home / End jump to the start / end (stays beat-locked when synced), with its position announced.
+  Tested at 375 px: works, no sideways overflow.
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 9 · Tidiness 8.5

@@ -1490,6 +1490,8 @@
     background: radial-gradient(circle at 40% 35%, #44454f, #22232b); border: 1px solid #4a4b58; transform: rotate(var(--r, 0deg)); }
   .dk-knob::after { content: ""; position: absolute; left: 50%; top: 2px; width: 2px; height: 6px; margin-left: -1px; border-radius: 1px; background: var(--accent); }
   .dk-knob:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .dk-knob::before { content: ""; position: absolute; inset: -8px; }     /* a bigger touch area than the knob */
+  .cdj-wave:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
   .dk-xf { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 8px; font: 800 10px "JetBrains Mono", monospace; color: var(--muted); }
   .dk-xfw { position: relative; display: grid; width: min(220px, 55%); }
   .dk-xf input { position: relative; z-index: 1; width: 100%; margin: 0; accent-color: var(--accent); cursor: pointer; }
@@ -4103,7 +4105,7 @@ const DK_PLAY = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5.5v1
 const cdjHTML = i => `<div class="cdj" data-deck="${i}">
     <div class="cdj-screen">
       <div class="cdj-top"><span class="cdj-n">${"AB"[i]}</span><span class="cdj-names"><span class="cdj-tt" data-no-i18n></span><span class="cdj-ta" data-no-i18n></span></span></div>
-      <canvas class="cdj-wave" aria-hidden="true" title="Tap or drag to jump to that point"></canvas>
+      <canvas class="cdj-wave" role="slider" tabindex="0" aria-label="Position, deck ${"AB"[i]}" aria-valuemin="0" aria-valuemax="30" aria-valuenow="0" title="Tap or drag to jump to that point (arrow keys skip 2 seconds)"></canvas>
       <div class="cdj-info"><span class="cdj-time">-0:00</span><span><span class="cdj-bpm">---</span> <small class="cdj-pct">0.0%</small></span></div>
     </div>
     <div class="cdj-mid">
@@ -4302,6 +4304,7 @@ function dkFrame() {
     el.querySelector(".cdj-plat").style.transform = `rotate(${(pos / REV * 360) % 360}deg)`;
     const left = Math.max(0, Math.round(dur - pos));
     el.querySelector(".cdj-time").textContent = `-${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`;
+    const wv = el.querySelector(".cdj-wave"); wv.setAttribute("aria-valuenow", Math.round(pos)); wv.setAttribute("aria-valuemax", Math.round(dur) || 30);
     const bpm = (d.grid?.bpm || Number(d.t?.bpm) || 0) * d.rate * d.bend;
     el.querySelector(".cdj-bpm").textContent = bpm ? bpm.toFixed(1) : "---";
     const pct = (d.rate - 1) * 100; el.querySelector(".cdj-pct").textContent = `${pct > 0.04 ? "+" : ""}${pct.toFixed(1)}%`;
@@ -4409,6 +4412,14 @@ $("#decks").addEventListener("pointermove", e => {
   if (dkJog) { clearTimeout(dkJog.timer); dkJog.d.bend = 1; setRate(dkJog.d); dkJog = null; }
 }));
 $("#decks").addEventListener("keydown", e => {
+  const w = e.target.closest(".cdj-wave");
+  if (w) {                                         // keyboard: arrows skip 2 s, Home / End jump to the start / end
+    const d = decks[w.closest(".cdj").dataset.deck]; if (!d.buf) return;
+    const to = { ArrowRight: deckPos(d) + 2, ArrowUp: deckPos(d) + 2, ArrowLeft: deckPos(d) - 2, ArrowDown: deckPos(d) - 2,
+                 Home: 0, End: d.buf.duration - 1 }[e.key];
+    if (to !== undefined) { e.preventDefault(); seekDeck(d, to); if (d.synced) alignBeats(d); dkFrame(); }
+    return;
+  }
   const k = e.target.closest(".dk-knob"); if (!k) return;
   const step = { ArrowUp: .1, ArrowRight: .1, ArrowDown: -.1, ArrowLeft: -.1 }[e.key];
   if (step) { e.preventDefault(); setKnob(k, decks[k.dataset.ch].eqv[k.dataset.band] + step); }
