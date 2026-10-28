@@ -213,7 +213,29 @@ def track_page(index, q: dict, results: list[dict], style: str | None) -> str:
   <h2>Related pages</h2>
   <ul class="related">{related}</ul>
   <p class="note">Matched on sound, key, BPM and energy from 30-second previews on {today.strftime('%-d %B %Y')}. Rankings update as new releases are added.</p>"""
-    return page(title, desc, path, body)
+    return page(title, desc, path, body, jsonld=track_jsonld(r, results, style, path))
+
+
+def track_jsonld(r: dict, results: list[dict], style: str | None, path: str) -> str:
+    """Structured data for a track page: the breadcrumb trail, the track itself and its list of similar
+    tracks, so search engines can read what the page is about."""
+    import json
+    crumbs = [("Home", "/"), ("Similar tracks", "/similar-to")] + ([(style, style_path(style))] if style else [])
+    crumbs.append((f"{r['title']} by {r['artist']}", path))
+    rec = {"@type": "MusicRecording", "name": r["title"], "url": SITE + path,
+           "byArtist": {"@type": "MusicGroup", "name": r["artist"]}}
+    if r.get("release_date"): rec["datePublished"] = r["release_date"]
+    if r.get("cover"): rec["image"] = r["cover"]
+    if r.get("isrc"): rec["isrcCode"] = r["isrc"]
+    if style: rec["genre"] = style
+    data = {"@context": "https://schema.org", "@graph": [
+        {"@type": "BreadcrumbList", "itemListElement": [
+            {"@type": "ListItem", "position": i, "name": n, "item": SITE + u} for i, (n, u) in enumerate(crumbs, 1)]},
+        rec,
+        {"@type": "ItemList", "name": f"Tracks similar to {r['title']} by {r['artist']}", "numberOfItems": len(results),
+         "itemListElement": [{"@type": "ListItem", "position": i, "url": SITE + track_path(t),
+                              "name": f"{t['artist']} - {t['title']}"} for i, t in enumerate(results, 1)]}]}
+    return '<script type="application/ld+json">' + json.dumps(data, ensure_ascii=False).replace("</", "<\\/") + "</script>"
 
 
 def gone_page(deezer_id: int, artist: str, title: str) -> str:

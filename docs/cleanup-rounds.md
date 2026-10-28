@@ -88,3 +88,12 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
   smaller than the last published (tested: both refused, nothing uploaded; FORCE_PUBLISH=1 for a deliberate
   big clean-up).
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5
+
+### Round 8: 8.4 → 8.5 (kept)
+- Track pages already had a unique title, description, canonical address, H1, ~1,100 words and ~60 internal
+  links, but no structured data. They now carry schema.org data Google reads: the breadcrumb trail, the track as
+  a MusicRecording (artist, release date, genre, ISRC, artwork) and the 30 similar tracks as an ItemList.
+  Validated on a local page.
+- Google has found ~15,000 pages and indexed 848: normal for a 3-week-old site; it indexes more as the site
+  earns links and visits. Nothing blocks it (1 robots-blocked page is /stats, on purpose).
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5
