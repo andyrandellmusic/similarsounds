@@ -397,7 +397,8 @@
     try {
       let id = localStorage.getItem("ss_device");
       if (!id) { id = crypto.randomUUID(); localStorage.setItem("ss_device", id); }
-      sb.rpc("log_visit", { p_device: id }).then(() => {}, () => {});
+      let tz = null; try { tz = Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch {}   // e.g. "Europe/London": the country, never an IP
+      sb.rpc("log_visit", { p_device: id, p_tz: tz }).then(() => {}, () => {});
     } catch {}
   }
   sb.auth.onAuthStateChange((event, session) => {
