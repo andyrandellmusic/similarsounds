@@ -60,7 +60,9 @@ MAX_AGE_DAYS = 730   # only add releases from the last 2 years: newer music matt
 
 
 BLOCKED_FILE = Path(__file__).resolve().parent.parent / "data" / "blocked_artists.json"
-BLOCKED = {a.lower() for a in (json.loads(BLOCKED_FILE.read_text())["artists"] if BLOCKED_FILE.exists() else [])}
+_blocked = json.loads(BLOCKED_FILE.read_text()) if BLOCKED_FILE.exists() else {}
+BLOCKED = {a.lower() for a in _blocked.get("artists", [])}
+BLOCKED_LABELS = {a.lower() for a in _blocked.get("labels", [])}
 
 
 def fetch(track_id: int, style: str) -> tuple[dict, bytes] | None:
@@ -79,6 +81,8 @@ def fetch(track_id: int, style: str) -> tuple[dict, bytes] | None:
         except Exception:
             _albums[album_id] = {}
     album = _albums[album_id]
+    if (album.get("label") or "").lower() in BLOCKED_LABELS:          # labels taken off the site never come back
+        return None
     meta = {
         "deezer_id": t["id"], "isrc": t.get("isrc"), "title": t["title"],
         "artist": t["artist"]["name"], "album": t["album"]["title"], "label": album.get("label"),
@@ -173,7 +177,7 @@ def label_candidates(conn, n_labels: int, seen: set[int], max_age_days: int = 12
     state = json.loads(LABEL_STATE.read_text()) if LABEL_STATE.exists() else {"next": 0, "done": []}
     done = set(state.get("done", []))
     in_cat = [l for l, n in conn.execute(
-        "SELECT label, COUNT(*) n FROM tracks WHERE label IS NOT NULL AND label != '' GROUP BY label HAVING n >= 3")]
+        "SELECT label, COUNT(*) n FROM tracks WHERE label IS NOT NULL AND label != '' GROUP BY label HAVING n >= 3") if l.lower() not in BLOCKED_LABELS]
     names = list(dict.fromkeys(HOUSE_LABELS + sorted(in_cat)))
     start = state.get("next", 0) % max(1, len(names))
     batch = (names[start:] + names[:start])[:n_labels]
