@@ -78,3 +78,13 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
 - Checked: every element's computed style compared old vs new styles on the same page (animations frozen) -
   0 differences on desktop results and set builder, and on phone home, results and set builder.
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 8.5
+
+### Round 7: 8.3 → 8.4 (kept)
+- Found why Discogs finds nothing on GitHub: it answers 401 "Invalid consumer token". The GitHub secret holds
+  46 characters but the working key is 40 - it needs pasting again (owner action). New "Check track sources"
+  workflow tests every source from GitHub in a minute (status codes only): MusicBrainz, iTunes, Deezer all 200.
+- Safety: the daily pull's publish step always runs, so a failed download at the start would have uploaded an
+  empty catalogue over the good one. Publishing now refuses a missing/unreadable catalogue or one more than 10%
+  smaller than the last published (tested: both refused, nothing uploaded; FORCE_PUBLISH=1 for a deliberate
+  big clean-up).
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5

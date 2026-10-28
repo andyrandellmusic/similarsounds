@@ -102,9 +102,18 @@ def fetch() -> None:
 def publish() -> None:
     """Compact the catalogue, upload both files to the release, and record their checksums."""
     db = DATA / "catalogue.db"
+    if not db.exists():
+        sys.exit("no catalogue here to publish (did the download fail?) - nothing uploaded")
     apply_removals()
     conn = sqlite3.connect(db)
-    total = conn.execute("SELECT COUNT(*) FROM tracks").fetchone()[0]
+    try:
+        total = conn.execute("SELECT COUNT(*) FROM tracks").fetchone()[0]
+    except sqlite3.Error:
+        sys.exit("the catalogue here isn't readable - nothing uploaded")
+    last = _version().get("tracks") or 0
+    if total < last * 0.9 and not os.environ.get("FORCE_PUBLISH"):   # never replace a good catalogue with a broken one
+        # (a big clean-up on purpose: run with FORCE_PUBLISH=1)
+        sys.exit(f"refusing to publish {total:,} tracks over the last published {last:,} - nothing uploaded")
     conn.execute("VACUUM"); conn.close()                # drop the space left by removed tracks
     gh = lambda *a: subprocess.run(["gh", *a, "--repo", REPO], check=False, capture_output=True, text=True)
     if gh("release", "view", TAG).returncode != 0:
