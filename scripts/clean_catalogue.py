@@ -35,11 +35,16 @@ def genres(deezer_id: int) -> list[str] | None:
 
 
 EDITS = re.compile(r"\b(slowed|sped up|nightcore)\b", re.I)   # TikTok-style speed edits, not DJ versions
+# Live recordings: "(Live)", "(Live in Melbourne)", "- Live in London"; not titles like "Live at Palladium"
+LIVE = re.compile(r"[\(\[]\s*live(\s+(version|recording|session|edit)|\s+(at|in|from|on)\b[^\)\]]*)?\s*[\)\]]"
+                  r"|\s[-–]\s*live(\s+(version|recording|session)|\s+(at|in|from|on)\b.*)?\s*$", re.I)
 
 
 def verdict(bpm: float, g: list[str] | None, title: str = "") -> str | None:
     if EDITS.search(title):
         return "speed edit"
+    if LIVE.search(title):
+        return "live recording"
     if not BPM_MIN <= bpm <= BPM_MAX:
         return f"tempo {round(bpm)} BPM"
     if g is None or not g:
