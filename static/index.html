@@ -4344,22 +4344,26 @@ function setKnob(k, v) {
 let dkKnob = null;
 $("#decks").addEventListener("pointerdown", e => {
   const k = e.target.closest(".dk-knob");
-  if (k) { e.preventDefault(); dkKnob = { k, y: e.clientY, v: decks[k.dataset.ch].eqv[k.dataset.band] }; k.setPointerCapture(e.pointerId); return; }
+  if (k) { e.preventDefault(); dkKnob = { k, y: e.clientY, v: decks[k.dataset.ch].eqv[k.dataset.band] }; try { k.setPointerCapture(e.pointerId); } catch {} return; }
   const jog = e.target.closest(".cdj-jog"); if (!jog) return;
   const d = decks[jog.closest(".cdj").dataset.deck]; if (!d.buf) return;
-  e.preventDefault(); jog.setPointerCapture(e.pointerId);
+  e.preventDefault(); try { jog.setPointerCapture(e.pointerId); } catch {}
   const r = jog.getBoundingClientRect();
-  dkJog = { d, cx: r.left + r.width / 2, cy: r.top + r.height / 2, a: null, timer: 0 }; dkLoop();
+  dkJog = { d, cx: r.left + r.width / 2, cy: r.top + r.height / 2, a: null, ts: 0, timer: 0 }; dkLoop();
 });
 $("#decks").addEventListener("pointermove", e => {
   if (dkKnob) return setKnob(dkKnob.k, dkKnob.v + (dkKnob.y - e.clientY) / 70);
   if (!dkJog) return;
   const j = dkJog, d = j.d, a = Math.atan2(e.clientY - j.cy, e.clientX - j.cx) * 180 / Math.PI;
-  if (j.a === null) { j.a = a; return; }
+  if (j.a === null) { j.a = a; j.ts = e.timeStamp; return; }
   let da = a - j.a; da -= Math.round(da / 360) * 360; j.a = a;
-  if (d.playing) {                  // nudge: speed up or slow down while the wheel turns, back to normal when it stops
-    d.bend = 1 + clampN(da * 0.03, -0.4, 0.4); setRate(d);
-    clearTimeout(j.timer); j.timer = setTimeout(() => { d.bend = 1; setRate(d); }, 90);
+  const dt = Math.max(4, e.timeStamp - j.ts); j.ts = e.timeStamp;
+  if (d.playing) {
+    // nudge: turning forwards (clockwise) speeds the track up, backwards slows it down, by how fast the wheel turns
+    // (a gentle 60° a second is about 3%, a quick half turn a second about 9%); back to normal as soon as it stops
+    const want = 1 + clampN(da / dt * 1000 / 2000, -0.35, 0.35);
+    d.bend += (want - d.bend) * 0.5; setRate(d);
+    clearTimeout(j.timer); j.timer = setTimeout(() => { d.bend = 1; setRate(d); }, 80);
   } else seekDeck(d, d.off + da / 360 * REV);     // paused: scrub through the track
 });
 ["pointerup", "pointercancel"].forEach(t => $("#decks").addEventListener(t, () => {
