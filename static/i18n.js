@@ -360,6 +360,7 @@
     "How long": ["Duración", "Durée", "Dauer", "Durata", "Duração", "Hoe lang"],
     "Your slot": ["Tu franja", "Ton créneau", "Dein Slot", "Il tuo slot", "Seu horário", "Je tijdslot"],
     "Vibe": ["Estilo", "Ambiance", "Vibe", "Vibe", "Vibe", "Vibe"],
+    "Genre": ["Género", "Genre", "Genre", "Genere", "Gênero", "Genre"],
     "Any house": ["Cualquier house", "Toute la house", "Jeder House", "Qualsiasi house", "Qualquer house", "Alle house"],
     "1 hour": ["1 hora", "1 heure", "1 Stunde", "1 ora", "1 hora", "1 uur"], "1½ hours": ["1½ horas", "1h30", "1½ Stunden", "1 ora e mezza", "1h30", "1½ uur"],
     "2 hours": ["2 horas", "2 heures", "2 Stunden", "2 ore", "2 horas", "2 uur"], "3 hours": ["3 horas", "3 heures", "3 Stunden", "3 ore", "3 horas", "3 uur"],

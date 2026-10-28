@@ -97,6 +97,7 @@
   .menu-btn { width: 48px; height: 48px; border-radius: 12px; background: var(--panel); border: 1px solid var(--line); display: grid; place-content: center; gap: 5px; padding: 0; }
   .menu-btn span { display: block; width: 20px; height: 2px; border-radius: 2px; background: var(--text); transition: transform .2s, opacity .2s; }
   .menu-btn:hover { border-color: #4a4a5c; }
+  .menu-btn span:nth-child(1), .menu-btn span:nth-child(3) { background: var(--accent); }   /* green top and bottom: the X is two green lines */
   .menu-btn[aria-expanded="true"] span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .menu-btn[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
   .menu-btn[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
@@ -1980,7 +1981,7 @@
           <button type="button" data-v="closing" role="radio" aria-checked="false">Closing</button>
           <button type="button" data-v="allnight" role="radio" aria-checked="false">All night</button>
         </div></div>
-      <div class="plan-fld"><label class="fl" for="plan-style">Vibe</label><select id="plan-style"><option value="">Any house</option></select></div>
+      <div class="plan-fld"><label class="fl" for="plan-style">Genre</label><select id="plan-style"><option value="">Any house</option></select></div>
       <label class="chk plan-seed" id="plan-seed-wrap" hidden><input type="checkbox" id="plan-seed" checked> <span>Start with <b id="plan-seed-name"></b></span></label>
       <div class="confirm-btns" id="plan-btns"></div>
       <p class="acct-msg" id="plan-msg" role="status" aria-live="polite"></p>
@@ -4647,6 +4648,6 @@ addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=13" defer></script>
-<script src="/static/i18n.js?v=63"></script>
+<script src="/static/i18n.js?v=64"></script>
 </body>
 </html>
