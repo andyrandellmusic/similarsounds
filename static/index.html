@@ -52,6 +52,7 @@
   .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
   .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
   .tok-pill[hidden] { display: none; }
+  html:not(.subs-open) .subs-on, html.subs-open .subs-off { display: none !important; }   /* SimilarSounds Unlimited open yet? */
   .tok-pill .tok-l:empty { display: none; }
   .tok-pill svg, .lang-mini svg { width: 17px; height: 17px; flex: none; }
   .tok-pill svg { color: var(--accent); }
@@ -2010,6 +2011,7 @@
           <button type="button" class="secondary" id="pk-toggle"></button>
         </div>
         <div id="acct-stats" hidden></div>
+        <button type="button" class="secondary" id="acct-billing" hidden>Manage subscription</button>
         <button type="button" class="primary" id="acct-logout">Log out</button>
         <p class="acct-links"><a href="#" id="acct-delete">Delete my account</a></p>
       </div>
@@ -2103,7 +2105,9 @@
         <h2>You have 1 credit left</h2>
         <p class="acct-sub">When it's used, you'll get 2 more free searches 24 hours later.</p>
         <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
-        <button type="button" class="primary" data-pw-close>Got it</button>
+        <button type="button" class="primary subs-on" data-go-unlimited>Go Unlimited · £4.99/month</button>
+        <button type="button" class="primary subs-off" data-pw-close>Got it</button>
+        <p class="acct-links subs-on"><a href="#" data-pw-close>Not now</a></p>
       </div>
       <div data-pw="account" hidden>
         <h2>You have used all your credits</h2>
@@ -2112,8 +2116,11 @@
         <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
         <div class="plan"><div class="plan-price">£4.99<span>/month</span></div>
           <ul><li>Unlimited searches and "Similar" finds</li><li>Build and share as many sets as you like</li><li>Cancel anytime</li></ul></div>
-        <button type="button" class="primary" disabled>Subscriptions coming soon</button>
-        <p class="acct-fine">We're putting the finishing touches on subscriptions. Your saved set is safe in your account in the meantime.</p>
+        <button type="button" class="primary subs-on" data-go-unlimited>Go Unlimited · £4.99/month</button>
+        <p class="acct-fine subs-on">Secure payment by Stripe. Cancel anytime from your account.</p>
+        <button type="button" class="primary subs-off" disabled>Subscriptions coming soon</button>
+        <p class="acct-fine subs-off">We're putting the finishing touches on subscriptions. Your saved set is safe in your account in the meantime.</p>
+        <p class="acct-msg" data-pw-msg role="alert"></p>
       </div>
     </div>
   </div>
@@ -2873,6 +2880,7 @@ function showTokens(t) {
   // Running low: when a search leaves 1 credit, warn once (same box as "You have used all your credits")
   if (lastTokens && !t.subscribed && t.left === 1 && lastTokens.left > 1) setTimeout(() => openPaywall(t.stage === "account" ? "low-account" : "low-anon"), 900);
   lastTokens = t;
+  if ($("#acct-billing")) $("#acct-billing").hidden = !t.subscribed;
   resetAt = t.reset_at ? Date.parse(t.reset_at) : null;
   tickCountdown();
   el.hidden = false;
@@ -2927,6 +2935,27 @@ document.addEventListener("click", e => {
 document.addEventListener("keydown", e => { if (e.key === "Escape" && !$("#paywall").hidden) closePaywall(); });
 window.addEventListener("ss:auth", refreshTokens);
 refreshTokens();
+/* SimilarSounds Unlimited: £4.99 a month through Stripe (only once subscriptions are switched on, on the server) */
+const subsPaint = () => document.documentElement.classList.toggle("subs-open", !!window.ssSubsOn);
+window.addEventListener("ss:subs", subsPaint); subsPaint();
+async function goUnlimited(btn) {
+  const msg = btn.closest("[data-pw]")?.querySelector("[data-pw-msg]");
+  const auth = await window.ssAuthHeader?.();
+  if (!auth?.Authorization) { closePaywall(); window.ssOpenAccount?.("signup"); return; }   // an account first, so it knows who paid
+  btn.disabled = true; if (msg) msg.textContent = "Opening secure payment…";
+  try {
+    const r = await fetch("/api/subscribe", { method: "POST", headers: auth }), d = await r.json();
+    if (!r.ok || !d.url) throw new Error(d.detail || "");
+    location.href = d.url;
+  } catch (e) { btn.disabled = false; if (msg) msg.textContent = e.message || "Couldn't open the payment page. Please try again."; }
+}
+document.addEventListener("click", e => { const b = e.target.closest("[data-go-unlimited]"); if (b) { e.preventDefault(); goUnlimited(b); } });
+// back from Stripe: welcome them (the payment reaches us a moment later, so look again shortly)
+{ const u = new URL(location.href), v = u.searchParams.get("unlimited");
+  if (v !== null) {
+    u.searchParams.delete("unlimited"); history.replaceState(null, "", u.pathname + u.search + u.hash);
+    if (v === "1") { setTimeout(() => toast("Welcome to SimilarSounds Unlimited!"), 600); [2000, 6000].forEach(ms => setTimeout(refreshTokens, ms)); }
+  } }
 
 /* ================= Thumbs up / down: every vote is a DJ's judgement we can learn from ================= */
 function votes() { try { return JSON.parse(localStorage.getItem("ss_votes") || "{}"); } catch { return {}; } }

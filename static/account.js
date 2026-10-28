@@ -9,6 +9,7 @@
   window.ssAuthReady = new Promise(r => { authReady = r; });
   let cfg;
   try { cfg = await (await fetch("/api/config")).json(); } catch { authReady(); return; }
+  window.ssSubsOn = !!cfg.subscriptions; window.dispatchEvent(new Event("ss:subs"));   // SimilarSounds Unlimited open yet?
   if (!cfg.supabase_url || !cfg.supabase_anon_key) { authReady(); return; }   // accounts not switched on yet
 
   await new Promise((ok, fail) => {
@@ -291,6 +292,15 @@
     busy(f, false);
     if (error) return msg("account", friendly(error));
     user = data.user; paint(); msg("account", "Name saved", true);
+  });
+  $("#acct-billing")?.addEventListener("click", async () => {    // cancel or change card, on Stripe's own page
+    const b = $("#acct-billing"); b.disabled = true;
+    try {
+      const r = await fetch("/api/billing-portal", { method: "POST", headers: await window.ssAuthHeader() }), d = await r.json();
+      if (r.ok && d.url) { location.href = d.url; return; }
+      say(d.detail || "Couldn't open your subscription. Please try again.");
+    } catch { say("Couldn't open your subscription. Please try again."); }
+    b.disabled = false;
   });
   $("#acct-logout").addEventListener("click", async () => {
     await sb.auth.signOut(); close(); say("Logged out. Your set stays on this device.");

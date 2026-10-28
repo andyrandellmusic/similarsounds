@@ -17,7 +17,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
+from app import billing, guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import DB_PATH, Index, energy_vector
@@ -87,7 +87,53 @@ SUPABASE_ANON_KEY = os.environ.get("SUPABASE_ANON_KEY", "").strip()
 
 @app.get("/api/config")
 def config():
-    return {"supabase_url": SUPABASE_URL if SUPABASE_ANON_KEY else "", "supabase_anon_key": SUPABASE_ANON_KEY}
+    return {"supabase_url": SUPABASE_URL if SUPABASE_ANON_KEY else "", "supabase_anon_key": SUPABASE_ANON_KEY,
+            "subscriptions": billing.enabled()}
+
+
+@app.post("/api/subscribe")
+async def subscribe(request: Request):
+    """SimilarSounds Unlimited: a Stripe Checkout page for the logged-in visitor (off until SUBSCRIPTIONS_ON=1)."""
+    if not billing.enabled():
+        raise HTTPException(503, "Subscriptions aren't open yet")
+    user = await run_in_threadpool(billing.signed_in_user, request)
+    if not user:
+        raise HTTPException(401, "Log in first")
+    try:
+        return {"url": await run_in_threadpool(billing.checkout_url, user)}
+    except Exception as e:
+        print(f"billing: checkout failed: {e}", flush=True)
+        raise HTTPException(502, "Couldn't open the payment page. Please try again.")
+
+
+@app.post("/api/billing-portal")
+async def billing_portal(request: Request):
+    """Stripe's page to cancel SimilarSounds Unlimited or change the card."""
+    user = await run_in_threadpool(billing.signed_in_user, request)
+    if not user:
+        raise HTTPException(401, "Log in first")
+    try:
+        url = await run_in_threadpool(billing.portal_url, user)
+    except Exception as e:
+        print(f"billing: portal failed: {e}", flush=True)
+        url = None
+    if not url:
+        raise HTTPException(404, "No subscription found for this account")
+    return {"url": url}
+
+
+@app.post("/api/stripe/webhook", include_in_schema=False)
+async def stripe_webhook(request: Request):
+    """Stripe tells us about payments, renewals and cancellations; the account's searches follow."""
+    payload = await request.body()
+    if not billing.verify(payload, request.headers.get("stripe-signature", "")):
+        raise HTTPException(400, "Bad signature")
+    try:
+        await run_in_threadpool(billing.handle, json.loads(payload))
+    except Exception as e:                       # tell Stripe to try again later
+        print(f"billing: webhook failed: {e}", flush=True)
+        raise HTTPException(500, "Couldn't save that")
+    return {"ok": True}
 
 
 @app.get("/healthz")

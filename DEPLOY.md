@@ -54,3 +54,27 @@ To run it now: GitHub repo → **Actions** → *Daily catalogue update* → **Ru
 
 The stand-in preview source (Deezer) allows **non-commercial use only**: no ads, no paid features,
 until Beatport (or another licensed source) replaces it.
+
+## SimilarSounds Unlimited (£4.99 / month) - built, switched OFF
+
+Everything is in place (`app/billing.py`, the Go Unlimited button, Manage subscription in the account) but the
+site keeps showing "Subscriptions coming soon" until it's switched on. **Only switch it on once Deezer (or
+Beatport / another licensed source) has agreed to paid use** - see "Before a public launch" above.
+
+To switch on:
+1. **Stripe** (stripe.com): create the product "SimilarSounds Unlimited" with a £4.99 / month recurring price.
+   Copy its price id (`price_...`).
+2. Stripe → Developers → Webhooks → add endpoint `https://www.similarsounds.com/api/stripe/webhook` with the events
+   `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`,
+   `customer.subscription.deleted`. Copy its signing secret (`whsec_...`).
+3. Stripe → Settings → Billing → Customer portal: turn it on (lets subscribers cancel or change their card).
+4. Supabase → Project settings → API: copy the `service_role` key (keep it secret: server only).
+5. Render → similarsounds → Environment, add:
+   `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_KEY`, and `SUBSCRIPTIONS_ON` = `1`.
+   Render redeploys; the pop-up then shows **Go Unlimited · £4.99/month**.
+6. Update the Terms page with the subscription terms (price, renews monthly, cancel anytime, UK 14-day cancellation
+   rights) before taking real payments. Try it first with Stripe's test keys and card 4242 4242 4242 4242.
+
+A paying account gets a row in `public.subscriptions` (status active), which the search_tokens function already
+treats as unlimited. Free users keep their searches refreshing every 24 hours. The owner row (`customer_ref`
+starting with `owner`) is never changed by payments.
