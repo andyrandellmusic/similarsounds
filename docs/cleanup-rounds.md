@@ -70,3 +70,11 @@ Bugs 8.5 · Content 8 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
 - Privacy policy: says what the visitor count now records (the browser's time zone, roughly the country; an
   account's first time zone) and "no third-party analytics" instead of "no analytics". Dated 28 October 2026.
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
+
+### Round 6: 8.1 → 8.3 (kept)
+- Leftovers from today's changes removed: styles for 27 classes nothing uses any more (old transition lines and
+  play buttons, old guide icons, the old rotate tip, retired layout bits) - about 100 rules, ~8 KB - and the
+  "Hear the mix" translations.
+- Checked: every element's computed style compared old vs new styles on the same page (animations frozen) -
+  0 differences on desktop results and set builder, and on phone home, results and set builder.
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 8.5
