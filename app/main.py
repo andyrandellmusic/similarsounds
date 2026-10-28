@@ -8,6 +8,7 @@ import random
 import re
 import sqlite3
 import threading
+from collections import OrderedDict
 from datetime import date
 from pathlib import Path
 
@@ -528,7 +529,8 @@ def home():
 
 
 # ---------- public pages for search engines (one per catalogue track, plus browse pages)
-_page_cache: dict[int, str] = {}
+_page_cache: OrderedDict[int, str] = OrderedDict()     # the most recent track pages (~37 KB each)
+PAGE_CACHE_MAX = 300                                     # ~11 MB: crawlers used to fill 2,000 (~74 MB)
 _style_by_slug = lambda: {pages.slugify(s): s for s in {r["style"] for r in index.rows if r["style"]}}
 
 
@@ -561,12 +563,14 @@ def similar_track(slug: str):
     r = index.rows[index.ids[deezer_id]]
     if pages.track_path(r) != f"/similar-to/{slug}":
         return RedirectResponse(pages.track_path(r), status_code=301)
-    if deezer_id not in _page_cache:
+    if deezer_id in _page_cache:
+        _page_cache.move_to_end(deezer_id)
+    else:
         q = analyse_query(deezer_id)
         results, guessed = rank(index, q, exclude_id=deezer_id, limit=30)
-        if len(_page_cache) > 2000:
-            _page_cache.clear()
         _page_cache[deezer_id] = pages.track_page(index, q, results, r["style"] or guessed)
+        while len(_page_cache) > PAGE_CACHE_MAX:
+            _page_cache.popitem(last=False)
     return _page_cache[deezer_id]
 
 

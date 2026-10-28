@@ -44,3 +44,11 @@ Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 6.5 
 - Dead code removed: the old "Hear the mix" endpoint /api/mixinfo and its CPU-heavy beat analysis (the decks
   find the beats in the browser now).
 Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 7 · Mobile 8.5 · Tidiness 7.5
+
+### Round 3: 7.6 → 7.8 (kept)
+- Memory: the server kept up to 2,000 rendered track pages (~37 KB each, ~74 MB) and crawlers filled it fast;
+  now the 300 most recent (~11 MB).
+- Old pages: tracks taken out by hand (data/removed_tracks.json) are now set aside as "removed by hand", so
+  their old pages answer with the friendly "gone" page (410, Google drops them) instead of a bare 404.
+  (The 404s in Search Console are tracks deleted by hand before this; they'll drop out on their own.)
+Bugs 8.5 · Content 8 · Catalogue 7.5 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5

@@ -51,7 +51,16 @@ def apply_removals() -> int:
     if not ids or not db.exists():
         return 0
     conn = sqlite3.connect(db)
-    n = conn.executemany("DELETE FROM tracks WHERE deezer_id = ?", [(int(i),) for i in ids]).rowcount
+    q = ",".join("?" * len(ids)); args = [int(i) for i in ids]
+    # set aside (not just deleted), so the track's old page says "gone" (410) instead of a bare 404
+    cols = [c[1] for c in conn.execute("PRAGMA table_info(tracks)")]
+    try:
+        conn.execute(f"INSERT INTO set_aside ({','.join(cols)}, aside_kind, aside_why, aside_at) "
+                     f"SELECT {','.join(cols)}, 'removed by hand', 'taken out by hand', datetime('now') "
+                     f"FROM tracks WHERE deezer_id IN ({q})", args)
+    except sqlite3.OperationalError:
+        pass                                   # no set_aside table: just delete
+    n = conn.execute(f"DELETE FROM tracks WHERE deezer_id IN ({q})", args).rowcount
     conn.commit(); conn.close()
     return n
 
