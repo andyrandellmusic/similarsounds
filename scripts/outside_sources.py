@@ -1,7 +1,10 @@
 """More places to find new house releases for the daily pull, beyond Deezer's own playlists and labels:
     Discogs      the newest house releases added, by style (needs DISCOGS_TOKEN, or the token saved on the Mac)
     MusicBrainz  releases tagged house / deep house / tech house... from the last few weeks (open, no key)
+    (and a daily back-catalogue batch: older Discogs and MusicBrainz releases, and every house / dance release Apple's
+     iTunes catalogue has for the artists we already carry)
     Last.fm      the top tracks on each house tag (only when LASTFM_API_KEY is set; non-commercial use only)
+    iTunes       Apple's House and Dance top-song charts in 8 countries (open, no key; popular tracks of any age)
 Each find is then looked up on Deezer, which supplies the preview, artwork and release date, and has to pass the
 same checks as the label pull: a dance album, released in the last few months. Releases already looked at are
 remembered in data/outside_follow.json, so each day only opens new ones.
@@ -23,6 +26,8 @@ UA = "SimilarSounds/1.0 ( management@similarsounds.com )"
 DISCOGS_STYLES = ["House", "Deep House", "Tech House", "Minimal", "Nu-Disco", "Afro House"]
 MB_TAGS = ["house", "deep house", "tech house", "minimal", "nu disco", "afro house"]
 LASTFM_TAGS = ["deep house", "tech house", "house", "minimal house", "nu disco", "afro house"]
+ITUNES_CHARTS = {"House": 1048, "Dance": 17}
+ITUNES_COUNTRIES = ["gb", "us", "de", "nl", "fr", "es", "it", "au"]
 
 _http = httpx.Client(timeout=30, headers={"User-Agent": UA})
 _albums: dict[int, dict] = {}
@@ -108,6 +113,19 @@ def lastfm_tracks() -> list[tuple[str, str, str]]:
     return out
 
 
+def itunes_charts() -> list[tuple[str, str, str]]:
+    out = []
+    for country in ITUNES_COUNTRIES:
+        for genre in ITUNES_CHARTS.values():
+            r = _get(f"https://itunes.apple.com/{country}/rss/topsongs/limit=200/genre={genre}/json")
+            time.sleep(0.5)
+            for e in ((r.json().get("feed") or {}).get("entry", []) if r else []):
+                artist, title = e.get("im:artist", {}).get("label", ""), e.get("im:name", {}).get("label", "")
+                if artist and title:
+                    out.append((f"it:{_norm(artist)}|{_norm(title)}", artist, title))
+    return out
+
+
 # ---------- finding them on Deezer ----------
 def _album(aid: int) -> dict:
     if aid not in _albums:
@@ -123,7 +141,8 @@ def _ok_album(al: dict, cutoff: str, dance_genres: set[int]) -> bool:
 def deezer_release(artist: str, title: str) -> dict | None:
     """The Deezer album for this release, if the names match."""
     a, t = _clean(artist).split(",")[0].split(" & ")[0], _clean(title)
-    hits = sources.deezer("/search/album", q=f'artist:"{a}" album:"{t}"', limit=10).get("data", [])
+    hits = sources.deezer("/search/album", q=f'artist:"{a}" album:"{t}"', limit=10).get("data", []) \
+        or sources.deezer("/search/album", q=f"{a} {t}", limit=10).get("data", [])
     for h in hits:
         if _norm(h.get("title", "")).startswith(_norm(t)[:24]) and _norm(a) in _norm(h.get("artist", {}).get("name", "")):
             return _album(h["id"])
@@ -132,7 +151,8 @@ def deezer_release(artist: str, title: str) -> dict | None:
 
 def deezer_track(artist: str, title: str) -> dict | None:
     a, t = _clean(artist).split(",")[0].split(" & ")[0], _clean(title)
-    hits = sources.deezer("/search", q=f'artist:"{a}" track:"{t}"', limit=10).get("data", [])
+    # a plain search, checked by name below (Deezer's artist:/track: search syntax no longer finds tracks reliably)
+    hits = sources.deezer("/search", q=f"{a} {t}", limit=15).get("data", [])
     return next((h for h in hits if h.get("preview") and _norm(h.get("title", "")).startswith(_norm(t)[:20])
                  and _norm(a) in _norm(h.get("artist", {}).get("name", ""))), None)
 
@@ -145,7 +165,7 @@ def outside_candidates(seen: set[int], dance_genres: set[int], max_age_days: int
     cutoff = (date.today() - timedelta(days=max_age_days)).isoformat()
     out, counts = [], {}
     for name, finder, kind in (("Discogs", discogs_releases, "album"), ("MusicBrainz", musicbrainz_releases, "album"),
-                               ("Last.fm", lastfm_tracks, "track")):
+                               ("Last.fm", lastfm_tracks, "track"), ("iTunes charts", itunes_charts, "any-age track")):
         if time.time() > until:
             break
         try:
@@ -163,9 +183,10 @@ def outside_candidates(seen: set[int], dance_genres: set[int], max_age_days: int
                         for t in (al.get("tracks") or {}).get("data", []):
                             if t["id"] not in seen and t.get("preview"):
                                 seen.add(t["id"]); out.append((t["id"], "House"))
-                else:
+                else:                               # chart hits are popular whatever their age
                     t = deezer_track(artist, title)
-                    if t and t["id"] not in seen and _ok_album(_album(t["album"]["id"]), cutoff, dance_genres):
+                    if t and t["id"] not in seen and _ok_album(_album(t["album"]["id"]),
+                                                               "0000" if kind == "any-age track" else cutoff, dance_genres):
                         seen.add(t["id"]); out.append((t["id"], "House"))
                 done.add(key)                       # looked at: don't open it again
             except Exception as e:
@@ -207,6 +228,24 @@ def _mb_page(tag: str, start: str, end: str, offset: int) -> list[tuple[str, str
     return out
 
 
+def _itunes_artist_releases(artist: str) -> list[tuple[str, str, str]]:
+    """Every house / dance / electronic release Apple has for this artist (the iTunes catalogue)."""
+    r = _get("https://itunes.apple.com/search", params={"term": artist, "entity": "musicArtist", "limit": 5})
+    time.sleep(3)                                                    # iTunes: about 20 requests a minute
+    hit = next((a for a in (r.json().get("results", []) if r else []) if _norm(a.get("artistName", "")) == _norm(artist)), None)
+    if not hit:
+        return []
+    r = _get("https://itunes.apple.com/lookup", params={"id": hit["artistId"], "entity": "album", "limit": 200})
+    time.sleep(3)
+    rel = [x for x in (r.json().get("results", []) if r else [])
+           if x.get("wrapperType") == "collection" and x.get("primaryGenreName") in ITUNES_GENRES]
+    rel.sort(key=lambda x: x.get("releaseDate", ""), reverse=True)  # the newest few, so no one artist floods it
+    return [(f"ia:{x['collectionId']}", artist, x["collectionName"]) for x in rel[:ITUNES_RELEASES_PER_ARTIST]]
+
+
+ITUNES_GENRES = {"House", "Dance", "Electronic", "Deep House", "Techno", "Disco"}
+ITUNES_ARTISTS_PER_DAY = 120
+ITUNES_RELEASES_PER_ARTIST = 10
 DISCOGS_PAGES_PER_YEAR = 5          # per style: the 500 most-owned releases of each year
 OLDEST_YEAR = 2000
 
@@ -220,7 +259,14 @@ def backfill_candidates(seen: set[int], dance_genres: set[int], limit: int,
     back = state.setdefault("back", {})
     dg = back.setdefault("discogs", {"year": date.today().year - 1, "style": 0, "page": 1})
     mb = back.setdefault("musicbrainz", {"end": (date.today() - timedelta(days=45)).isoformat(), "tag": 0, "offset": 0})
-    out, looked = [], {"Discogs": 0, "MusicBrainz": 0}
+    it = back.setdefault("itunes", {"next": 0})
+    from app.catalogue import connect                                 # artists already in the catalogue, biggest first
+    blocked_file = Path(__file__).resolve().parent.parent / "data" / "blocked_artists.json"
+    blocked = {_norm(a) for a in (json.loads(blocked_file.read_text()).get("artists", []) if blocked_file.exists() else [])}
+    artists = [a for (a,) in connect().execute(
+        "SELECT artist FROM tracks GROUP BY artist ORDER BY COUNT(*) DESC, artist") if _norm(a) not in blocked]
+    it_today = 0
+    out, looked = [], {"Discogs": 0, "MusicBrainz": 0, "iTunes": 0}
 
     def take(found, name):
         for key, artist, title in found:
@@ -262,10 +308,16 @@ def backfill_candidates(seen: set[int], dance_genres: set[int], limit: int,
                 else:
                     mb["offset"] += 100
             progressed = True
+        if len(out) < limit and time.time() < until and it_today < ITUNES_ARTISTS_PER_DAY and artists:
+            name = artists[it["next"] % len(artists)]
+            if take(_itunes_artist_releases(_clean(name).split(",")[0].split(" & ")[0]), "iTunes"):
+                it["next"] = (it["next"] + 1) % len(artists); it_today += 1
+            progressed = True
         if not progressed:
             break                                                    # gone all the way back
-    print(f"    back catalogue: {looked['Discogs']} Discogs + {looked['MusicBrainz']} MusicBrainz releases looked up, "
-          f"{len(out)} new tracks (Discogs now at {dg['year']}, MusicBrainz at {mb['end']})", flush=True)
+    print(f"    back catalogue: {looked['Discogs']} Discogs + {looked['MusicBrainz']} MusicBrainz + {looked['iTunes']} iTunes "
+          f"releases looked up, {len(out)} new tracks (Discogs now at {dg['year']}, MusicBrainz at {mb['end']}, "
+          f"iTunes at artist {it['next']} of {len(artists)})", flush=True)
     state["done"] = sorted(done)[-150000:]
     STATE.write_text(json.dumps(state))
     return out

@@ -206,7 +206,7 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--artists", type=int, default=0, help="also check this many catalogue artists for new releases")
     ap.add_argument("--labels", type=int, default=0, help="also check this many house labels for new releases")
-    ap.add_argument("--outside", action="store_true", help="also find new releases on Discogs, MusicBrainz and Last.fm")
+    ap.add_argument("--outside", action="store_true", help="also find new releases on Discogs, MusicBrainz, Last.fm and iTunes charts")
     ap.add_argument("--backfill", type=int, default=0, help="also add up to this many older house tracks (Discogs / MusicBrainz back catalogue)")
     ap.add_argument("--max-new", type=int, default=1500, help="most new tracks to fetch and analyse in one run")
     ap.add_argument("--per-style", type=int, default=100)
@@ -250,7 +250,7 @@ def main():
     if args.outside and time.time() < search_until:
         from scripts.outside_sources import outside_candidates
         c = outside_candidates(seen, DANCE_GENRES, until=search_until)
-        print(f"{stamp()}   new releases found on Discogs / MusicBrainz / Last.fm: {len(c)} candidates", flush=True)
+        print(f"{stamp()}   new releases found on Discogs / MusicBrainz / Last.fm / iTunes: {len(c)} candidates", flush=True)
         todo += c
     if args.backfill and time.time() < search_until:      # last, so new releases always come first
         from scripts.outside_sources import backfill_candidates
