@@ -1,0 +1,30 @@
+# Uploads the current catalogue.db and clap.npz to the "catalogue-data" release by hand (the daily pull does
+# this itself every morning). Used once to set the release up; safe to run any time.
+name: Publish catalogue
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: Get the latest catalogue
+        run: uv run python -m scripts.catalogue_store fetch
+      - name: Compact and upload it
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: uv run python -m scripts.catalogue_store publish
+      - name: Commit the version file
+        run: |
+          git config user.name "similarsounds-bot"
+          git config user.email "similarsounds-bot@users.noreply.github.com"
+          git add data/catalogue_version.json data/catalogue_runs.json
+          [ -f data/removed_tracks.json ] && git add data/removed_tracks.json
+          git diff --cached --quiet || git commit -m "Catalogue published to the catalogue-data release"
+          for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
