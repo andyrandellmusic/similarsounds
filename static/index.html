@@ -4138,29 +4138,81 @@ function deckNodes(d) {
   }
   return d.nodes;
 }
-const deckPos = d => d.playing ? Math.min(d.buf.duration, d.off + (mixCtx.currentTime - d.at) * d.rate * d.bend) : d.off;
+const deckPos = d => d.playing ? Math.min(d.buf.duration, d.off + Math.max(0, mixCtx.currentTime - d.at) * d.rate * d.bend) : d.off;
 function setRate(d) {
   if (d.playing) { d.off = deckPos(d); d.at = mixCtx.currentTime; }
   if (d.src) d.src.playbackRate.value = d.rate * d.bend;
 }
-function startSrc(d) {
+function startSrc(d, when = 0) {           // when: an exact moment on the audio clock (0 = straight away)
   const src = audioCtx().createBufferSource();
   src.buffer = d.buf; src.playbackRate.value = d.rate * d.bend; src.connect(deckNodes(d).eq);
   src.onended = () => { if (d.src === src) { d.src = null; d.playing = false; d.off = 0; paintDeck(d); } };   // ran to the end
-  d.at = mixCtx.currentTime; src.start(0, Math.min(d.off, d.buf.duration - 0.01)); d.src = src;
+  d.at = when || mixCtx.currentTime; src.start(when, Math.min(d.off, d.buf.duration - 0.01)); d.src = src;
 }
 function stopSrc(d) { const s = d.src; d.src = null; if (s) try { s.stop(); } catch {} }
 function seekDeck(d, pos) {
   pos = clampN(pos, 0, d.buf.duration - 0.05);
   if (d.playing) { stopSrc(d); d.off = pos; startSrc(d); } else d.off = pos;
 }
-// line this deck's beats up with the other deck's (moving by less than half a beat)
+/* Where the kicks are, to a fraction of a millisecond, found in the browser on the exact audio the deck plays.
+   1. The low end (a 120 Hz low-pass) is followed in 0.5 ms steps.
+   2. A rough beat grid: every tempo near the track's BPM and every starting point, keeping the one on the most kick.
+   3. The start of each kick near each beat: where the low end jumps fastest.
+   4. A straight line through those kick times (robust to stray hits) gives the exact tempo and first beat. */
+const KR = 2000;                                     // steps per second
+function kickGrid(buf, guess) {
+  const sr = buf.sampleRate, n = buf.length, L = buf.getChannelData(0), R = buf.numberOfChannels > 1 ? buf.getChannelData(1) : L;
+  const w = 2 * Math.PI * 120 / sr, al = Math.sin(w) / (2 * Math.SQRT1_2), cw = Math.cos(w), a0 = 1 + al;
+  const b0 = (1 - cw) / 2 / a0, b1 = (1 - cw) / a0, a1 = -2 * cw / a0, a2 = (1 - al) / a0;
+  const y = new Float32Array(n);
+  for (let pass = 0; pass < 2; pass++) {             // two biquads: a steep low-pass
+    let x1 = 0, x2 = 0, y1 = 0, y2 = 0;
+    for (let i = 0; i < n; i++) {
+      const x = pass ? y[i] : (L[i] + R[i]) * 0.5, v = b0 * x + b1 * x1 + b0 * x2 - a1 * y1 - a2 * y2;
+      x2 = x1; x1 = x; y2 = y1; y1 = v; y[i] = v;
+    }
+  }
+  const hop = sr / KR, m = Math.floor(n / hop), e = new Float32Array(m), s = new Float32Array(m);
+  for (let k = 0; k < m; k++) { let acc = 0; const i0 = Math.round(k * hop), i1 = Math.round((k + 1) * hop); for (let i = i0; i < i1; i++) acc += y[i] * y[i]; e[k] = acc / (i1 - i0); }
+  for (let k = 0, acc = 0; k < m; k++) { acc += e[k]; if (k >= 6) acc -= e[k - 6]; s[k] = acc / 6; }      // low-end energy, 3 ms smoothing
+  const rise = new Float32Array(m), lg = new Float32Array(m);
+  for (let k = 0; k < m; k++) { lg[k] = Math.log(s[k] + 1e-10); if (k >= 16) rise[k] = Math.max(0, s[k] - s[k - 16]); }
+  const score = (bpm, ph) => { let v = 0; for (let t = ph, P = 60 / bpm; t * KR < m - 1; t += P) v += rise[Math.round(t * KR)]; return v; };
+  let best = [-1, guess || 122, 0];
+  const span = guess ? 2.5 : 14, mid = guess || 122;
+  for (let b = mid - span; b <= mid + span; b += 0.05)
+    for (let ph = 0, P = 60 / b; ph < P; ph += 0.002) { const v = score(b, ph); if (v > best[0]) best = [v, b, ph]; }
+  const P0 = 60 / best[1], p0 = best[2], hits = [];
+  for (let k = 0; p0 + k * P0 < (m - 200) / KR; k++) {
+    const c = Math.round((p0 + k * P0) * KR); let bi = -1, bv = 0;
+    for (let j = Math.max(2, c - 120); j <= Math.min(m - 30, c + 60); j++) { const d = (lg[j] - lg[j - 2]) * Math.sqrt(s[j + 20]); if (d > bv) { bv = d; bi = j; } }
+    if (bi > 0) hits.push({ k, t: bi / KR, st: s[bi + 20] });
+  }
+  const med = a => { const b = [...a].sort((x, z) => x - z); return b[Math.floor(b.length / 2)]; };
+  const q = med(hits.map(h => h.st).sort((x, z) => x - z).slice(Math.floor(hits.length / 2))) || 0;   // a loud kick
+  let pts = hits.filter(h => h.st >= q * 0.25);       // beats where a kick actually plays
+  if (pts.length < 8) return { bpm: best[1], phase: p0 };
+  const slopes = [];
+  for (let x = 0; x < pts.length; x++) for (let z = x + 1; z < pts.length; z++) slopes.push((pts[z].t - pts[x].t) / (pts[z].k - pts[x].k));
+  let P = med(slopes), a = med(pts.map(h => h.t - P * h.k));
+  pts = pts.filter(h => Math.abs(h.t - (a + h.k * P)) < 0.003);
+  if (pts.length >= 8) {                              // least squares through the kicks that sit on the line
+    const mk = pts.reduce((v, h) => v + h.k, 0) / pts.length, mt = pts.reduce((v, h) => v + h.t, 0) / pts.length;
+    let num = 0, den = 0; pts.forEach(h => { num += (h.k - mk) * (h.t - mt); den += (h.k - mk) ** 2; });
+    P = num / den; a = mt - P * mk;
+  }
+  return { bpm: 60 / P, phase: ((a % P) + P) % P };
+}
+// line this deck's kicks up with the other deck's (moving by less than half a beat). The jump is scheduled a
+// moment ahead on the audio clock, so both positions are worked out for the same instant, to the sample.
 function alignBeats(d) {
   const o = decks[1 - d.i];
   if (!d.playing || !o.playing || !d.grid || !o.grid) return;
+  const t0 = mixCtx.currentTime + 0.04, posAt = x => x.off + (t0 - x.at) * x.rate * x.bend;
   const frac = (pos, g) => { const x = (pos - g.phase) / (60 / g.bpm); return x - Math.floor(x); };
-  let df = frac(deckPos(o), o.grid) - frac(deckPos(d), d.grid); df -= Math.round(df);
-  seekDeck(d, deckPos(d) + df * 60 / d.grid.bpm);
+  let df = frac(posAt(o), o.grid) - frac(posAt(d), d.grid); df -= Math.round(df);
+  const old = d.src; d.src = null; if (old) try { old.stop(t0); } catch {}
+  d.off = clampN(posAt(d) + df * 60 / d.grid.bpm, 0, d.buf.duration - 0.05); startSrc(d, t0);
 }
 async function deckPlay(d) {
   if (!d.buf) return;
@@ -4170,7 +4222,7 @@ async function deckPlay(d) {
     stopAllPlayers("decks");
     if (d.off >= d.buf.duration - 0.1) d.off = d.cue;
     d.playing = true; startSrc(d);
-    if (d.synced) alignBeats(d);
+    if (d.synced) alignBeats(d); else if (decks[1 - d.i].synced) alignBeats(decks[1 - d.i]);
     if (!d.counted) { d.counted = true; countPlay(); }
   }
   paintDeck(d); dkLoop();
@@ -4203,8 +4255,7 @@ async function loadDeck(i, t) {
     const buf = await mixClip(t.deezer_id);
     if (run !== d.run) return;
     d.buf = buf; d.peaks = wavePeaks(buf, 90);
-    fetch(`/api/mixinfo?a=${t.deezer_id}&b=${t.deezer_id}`).then(r => r.ok ? r.json() : null)
-      .then(g => { if (g && run === d.run) { d.grid = g.a; paintDeck(d); } }).catch(() => {});
+    setTimeout(() => { if (run === d.run) { d.grid = kickGrid(buf, Number(t.bpm) || 0); paintDeck(d); } }, 30);
   } catch {
     if (run !== d.run) return;
     d.t = null; dkHint("Couldn't load that track. Try another one.");
@@ -4271,7 +4322,14 @@ $("#decks").addEventListener("input", e => {
   const t = e.target;
   if (t.id === "dk-xf") { xfade = Number(t.value); applyMixer(); }
   else if (t.classList.contains("dk-fader")) { decks[t.dataset.ch].vol = Number(t.value); applyMixer(); }
-  else if (t.classList.contains("cdj-tempo")) { const d = decks[t.closest(".cdj").dataset.deck]; d.rate = 1 + Number(t.value) / 100; d.synced = false; setRate(d); paintDeck(d); }
+  else if (t.classList.contains("cdj-tempo")) {
+    const d = decks[t.closest(".cdj").dataset.deck], o = decks[1 - d.i];
+    d.rate = 1 + Number(t.value) / 100; d.synced = false; setRate(d);
+    if (o.synced && d.grid && o.grid) {           // the synced deck follows, on the same instant, so the kicks stay together
+      o.rate = d.grid.bpm * d.rate / o.grid.bpm; setRate(o); o.el.querySelector(".cdj-tempo").value = ((o.rate - 1) * 100).toFixed(2); paintDeck(o);
+    }
+    paintDeck(d);
+  }
 });
 $("#decks").addEventListener("dblclick", e => {
   const t = e.target.closest(".cdj-tempo, #dk-xf, .dk-knob"); if (!t) return;
