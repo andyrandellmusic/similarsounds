@@ -16,6 +16,9 @@ jobs:
       - uses: astral-sh/setup-uv@v6
       - name: Get the latest catalogue
         run: uv run python -m scripts.catalogue_store fetch
+      - name: Small repairs (missing cover art)
+        continue-on-error: true
+        run: uv run python -m scripts.repair_catalogue
       - name: Compact and upload it
         env:
           GH_TOKEN: ${{ github.token }}

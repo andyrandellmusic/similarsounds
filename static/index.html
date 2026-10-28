@@ -52,6 +52,7 @@
   .tok-pill, .lang-mini { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 12px 0 10px; border-radius: 999px; background: var(--panel); border: 1px solid var(--line); color: var(--text); font: 600 13px Inter, system-ui, sans-serif; cursor: pointer; white-space: nowrap; }
   .tok-pill:hover, .lang-mini:hover, .lang-mini:focus-within { border-color: #4a4a5c; }
   .tok-pill[hidden] { display: none; }
+  img[src=""], img:not([src]) { visibility: hidden; }   /* a track with no cover art: the tile's own background, never a broken-image icon */
   html:not(.subs-open) .subs-on, html.subs-open .subs-off { display: none !important; }   /* SimilarSounds Unlimited open yet? */
   .tok-pill .tok-l:empty { display: none; }
   .tok-pill svg, .lang-mini svg { width: 17px; height: 17px; flex: none; }

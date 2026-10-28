@@ -74,6 +74,10 @@ jobs:
           uv run --no-project --python 3.10 --with laion-clap --with "torch<2.6" --with torchvision
           --with "transformers<4.45" --with librosa --with httpx --with soundfile --with "numpy<2" --with "setuptools<70"
           python -m scripts.clap_update --ckpt ~/clap/music.pt
+      - name: Small repairs (missing cover art)
+        if: always()
+        continue-on-error: true
+        run: uv run python -m scripts.repair_catalogue
       - name: Publish the catalogue (compact it, upload to the release)
         if: always()       # keep whatever was saved, even if a step above had trouble
         env:

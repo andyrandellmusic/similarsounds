@@ -52,3 +52,12 @@ Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 7 ·
   their old pages answer with the friendly "gone" page (410, Google drops them) instead of a bare 404.
   (The 404s in Search Console are tracks deleted by hand before this; they'll drop out on their own.)
 Bugs 8.5 · Content 8 · Catalogue 7.5 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
+
+### Round 4: 7.8 → 7.9 (kept)
+- Catalogue checks: no missing keys/BPM/dates/labels, no duplicate titles or ISRCs, no blocked artists, all BPMs
+  100-140. 44 tracks had no cover art: a repair step (scripts/repair_catalogue.py) now runs in the daily pull
+  and the publish workflow and fills them from Deezer (11 of 44 have one there); the rest show a plain tile,
+  never a broken-image icon.
+- Left for the owner to decide: the label "No Reclaim" - 438 tracks in 4 months from 44 artists, 52 on one day,
+  made-up-sounding artist names (a likely mass-upload "content farm"); twice as prolific as any other label.
+Bugs 8.5 · Content 8 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
