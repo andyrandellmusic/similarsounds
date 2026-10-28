@@ -30,6 +30,7 @@ ITUNES_CHARTS = {"House": 1048, "Dance": 17}
 ITUNES_COUNTRIES = ["gb", "us", "de", "nl", "fr", "es", "it", "au"]
 
 _http = httpx.Client(timeout=30, headers={"User-Agent": UA})
+_last_status: dict[str, int] = {}                # host -> the last error answer, so the log can say why
 _albums: dict[int, dict] = {}
 
 
@@ -55,6 +56,7 @@ def _get(url: str, tries: int = 3, **kw) -> httpx.Response | None:
             r = _http.get(url, **kw)
             if r.status_code == 200:
                 return r
+            _last_status[httpx.URL(url).host] = r.status_code
             if r.status_code in (429, 503):
                 time.sleep(2 + 3 * n); continue
             return None
@@ -76,6 +78,9 @@ def discogs_releases(pages: int = 2) -> list[tuple[str, str, str]]:
                      params={"type": "release", "style": style, "year": year, "sort": "date_added", "sort_order": "desc",
                              "per_page": 100, "page": page})
             time.sleep(1.1)                                          # Discogs: 60 requests a minute
+            if r is None:
+                print(f"  Discogs said {_last_status.get('api.discogs.com', '?')} for {style} page {page}"
+                      " (401 = the token isn't right; 403/429 = blocked or too many requests)", flush=True)
             for x in (r.json().get("results", []) if r else []):
                 artist, _, title = (x.get("title") or "").partition(" - ")
                 if title and not artist.lower().startswith("various"):

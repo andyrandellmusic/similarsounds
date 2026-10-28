@@ -127,6 +127,8 @@ def artist_candidates(conn, n_artists: int, seen: set[int], max_age_days: int = 
 
 
 LABEL_STATE = Path(__file__).resolve().parent.parent / "data" / "label_follow.json"
+# Candidates found but not analysed (over the daily limit, or out of time): tried first next run, never lost
+PENDING = Path(__file__).resolve().parent.parent / "data" / "pending_candidates.json"
 
 # Well-known house labels (deep, tech, minimal / deep tech, disco / funky and classic house). Labels
 # already in the catalogue with a few tracks are added to these automatically.
@@ -231,6 +233,11 @@ def main():
     print(f"{stamp()} Catalogue currently has {len(seen)} tracks", flush=True)
 
     todo = []
+    if PENDING.exists():                                  # left over from last time: these go first
+        left = [(int(t), st) for t, st in json.loads(PENDING.read_text()) if int(t) not in seen]
+        seen |= {t for t, _ in left}
+        todo += left
+        print(f"{stamp()}   left over from last run: {len(left)} candidates", flush=True)
     for style, queries in STYLES.items():
         if args.styles and style not in args.styles:
             continue
@@ -259,9 +266,10 @@ def main():
         todo += c
 
     # Keep each daily run inside its time limit; whatever's left is picked up the next day
+    later = []
     if len(todo) > args.max_new:
-        print(f"  {len(todo)} candidates: taking the first {args.max_new} this run", flush=True)
-        todo = todo[:args.max_new]
+        print(f"  {len(todo)} candidates: taking the first {args.max_new} this run, the rest next run", flush=True)
+        todo, later = todo[:args.max_new], todo[args.max_new:]
     print(f"{stamp()} fetching and analysing {len(todo)} candidates in batches…", flush=True)
 
     # In batches: download previews (network threads), analyse them (worker processes), save to the
@@ -274,6 +282,7 @@ def main():
         for b in range(0, len(todo), BATCH):
             if time.time() > deadline:
                 print(f"{stamp()} time budget reached: stopping with {len(todo) - b} candidates left for tomorrow", flush=True)
+                later = todo[b:] + later
                 break
             fetched = []
             for f in as_completed([io_pool.submit(fetch, tid, style) for tid, style in todo[b:b + BATCH]]):
@@ -311,6 +320,9 @@ def main():
                 pending = retry
             print(f"{stamp()}   saved {added} so far ({min(b + BATCH, len(todo))}/{len(todo)} candidates checked)", flush=True)
 
+    PENDING.write_text(json.dumps(later[:8000]))         # tried first next run
+    if later:
+        print(f"{stamp()} {len(later)} candidates saved for next run", flush=True)
     total = conn.execute("SELECT COUNT(*) FROM tracks").fetchone()[0]
     print(f"{stamp()} Added {added} tracks. Catalogue now has {total}.", flush=True)
     summary = os.environ.get("GITHUB_STEP_SUMMARY")

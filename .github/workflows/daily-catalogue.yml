@@ -77,7 +77,7 @@ jobs:
         run: |
           git config user.name "similarsounds-bot"
           git config user.email "similarsounds-bot@users.noreply.github.com"
-          git add data/catalogue.db data/clap.npz data/artist_follow.json data/label_follow.json data/outside_follow.json
+          git add data/catalogue.db data/clap.npz data/artist_follow.json data/label_follow.json data/outside_follow.json data/pending_candidates.json
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           # site changes may have landed while this ran: take them first, then push (a few tries)
           for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
