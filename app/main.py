@@ -157,7 +157,7 @@ def analyse_query(deezer_id: int) -> dict:
     if deezer_id in index.ids:
         r = index.rows[index.ids[deezer_id]]
         return {"key": r["key"], "camelot": r["camelot"], "bpm": r["bpm"], "energy": float(r["energy"]),
-                "embedding": json.loads(r["embedding"]), "energy_raw": json.loads(r["energy_raw"]),
+                "embedding": index.emb_raw[index.ids[deezer_id]].tolist(), "energy_raw": index.energy_raw[index.ids[deezer_id]],
                 "title": r["title"], "artist": r["artist"],
                 "label": r["label"], "cover": r["cover"], "release_date": r["release_date"],
                 "deezer_id": deezer_id, "in_catalogue": True, "row": index.ids[deezer_id],
@@ -346,21 +346,6 @@ async def mix_clip(deezer_id: int, request: Request):
         headers["Content-Range"] = f"bytes {start}-{end}/{size}"
         return Response(data[start:end + 1], status_code=206, media_type="audio/mpeg", headers=headers)
     return Response(data, media_type="audio/mpeg", headers=headers)
-
-
-@app.get("/api/mixinfo")
-async def mix_info(a: int, b: int):
-    """Tempo and beat positions for both tracks of a "Hear the mix" preview."""
-    try:
-        qa = await run_in_threadpool(analyse_query, a)
-        qb = await run_in_threadpool(analyse_query, b)
-        ga = await run_in_threadpool(mixprev.beat_grid, a, float(qa["bpm"]))
-        gb = await run_in_threadpool(mixprev.beat_grid, b, float(qb["bpm"]))
-    except HTTPException:
-        raise
-    except Exception:
-        raise HTTPException(404, "Couldn't prepare that mix")
-    return {"a": ga, "b": gb}
 
 
 @app.get("/api/bridge")

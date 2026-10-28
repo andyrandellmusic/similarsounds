@@ -72,6 +72,17 @@ def sound_axes(raw: dict, emb) -> list[float]:
     return [raw["onset"], raw["brightness"], float(emb[1]), float(emb[54]), float(emb[56])]
 
 
+def _give_back_memory():
+    """After a (re)load, hand the temporary memory back to the system (Linux), so the server stays under
+    Render's 512 MB instead of keeping the peak."""
+    import ctypes, gc
+    gc.collect()
+    try:
+        ctypes.CDLL("libc.so.6").malloc_trim(0)
+    except OSError:
+        pass                                  # not Linux (e.g. a Mac): nothing to do
+
+
 class Index:
     """All catalogue tracks held in numpy arrays for fast scoring."""
 
@@ -88,9 +99,12 @@ class Index:
             self.ids = {r["deezer_id"]: i for i, r in enumerate(rows)}
             if not rows:
                 return
-            emb = np.array([json.loads(r["embedding"]) for r in rows], dtype="float32")
-            self.sound_ref = np.sort(np.array([sound_axes(json.loads(r["energy_raw"]), e)
-                                               for r, e in zip(rows, emb)], dtype="float32"), axis=0)
+            # each track's raw features, parsed once; the text copies are dropped from the rows (memory)
+            emb = np.array([json.loads(r.pop("embedding")) for r in rows], dtype="float32")
+            self.emb_raw = emb
+            self.energy_raw = [json.loads(r.pop("energy_raw")) for r in rows]
+            self.sound_ref = np.sort(np.array([sound_axes(er, e) for er, e in zip(self.energy_raw, emb)],
+                                              dtype="float32"), axis=0)
             self.emb_mean = emb.mean(axis=0)
             self.emb_std = emb.std(axis=0) + 1e-6
             z = (emb - self.emb_mean) / self.emb_std
@@ -98,8 +112,7 @@ class Index:
             self._load_clap()
             self.scale = {name: self._cos_scale(M) for name, M in (("emb", self.emb), ("sound", self.sound))}
 
-            self.energy_feats = np.array(
-                [energy_vector(json.loads(r["energy_raw"])) for r in rows], dtype="float32")
+            self.energy_feats = np.array([energy_vector(er) for er in self.energy_raw], dtype="float32")
             for r, e in zip(rows, self.energy_scores(self.energy_feats)):
                 r["energy"] = e
             self.energy = np.array([r["energy"] for r in rows], dtype="float32")
@@ -110,6 +123,7 @@ class Index:
             self.age_days = np.array(
                 [(today - date.fromisoformat(r["release_date"])).days if r["release_date"] else 3650
                  for r in rows], dtype="float32")
+        _give_back_memory()
 
     def energy_scores(self, feats: np.ndarray) -> np.ndarray:
         """Map raw energy features to a 1-10 scale by percentile against the catalogue."""

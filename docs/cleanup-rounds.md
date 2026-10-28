@@ -35,3 +35,12 @@ Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 5 · Reliability 6.5 ·
   if they ignore it. Google, Bing, Apple and the AI search bots are still allowed. Tested: Semrush/Ahrefs 403,
   Googlebot/Bingbot/browsers 200.
 Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 6.5 · Mobile 8.5 · Tidiness 7
+
+### Round 2: 7.4 → 7.6 (kept)
+- Memory (Render restarts at 512 MB; the server sat at ~480 MB): each track's raw sound data is parsed once
+  into arrays and the text copies dropped from the in-memory rows (index keeps 101 MB instead of 111 MB), and
+  after loading the server hands freed memory back to the system (malloc_trim, Linux only). Preview-clip cache
+  40 → 24 clips (~8 MB less).
+- Dead code removed: the old "Hear the mix" endpoint /api/mixinfo and its CPU-heavy beat analysis (the decks
+  find the beats in the browser now).
+Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 7 · Mobile 8.5 · Tidiness 7.5
