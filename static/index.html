@@ -1396,8 +1396,8 @@
   .sg-grip { font-size: 18px; color: var(--muted); }
   .sg-next { font: 700 9px Inter, sans-serif; color: var(--accent); background: rgba(198,255,61,.08); padding: 4px 5px; border-radius: 6px; white-space: nowrap; }
   .sg-x { color: var(--accent); font-size: 14px; }
-  .sg-bar { --c: var(--good); width: 44px; padding: 3px 0; border-radius: 6px; text-align: center; font: 800 8.5px Inter, sans-serif; letter-spacing: .08em; text-transform: uppercase;
-    color: var(--c); background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); }
+  .sg-bar { --c: var(--good); width: 42px; height: 12px; border-radius: 5px; box-sizing: border-box;
+    background: color-mix(in srgb, var(--c) 16%, transparent); border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); }
   .sg-bar.ok { --c: var(--ok); } .sg-bar.bad { --c: var(--bad); }
   .sg-jog { width: 28px; height: 28px; border-radius: 50%; background: repeating-conic-gradient(#22232c 0 10deg, #1a1b22 10deg 20deg); box-shadow: inset 0 0 0 1px #34353f, 0 0 0 2px rgba(198,255,61,.5); }
   .sg-chip { font: 800 8.5px Inter, sans-serif; letter-spacing: .06em; color: var(--accent); background: rgba(198,255,61,.1); border: 1px solid rgba(198,255,61,.45); padding: 4px 5px; border-radius: 6px; white-space: nowrap; }
@@ -1568,10 +1568,10 @@
     .sc-c .st-e { transition: color .32s ease; }
   }
 
-  /* how each track mixes into the next: a Good / Okay / Bad bar under it, in the mix colour */
+  /* how each track mixes into the next: a Mixes well / Workable / Will clash bar under it, in the mix colour */
   .mix-bar { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; height: 26px; margin-top: 6px; padding: 0; box-sizing: border-box;
     border-radius: 8px; border: 1px solid color-mix(in srgb, var(--c) 60%, transparent); background: color-mix(in srgb, var(--c) 16%, transparent);
-    color: var(--c); font: 800 10.5px Inter, sans-serif; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: background .15s, box-shadow .15s; }
+    color: var(--c); font: 800 10px Inter, sans-serif; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; overflow: hidden; cursor: pointer; transition: background .15s, box-shadow .15s; }
   .mix-bar.good { --c: var(--good); } .mix-bar.ok { --c: var(--ok); } .mix-bar.bad { --c: var(--bad); }
   .mix-bar i { font-style: normal; font-size: 12px; letter-spacing: 0; }
   .mix-bar:hover { background: color-mix(in srgb, var(--c) 26%, transparent); box-shadow: 0 0 12px color-mix(in srgb, var(--c) 35%, transparent); }
@@ -1885,9 +1885,9 @@
           <div class="sg"><span class="sg-v"><i class="sg-col"></i></span><span><b>Energy column</b><small>How hard each track hits, 1 to 10. The orange one is your peak.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-role">BUILD</i></span><span><b>Role</b><small>The job each track does: intro, warm-up, build, peak, cool down, end.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-key">8A</i></span><span><b>Key</b><small>Same number, or one either side, mixes smoothly.</small></span></div>
-          <div class="sg"><span class="sg-v"><i class="sg-bar good">Good</i></span><span><b class="c-good">Good</b><small>The bar under a track: it mixes well into the next one. Keys, BPM and energy all fit.</small></span></div>
-          <div class="sg"><span class="sg-v"><i class="sg-bar ok">Okay</i></span><span><b class="c-ok">Okay</b><small>Mixable into the next track with a bit of care. Tap the bar for why, or Fix this gap for a track to go between.</small></span></div>
-          <div class="sg"><span class="sg-v"><i class="sg-bar bad">Bad</i></span><span><b class="c-bad">Bad</b><small>The keys, BPM or energy jump too far. Tap the bar for why, and Fix this gap to find a track that bridges them.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-bar good"></i></span><span><b class="c-good">Mixes well</b><small>The bar under a track: it mixes well into the next one. Keys, BPM and energy all fit.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-bar ok"></i></span><span><b class="c-ok">Workable</b><small>Mixable into the next track with a bit of care. Tap the bar for why, or Fix this gap for a track to go between.</small></span></div>
+          <div class="sg"><span class="sg-v"><i class="sg-bar bad"></i></span><span><b class="c-bad">Will clash</b><small>The keys, BPM or energy jump too far. Tap the bar for why, and Fix this gap to find a track that bridges them.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-jog"></i></span><span><b>Decks</b><small>Drag a track onto a deck, or tap a bar and Load on decks. Turn the jog wheel forwards to speed up, back to slow down.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-chip">SYNC</i></span><span><b>Sync</b><small>Matches this deck's tempo to the other one and lines the kicks up. Moving the other deck's tempo keeps them locked.</small></span></div>
           <div class="sg"><span class="sg-v"><i class="sg-chip">A · B</i></span><span><b>Mixer</b><small>Crossfader to blend from deck A to B. HI, MID and LOW cut or boost each part of the sound; VOL sets each deck's level.</small></span></div>
@@ -3437,7 +3437,7 @@ function energyMix(a, b) {
   return [0, `energy jump ${s}`];
 }
 // short chips for the line between two tracks in the set: key change, BPM, energy change
-// Tap the Good / Okay / Bad bar under a track: the details (why, Fix this gap, Load on decks) open in the panel under the set; tap again to close
+// Tap the Mixes well / Workable / Will clash bar under a track: the details (why, Fix this gap, Load on decks) open in the panel under the set; tap again to close
 document.addEventListener("click", e => {
   const d = e.target.closest("[data-ld]"); if (!d) return;
   const i = d.dataset.ld, box = $("#set-detail");
@@ -3751,7 +3751,7 @@ function renderSet() {
         <button type="button" class="st-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}" title="Find tracks that mix after this one" aria-label="Find what mixes after ${esc(t.title)}">Mixes next →</button>
       </div>
       ${i < set.length - 1
-        ? `<button type="button" class="mix-bar ${links[i].cls}" data-ld="${i + 1}" aria-expanded="false" aria-label="${["Bad", "Okay", "Good"][links[i].score]} mix into ${esc(set[i + 1].title)}: show why" title="${esc(links[i].label)} · ${esc(links[i].detail)}">${["Bad", "Okay", "Good"][links[i].score]}<i aria-hidden="true">→</i></button>`
+        ? `<button type="button" class="mix-bar ${links[i].cls}" data-ld="${i + 1}" aria-expanded="false" aria-label="${esc(links[i].label)} into ${esc(set[i + 1].title)}: show why" title="${esc(links[i].label)} · ${esc(links[i].detail)}">${esc(links[i].label)}<i aria-hidden="true">→</i></button>`
         : `<span class="mix-bar none" aria-hidden="true"></span>`}
       </div>
       ${i === set.length - 1 ? `<button type="button" class="next-btn last-next" data-next="${t.deezer_id}" data-label="${esc(t.artist)} - ${esc(t.title)}"><span class="ga">Find what mixes next</span></button>` : ""}
@@ -4871,6 +4871,6 @@ addEventListener("pageshow", e => { if (e.persisted) emptyBars(); });
 ["pointerdown", "keydown"].forEach(ev => addEventListener(ev, () => { bootLoad = false; }, { capture: true, once: true }));
 </script>
 <script src="/static/account.js?v=13" defer></script>
-<script src="/static/i18n.js?v=66"></script>
+<script src="/static/i18n.js?v=67"></script>
 </body>
 </html>
