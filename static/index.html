@@ -1671,21 +1671,33 @@
   @keyframes rt-turn { 0%, 25% { transform: rotate(0); } 50%, 75% { transform: rotate(-90deg); } 100% { transform: rotate(0); } }
   @keyframes rt-in { from { opacity: 0; transform: translate(-50%, 16px); } to { opacity: 1; transform: translate(-50%, 0); } }
   @media (prefers-reduced-motion: reduce) { .rt-phone, .rotate-tip { animation: none; } }
-  /* ================= Phones turned sideways: a smaller version of the desktop set ================= */
-  @media (orientation: landscape) and (max-height: 520px) {
+  /* ================= The set page on computers and on phones turned sideways: title and summary on one line,
+     the decks across the page under them, then the buttons in one row, then the set; the whole page scrolls ================= */
+  @media (min-width: 1001px), (orientation: landscape) and (max-height: 520px) {
     #set-panel { overflow-y: auto; }
     #set-panel .set-body { flex: none; overflow: visible; }
     #set-panel .set-head { display: flex !important; flex-direction: row !important; flex-wrap: wrap; align-items: center; justify-content: flex-start; gap: 6px 10px; padding: 10px 56px 6px 16px; max-width: none; }
     #set-panel .set-head > * { order: 0 !important; }
     #set-panel .set-head .row1 { flex: none; }
-    #set-panel .set-head h2 { font-size: 18px; }
-    #set-panel .set-summary { flex: 1 1 280px; margin: 0; font-size: 11.5px; }
+    #set-panel .set-summary { flex: 1 1 280px; margin: 0; }
     #set-panel .set-tools, #set-panel .set-row2 { margin: 0; flex: 1 1 340px; max-width: none; }
-    #set-panel .set-tools .icon { height: 30px; font-size: 11px; }
-    #set-panel .set-row2 .plan-wide, #set-panel .set-row2 .share-mini { height: 30px; font-size: 12px; }
-    #set-panel .set-head > .decks { flex: 1 1 100%; }
+    /* the decks always start their own line: their width plus the space after them fills the row */
+    #set-panel .set-head > .decks { --dk-w: min(720px, 100%); flex: 0 0 var(--dk-w); max-width: none; margin: 0 calc(100% - var(--dk-w)) 0 0; box-sizing: border-box; }
     #set-panel #set-close { position: fixed; top: 8px; right: 10px; z-index: 6; }
     #set-panel .set-body { padding: 2px 16px 24px; }
+  }
+  /* computers: the same, a little roomier */
+  @media (min-width: 1001px) {
+    #set-panel .set-head { padding: 16px 64px 10px 24px; gap: 10px 14px; }
+    #set-panel .set-head > .decks { --dk-w: min(820px, 100%); }
+    #set-panel .set-body { padding: 4px 24px 32px; }
+  }
+  /* ================= Phones turned sideways: smaller text, buttons and cards to fit the short screen ================= */
+  @media (orientation: landscape) and (max-height: 520px) {
+    #set-panel .set-head h2 { font-size: 18px; }
+    #set-panel .set-summary { font-size: 11.5px; }
+    #set-panel .set-tools .icon { height: 30px; font-size: 11px; }
+    #set-panel .set-row2 .plan-wide, #set-panel .set-row2 .share-mini { height: 30px; font-size: 12px; }
     .st-col { height: 74px; margin-bottom: 6px; }
     .st-e { font-size: 11px; margin-bottom: 2px; }
     .st-role { font-size: 7px; }
