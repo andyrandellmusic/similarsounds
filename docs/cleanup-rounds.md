@@ -61,3 +61,12 @@ Bugs 8.5 · Content 8 · Catalogue 7.5 · SEO 7 · Speed 7.5 · Reliability 7.5 
 - Left for the owner to decide: the label "No Reclaim" - 438 tracks in 4 months from 44 artists, 52 on one day,
   made-up-sounding artist names (a likely mass-upload "content farm"); twice as prolific as any other label.
 Bugs 8.5 · Content 8 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
+
+### Round 5: 7.9 → 8.1 (kept)
+- FAQ (visible and the Google FAQ data) brought up to date, with translations in all 6 languages:
+  "Is it free?" now explains the 3 + 2 free searches that refresh every 24 hours (it said "you don't need an
+  account" and "no tracking"); "How do I build a set?" describes the Mixes well / Workable / Will clash bars and
+  the decks (it still described coloured transitions).
+- Privacy policy: says what the visitor count now records (the browser's time zone, roughly the country; an
+  account's first time zone) and "no third-party analytics" instead of "no analytics". Dated 28 October 2026.
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
