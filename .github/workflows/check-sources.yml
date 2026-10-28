@@ -1,0 +1,22 @@
+# Quick check that each outside track source answers from GitHub's servers (prints status codes only).
+name: Check track sources
+
+on:
+  workflow_dispatch:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ask each source once
+        env:
+          DISCOGS_TOKEN: ${{ secrets.DISCOGS_TOKEN }}
+        run: |
+          echo "Discogs key set: $([ -n "$DISCOGS_TOKEN" ] && echo yes, ${#DISCOGS_TOKEN} characters || echo no)"
+          ua="SimilarSounds/1.0 ( management@similarsounds.com )"
+          echo "Discogs with key:    $(curl -s -o /tmp/d.json -w '%{http_code}' -A "$ua" -H "Authorization: Discogs token=$(printf %s "$DISCOGS_TOKEN" | tr -d '[:space:]')" 'https://api.discogs.com/database/search?type=release&style=Deep+House&per_page=1') $(head -c 160 /tmp/d.json)"
+          echo "Discogs without key: $(curl -s -o /dev/null -w '%{http_code}' -A "$ua" 'https://api.discogs.com/releases/1')"
+          echo "MusicBrainz:         $(curl -s -o /dev/null -w '%{http_code}' -A "$ua" 'https://musicbrainz.org/ws/2/release/?query=tag:house&fmt=json&limit=1')"
+          echo "iTunes:              $(curl -s -o /dev/null -w '%{http_code}' 'https://itunes.apple.com/gb/rss/topsongs/limit=1/genre=1048/json')"
+          echo "Deezer:              $(curl -s -o /dev/null -w '%{http_code}' 'https://api.deezer.com/search?q=kerri+chandler')"
