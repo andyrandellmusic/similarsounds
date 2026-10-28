@@ -356,8 +356,13 @@ def sitemap(index, artists=None) -> str:
 
 
 # AI search and assistant crawlers are welcome too (ChatGPT, Claude, Perplexity, Google's AI, Bing/Copilot)
+# SEO-tool and scraper crawlers: they bring no visitors but read every page (thousands a day), which used up
+# the free bandwidth. Told to stay away here, and turned away by the server if they ignore it (main.py).
+BLOCKED_BOTS = ["SemrushBot", "AhrefsBot", "MJ12bot", "DotBot", "BLEXBot", "DataForSeoBot", "PetalBot",
+                "Bytespider", "SeekportBot", "serpstatbot", "barkrowler", "MegaIndex", "Screaming Frog SEO Spider"]
 ROBOTS = (
     "User-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /stats\n\n"
+    + "".join(f"User-agent: {b}\nDisallow: /\n\n" for b in BLOCKED_BOTS)
     + "".join(f"User-agent: {b}\nAllow: /\nDisallow: /api/\nDisallow: /stats\n\n" for b in
               ["OAI-SearchBot", "ChatGPT-User", "GPTBot", "ClaudeBot", "Claude-SearchBot", "Claude-User",
                "PerplexityBot", "Perplexity-User", "Google-Extended", "Bingbot", "Applebot", "Applebot-Extended"])

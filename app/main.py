@@ -42,8 +42,14 @@ _analysis_lock = threading.Lock()
 CANONICAL_HOST = os.environ.get("CANONICAL_HOST", "").strip().lower()
 
 
+_BLOCKED_UA = re.compile("|".join(re.escape(b) for b in pages.BLOCKED_BOTS), re.I)
+
+
 @app.middleware("http")
 async def redirect_to_canonical(request: Request, call_next):
+    # SEO-tool crawlers that ignore robots.txt: a tiny "no" instead of the page (saves the bandwidth)
+    if request.url.path != "/robots.txt" and _BLOCKED_UA.search(request.headers.get("user-agent", "")):
+        return PlainTextResponse("Crawling not allowed. See /robots.txt", status_code=403)
     host = request.headers.get("host", "").split(":")[0].lower()
     if CANONICAL_HOST and host and host != CANONICAL_HOST and request.url.path != "/healthz":
         query = f"?{request.url.query}" if request.url.query else ""
