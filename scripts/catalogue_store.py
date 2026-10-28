@@ -60,7 +60,7 @@ def fetch() -> None:
     want = _version()
     for name in FILES:
         path, expect = DATA / name, (want.get(name) or {}).get("sha256")
-        if path.exists() and expect and sha256(path) == expect:
+        if path.exists() and (not expect or sha256(path) == expect):     # no version yet: the copy here is it
             print(f"{name}: already the latest", flush=True); continue
         url = f"https://github.com/{REPO}/releases/download/{TAG}/{name}"
         tmp, got = path.with_suffix(path.suffix + ".part"), False
