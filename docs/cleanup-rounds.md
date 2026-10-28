@@ -17,6 +17,8 @@ score goes up. (The earlier UX rounds are in ux-rounds.md.)
 | Tidiness & security | No leftover code or unused endpoints; nothing exposed or abusable |
 
 ## Log
+(Overall = the plain average of the 8 area scores. The round headings were first written a little high from
+round 4 on; corrected to the true averages at the end.)
 
 ### Baseline: 7.1
 Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 5 · Reliability 6.5 · Mobile 8.5 · Tidiness 7
@@ -53,7 +55,7 @@ Bugs 8 · Content 8 · Catalogue 7.5 · SEO 6.5 · Speed 7.5 · Reliability 7 ·
   (The 404s in Search Console are tracks deleted by hand before this; they'll drop out on their own.)
 Bugs 8.5 · Content 8 · Catalogue 7.5 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
 
-### Round 4: 7.8 → 7.9 (kept)
+### Round 4: 7.8 → 7.8 (kept; 7.75 → 7.81)
 - Catalogue checks: no missing keys/BPM/dates/labels, no duplicate titles or ISRCs, no blocked artists, all BPMs
   100-140. 44 tracks had no cover art: a repair step (scripts/repair_catalogue.py) now runs in the daily pull
   and the publish workflow and fills them from Deezer (11 of 44 have one there); the rest show a plain tile,
@@ -62,7 +64,7 @@ Bugs 8.5 · Content 8 · Catalogue 7.5 · SEO 7 · Speed 7.5 · Reliability 7.5 
   made-up-sounding artist names (a likely mass-upload "content farm"); twice as prolific as any other label.
 Bugs 8.5 · Content 8 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
 
-### Round 5: 7.9 → 8.1 (kept)
+### Round 5: 7.8 → 7.9 (kept)
 - FAQ (visible and the Google FAQ data) brought up to date, with translations in all 6 languages:
   "Is it free?" now explains the 3 + 2 free searches that refresh every 24 hours (it said "you don't need an
   account" and "no tracking"); "How do I build a set?" describes the Mixes well / Workable / Will clash bars and
@@ -71,7 +73,7 @@ Bugs 8.5 · Content 8 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
   account's first time zone) and "no third-party analytics" instead of "no analytics". Dated 28 October 2026.
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 7.5
 
-### Round 6: 8.1 → 8.3 (kept)
+### Round 6: 7.9 → 8.1 (kept)
 - Leftovers from today's changes removed: styles for 27 classes nothing uses any more (old transition lines and
   play buttons, old guide icons, the old rotate tip, retired layout bits) - about 100 rules, ~8 KB - and the
   "Hear the mix" translations.
@@ -79,7 +81,7 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
   0 differences on desktop results and set builder, and on phone home, results and set builder.
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 · Mobile 8.5 · Tidiness 8.5
 
-### Round 7: 8.3 → 8.4 (kept)
+### Round 7: 8.1 → 8.1 (kept; 8.06 → 8.13)
 - Found why Discogs finds nothing on GitHub: it answers 401 "Invalid consumer token". The GitHub secret holds
   46 characters but the working key is 40 - it needs pasting again (owner action). New "Check track sources"
   workflow tests every source from GitHub in a minute (status codes only): MusicBrainz, iTunes, Deezer all 200.
@@ -89,7 +91,7 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 7.5 ·
   big clean-up).
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5
 
-### Round 8: 8.4 → 8.5 (kept)
+### Round 8: 8.1 → 8.2 (kept)
 - Track pages already had a unique title, description, canonical address, H1, ~1,100 words and ~60 internal
   links, but no structured data. They now carry schema.org data Google reads: the breadcrumb trail, the track as
   a MusicRecording (artist, release date, genre, ISRC, artwork) and the 30 similar tracks as an ItemList.
@@ -98,9 +100,28 @@ Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7 · Speed 7.5 · Reliability 8 · M
   earns links and visits. Nothing blocks it (1 robots-blocked page is /stats, on purpose).
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 8.5 · Tidiness 8.5
 
-### Round 9: 8.5 → 8.6 (kept)
+### Round 9: 8.2 → 8.3 (kept)
 - Decks on phones: the 20 px mixer knobs get an invisible 36 px touch area (a tap 5 px outside still grabs them).
 - Decks with a keyboard / screen reader: each waveform is a proper slider (Position, deck A/B): arrow keys skip
   2 s, Home / End jump to the start / end (stays beat-locked when synced), with its position announced.
   Tested at 375 px: works, no sideways overflow.
 Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 9 · Tidiness 8.5
+
+### Round 10: 8.3 → 8.4 (kept) - final round
+- Live check of rounds 1-9 on www.similarsounds.com: health OK (14,701 tracks), Semrush 403 / Googlebot 200,
+  robots.txt blocks the SEO tools, /api/mixinfo gone, new FAQ and privacy text live, structured data on track
+  pages, unused styles gone.
+- Security / reliability: /api/prefetch started a full audio analysis (the heaviest job) for any track, as many
+  times as anyone asked, with no limit and no credit used. Now at most 2 run at once, the same track never
+  twice, extras are skipped ("busy") - the real search is unaffected. Tested with a burst of 10: capped, site
+  stayed healthy.
+Bugs 8.5 · Content 9 · Catalogue 8 · SEO 7.5 · Speed 7.5 · Reliability 8.5 · Mobile 9 · Tidiness 9
+
+## Where it ended: 7.1 → 8.4 in 10 rounds
+What stands between 8.4 and 10:
+- Speed 7.5: only proven once the bandwidth graph flattens (the bot block went live 28 Oct). The home page is
+  still one 375 KB file (98 KB compressed); splitting out its styles and code would help returning visitors.
+- SEO 7.5: 848 of ~15,000 pages indexed - mostly time, links and visits.
+- Catalogue 8: owner decision on the "No Reclaim" label (438 tracks, likely a mass-upload farm).
+- Reliability 8.5: the Discogs key on GitHub needs pasting again (it's 46 characters, the real key is 40), and
+  memory headroom on the free 512 MB plan is tight (the $7 Starter plan fixes it for good).

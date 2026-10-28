@@ -381,11 +381,26 @@ async def tokens_left(request: Request):
     return await run_in_threadpool(tokens.check, request, None, False) or {"metered": False}
 
 
+_prefetch_slots = threading.BoundedSemaphore(2)        # at most 2 analyses started by prefetch at once
+_prefetching: set[int] = set()
+
+
 @app.post("/api/prefetch/{deezer_id}")
 async def prefetch(deezer_id: int):
-    """Start analysing a track the visitor is about to pick, so the real search is instant."""
-    if deezer_id not in index.ids and deezer_id not in _query_cache:
-        threading.Thread(target=lambda: _safe(analyse_query, deezer_id), daemon=True).start()
+    """Start analysing a track the visitor is about to pick, so the real search is instant. Capped: analysis is
+    the heaviest work the server does, so extra requests are skipped rather than queued (the search still works)."""
+    if deezer_id in index.ids or deezer_id in _query_cache or deezer_id in _prefetching:
+        return {"ok": True}
+    if not _prefetch_slots.acquire(blocking=False):
+        return {"ok": False, "busy": True}
+    _prefetching.add(deezer_id)
+
+    def run():
+        try:
+            _safe(analyse_query, deezer_id)
+        finally:
+            _prefetching.discard(deezer_id); _prefetch_slots.release()
+    threading.Thread(target=run, daemon=True).start()
     return {"ok": True}
 
 
