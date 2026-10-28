@@ -3,6 +3,7 @@ and what did it pull in. Prints a short plain report.
 
 Usage: python3 scripts/daily_check.py [DAYS]      (default 3; does a `git pull` first)
 """
+from pathlib import Path
 import hashlib, json, os, subprocess, sys, time, urllib.request
 
 DAYS = sys.argv[1] if len(sys.argv) > 1 else "3"
@@ -20,7 +21,7 @@ def get(url, timeout=60):
 
 run("git", "pull", "-q", "--rebase", "--autostash")
 # the catalogue itself is kept in the catalogue-data release, not git: get the latest copy
-_py = ROOT / ".venv" / "bin" / "python"
+_py = Path(ROOT) / ".venv" / "bin" / "python"
 subprocess.run([str(_py) if _py.exists() else sys.executable, "-m", "scripts.catalogue_store", "fetch"], cwd=ROOT,
                capture_output=True, text=True)
 print("== Site ==")
