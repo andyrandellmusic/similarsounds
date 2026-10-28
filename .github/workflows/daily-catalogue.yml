@@ -47,7 +47,10 @@ jobs:
         id: seed
         timeout-minutes: 150
         continue-on-error: true
-        run: uv run python -m scripts.seed --per-style 40 --artists 300 --labels 70 --minutes 120
+        env:
+          DISCOGS_TOKEN: ${{ secrets.DISCOGS_TOKEN }}       # Discogs new releases (skipped if not set)
+          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}     # Last.fm top tracks per house tag (skipped if not set)
+        run: uv run python -m scripts.seed --per-style 40 --artists 300 --labels 70 --outside --backfill 300 --max-new 2000 --minutes 120
       - name: Remove anything added today that isn't house
         if: always()
         run: uv run python -m scripts.clean_catalogue --since "$STARTED" --apply
@@ -74,7 +77,7 @@ jobs:
         run: |
           git config user.name "similarsounds-bot"
           git config user.email "similarsounds-bot@users.noreply.github.com"
-          git add data/catalogue.db data/clap.npz data/artist_follow.json data/label_follow.json
+          git add data/catalogue.db data/clap.npz data/artist_follow.json data/label_follow.json data/outside_follow.json
           git diff --cached --quiet || git commit -m "Daily catalogue update $(date -u +%F)"
           # site changes may have landed while this ran: take them first, then push (a few tries)
           for i in 1 2 3; do git pull --rebase -q origin main && git push && break; sleep 15; done
