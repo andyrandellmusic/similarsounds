@@ -1,12 +1,12 @@
 {
  "catalogue.db": {
-  "sha256": "6607f3eb6c2a7f1e1bda03d489134bad188f26621ff5ba6f425996c115ea7a43",
-  "bytes": 50233344
+  "sha256": "f7ec72f30ff66f4a69641f3eda0938f769c191b58cb37ca32b7cf66c0008c04e",
+  "bytes": 52076544
  },
  "clap.npz": {
-  "sha256": "42424d755f588bbfb9c078c5177cf76a746dd02709c4eef08c0375f26bf3f4b4",
-  "bytes": 33988234
+  "sha256": "5a38bd40d084902b6b1294b14777511092b2f9d3c10fac7e7fb767e7e8e1baaf",
+  "bytes": 35322578
  },
- "updated": "2026-11-01T07:25:59Z",
- "tracks": 16355
+ "updated": "2026-11-02T07:53:06Z",
+ "tracks": 16943
 }
