@@ -530,7 +530,12 @@ async def review(request: Request):
 
 
 @app.post("/api/reload")
-def reload():
+def reload(request: Request):
+    # a reload briefly needs memory for two catalogues, so it's off unless RELOAD_TOKEN is set and sent;
+    # Render redeploys on every catalogue update anyway
+    token = os.environ.get("RELOAD_TOKEN", "")
+    if not token or request.headers.get("x-reload-token", "") != token:
+        raise HTTPException(404)
     index.reload()
     artists.rebuild()
     _page_cache.clear()

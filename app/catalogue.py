@@ -144,20 +144,34 @@ class Index:
         self.clap_raw = np.zeros((n, 512), dtype="float32")
         if not CLAP_PATH.exists():
             return
-        z = np.load(CLAP_PATH)
-        C = np.zeros((n, z["emb"].shape[1]), dtype="float32")
-        for did, e in zip(z["ids"].tolist(), z["emb"]):
-            i = self.ids.get(did)
-            if i is not None:
-                C[i] = e
-                self.has_clap[i] = True
-        if not self.has_clap.any():
+        # Built in place, one full-size array at a time: the old version made several temporary copies
+        # of the whole table at once and went over Render's 512 MB as the catalogue grew.
+        with np.load(CLAP_PATH) as z:
+            src_ids = z["ids"].tolist()
+            E = z["emb"].astype("float32", copy=False)
+        pos = np.array([self.ids.get(d, -1) for d in src_ids])
+        keep = pos >= 0
+        if not keep.any():
             return
-        self.clap_raw = C / (np.linalg.norm(C, axis=1, keepdims=True) + 1e-9)   # as-is, for matching typed descriptions
-        mu, sd = C[self.has_clap].mean(0), C[self.has_clap].std(0) + 1e-6
-        Cz = np.where(self.has_clap[:, None], (C - mu) / sd, 0)
+        self.has_clap[pos[keep]] = True
+        d = E.shape[1]
+        clap = np.zeros((n, d), dtype="float32")
+        clap[pos[keep]] = E[keep]
+        del E
+        have = self.has_clap
+        mu, sd = clap[have].mean(0), clap[have].std(0) + 1e-6
+        # the blend: standardised, unit-length CLAP (weighted) next to our own groove features
+        sound = np.empty((n, d + self.emb.shape[1]), dtype="float32")
+        Cz = sound[:, :d]
+        np.subtract(clap, mu, out=Cz)
+        Cz /= sd
+        Cz[~have] = 0
         Cz /= np.linalg.norm(Cz, axis=1, keepdims=True) + 1e-9
-        self.sound = np.hstack([np.sqrt(CLAP_WEIGHT) * Cz, np.sqrt(1 - CLAP_WEIGHT) * self.emb]).astype("float32")
+        Cz *= np.sqrt(CLAP_WEIGHT)
+        np.multiply(self.emb, np.sqrt(1 - CLAP_WEIGHT), out=sound[:, d:])
+        clap /= np.linalg.norm(clap, axis=1, keepdims=True) + 1e-9   # as-is, for matching typed descriptions
+        self.clap_raw = clap
+        self.sound = sound
 
     @staticmethod
     def _cos_scale(M: np.ndarray) -> tuple[float, float]:
