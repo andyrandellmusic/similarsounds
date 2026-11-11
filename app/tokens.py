@@ -88,6 +88,22 @@ def count_play(deezer_id: int) -> bool:
         return False
 
 
+def join_waitlist(email: str, lang: str) -> bool:
+    """Add an email to the 'Tell me when Pro is ready' list (docs/supabase/10_pro_waitlist.sql)."""
+    if not ENABLED:
+        print(f"waitlist: Supabase not set up, not saved ({lang})", flush=True)
+        return os.environ.get("WAITLIST_DEV_OK") == "1"     # local testing only
+    try:
+        r = _client.post(f"{URL}/rest/v1/rpc/join_waitlist", headers={"apikey": KEY, "Content-Type": "application/json"},
+                         json={"p_email": email, "p_lang": lang})
+        if r.status_code >= 300:
+            print(f"waitlist: Supabase said {r.status_code} {r.text[:120]}", flush=True)
+        return r.status_code < 300
+    except httpx.HTTPError as e:
+        print(f"waitlist: couldn't reach Supabase ({e})", flush=True)
+        return False
+
+
 def top_played(days: int = 7, limit: int = 30) -> list[tuple[int, int]]:
     """[(deezer_id, plays)] most played first, over the last `days` days. Empty if Supabase can't be reached."""
     if not ENABLED:

@@ -62,6 +62,7 @@
     <div class="grid">
       <div class="card"><div class="big" id="avg">–</div><div class="muted">average review (<span id="nrev">0</span> reviews)</div></div>
       <div class="card"><div class="big" id="accounts">0</div><div class="muted">accounts</div></div>
+      <div class="card"><div class="big" id="waitlist">–</div><div class="muted">Pro sign-up list (<span id="wl7">0</span> this week)</div></div>
       <div class="card"><div class="big" id="searches">0</div><div class="muted">free searches used</div></div>
       <div class="card"><div class="big"><span id="up">0</span> / <span id="down">0</span></div><div class="muted">👍 / 👎 on matches</div></div>
     </div>
@@ -123,7 +124,7 @@ const TZ_COUNTRY = {"Europe/Andorra":"AD","Asia/Dubai":"AE","Asia/Kabul":"AF","A
     $("today").textContent = n(st.today); $("d7").textContent = n(st.last_7_days);
     $("d30").textContent = n(st.last_30_days); $("all").textContent = n(st.all_time);
     $("avg").textContent = st.stars_avg ? `${Number(st.stars_avg).toFixed(1)} ★` : "–";
-    $("nrev").textContent = n(st.reviews); $("accounts").textContent = n(st.accounts);
+    $("nrev").textContent = n(st.reviews); $("accounts").textContent = n(st.accounts); $("waitlist").textContent = st.waitlist == null ? "–" : n(st.waitlist); $("wl7").textContent = n(st.waitlist_7_days || 0);
     $("searches").textContent = n(st.searches_used); $("up").textContent = n(st.votes_up); $("down").textContent = n(st.votes_down);
 
     // 30-day chart, filling in days with no visitors

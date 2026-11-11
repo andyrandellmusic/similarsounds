@@ -1,4 +1,4 @@
-"""SimilarSounds Unlimited: unlimited searches for £4.99 a month, paid through Stripe Checkout.
+"""SimilarSounds Pro (called "Unlimited" in the code): unlimited searches for £4.99 a month, paid through Stripe Checkout.
 
 Switched OFF until SUBSCRIPTIONS_ON=1 is set on Render. Deezer's API terms are non-commercial, so it stays off
 until Deezer (or Beatport, or another licensed source) agrees to paid use. Everything else is ready:
@@ -6,6 +6,7 @@ until Deezer (or Beatport, or another licensed source) agrees to paid use. Every
     STRIPE_PRICE_ID        the £4.99 / month price (price_...)
     STRIPE_WEBHOOK_SECRET  signing secret of the webhook pointing at /api/stripe/webhook (whsec_...)
     SUPABASE_SERVICE_KEY   Supabase service-role key, so a payment can mark the account as subscribed
+    STRIPE_EARLY_COUPON    optional: coupon given to emails on the Pro sign-up list (£1 off for 3 months)
 A subscriber is a row in public.subscriptions with status active / trialing (the search_tokens function already
 gives those accounts unlimited searches). Rows whose customer_ref starts with "owner" are never touched.
 """
@@ -22,6 +23,8 @@ ON = os.environ.get("SUBSCRIPTIONS_ON", "").strip() == "1"
 STRIPE_KEY = os.environ.get("STRIPE_SECRET_KEY", "").strip()
 PRICE = os.environ.get("STRIPE_PRICE_ID", "").strip()
 HOOK_SECRET = os.environ.get("STRIPE_WEBHOOK_SECRET", "").strip()
+# Stripe coupon for people on the "Tell me when Pro is ready" list: £1 off (£3.99) for the first 3 months
+EARLY_COUPON = os.environ.get("STRIPE_EARLY_COUPON", "").strip()
 SERVICE_KEY = os.environ.get("SUPABASE_SERVICE_KEY", "").strip()
 SITE = "https://" + (os.environ.get("CANONICAL_HOST", "").strip() or "www.similarsounds.com")
 
@@ -77,7 +80,22 @@ def checkout_url(user: dict) -> str:
         data["customer"] = row["customer_ref"]              # subscribed before: same Stripe customer
     elif user["email"]:
         data["customer_email"] = user["email"]
+    if EARLY_COUPON and on_waitlist(user["email"]):
+        data.pop("allow_promotion_codes")                   # Stripe takes a coupon or the code box, not both
+        data["discounts[0][coupon]"] = EARLY_COUPON
     return _stripe("POST", "/checkout/sessions", data)["url"]
+
+
+def on_waitlist(email: str) -> bool:
+    """Did this email sign up for the early price before launch? (docs/supabase/10_pro_waitlist.sql)"""
+    if not email:
+        return False
+    try:
+        r = _client.get(f"{tokens.URL}/rest/v1/pro_waitlist", headers=_db_headers(),
+                        params={"email": f"eq.{email.strip().lower()}", "select": "email"})
+        return r.status_code == 200 and bool(r.json())
+    except (httpx.HTTPError, ValueError):
+        return False
 
 
 def portal_url(user: dict) -> str | None:

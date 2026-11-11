@@ -55,7 +55,7 @@ To run it now: GitHub repo → **Actions** → *Daily catalogue update* → **Ru
 The stand-in preview source (Deezer) allows **non-commercial use only**: no ads, no paid features,
 until Beatport (or another licensed source) replaces it.
 
-## SimilarSounds Unlimited (£4.99 / month) - built, switched OFF
+## SimilarSounds Pro (£4.99 / month; called "Unlimited" in the code) - built, switched OFF
 
 Everything is in place (`app/billing.py`, the Go Unlimited button, Manage subscription in the account) but the
 site keeps showing "Subscriptions coming soon" until it's switched on. **Only switch it on once Deezer (or
@@ -72,6 +72,11 @@ To switch on:
 5. Render → similarsounds → Environment, add:
    `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_KEY`, and `SUBSCRIPTIONS_ON` = `1`.
    Render redeploys; the pop-up then shows **Go Unlimited · £4.99/month**.
+5b. **Early sign-up price** (the "Tell me when Pro is ready" list, docs/supabase/10_pro_waitlist.sql): in Stripe make a
+   coupon "Early sign-up": £1.00 off, duration *repeating*, 3 months. Put its id in Render as `STRIPE_EARLY_COUPON`.
+   Anyone who subscribes with an email on the list then pays £3.99 for their first 3 months automatically.
+   Email the list once to say Pro is live (Supabase → Table editor → pro_waitlist → export as CSV). Delete the
+   list 3 months after launch, as the privacy policy promises (the early price can be claimed until then).
 6. Update the Terms page with the subscription terms (price, renews monthly, cancel anytime, UK 14-day cancellation
    rights) before taking real payments. Try it first with Stripe's test keys and card 4242 4242 4242 4242.
 

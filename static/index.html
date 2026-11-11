@@ -747,6 +747,11 @@
   .problem .countdown { font-size: 22px; }
   .plan { border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.06); border-radius: 12px; padding: 14px 16px; margin: 0 0 14px; }
   .plan-price { font-size: 28px; font-weight: 800; letter-spacing: -0.02em; }
+  .wl { display: grid; gap: 8px; margin: 4px 0 12px; padding: 14px 16px; border: 1px solid rgba(198,255,61,.45); background: rgba(198,255,61,.06); border-radius: 12px; }
+  .wl .wl-head { margin: 0; font-size: 14px; line-height: 1.45; }
+  .wl .wl-row { display: grid; gap: 8px; }
+  .wl .acct-fine { margin: 0; }
+  .wl.done .wl-row, .wl.done .acct-fine { display: none; }
   .plan-price span { font-size: 14px; font-weight: 600; color: var(--muted); margin-left: 2px; }
   .plan ul { margin: 8px 0 0; padding-left: 18px; color: var(--muted); font-size: 14px; display: grid; gap: 4px; }
   .acct-only { display: none !important; }
@@ -1963,6 +1968,12 @@
           <button type="button" class="secondary" id="pk-toggle"></button>
         </div>
         <div id="acct-stats" hidden></div>
+        <form class="wl subs-off" data-waitlist novalidate>
+          <p class="wl-head" data-i18n="wlHead"><b>SimilarSounds Pro</b> is coming, with unlimited searches. Sign up now and get it for <b>£3.99/month</b> for your first 3 months.</p>
+          <div class="wl-row"><input type="email" name="email" autocomplete="email" inputmode="email" placeholder="Your email" aria-label="Your email" maxlength="254" required><button class="primary" type="submit">Tell me when it's ready</button></div>
+          <p class="acct-fine">We'll email you once, when Pro launches. Nothing else, and you can ask us to remove it any time.</p>
+          <p class="acct-msg" role="status" aria-live="polite"></p>
+        </form>
         <button type="button" class="secondary" id="acct-billing" hidden>Manage subscription</button>
         <button type="button" class="primary" id="acct-logout">Log out</button>
         <p class="acct-links"><a href="#" id="acct-delete">Delete my account</a></p>
@@ -2056,22 +2067,32 @@
       <div data-pw="low-account" hidden>
         <h2>You have 1 credit left</h2>
         <p class="acct-sub">When it's used, you'll get 2 more free searches 24 hours later.</p>
-        <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
-        <button type="button" class="primary subs-on" data-go-unlimited>Go Unlimited · £4.99/month</button>
-        <button type="button" class="primary subs-off" data-pw-close>Got it</button>
+        <p class="acct-sub subs-on" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Pro</b>.</p>
+        <button type="button" class="primary subs-on" data-go-unlimited>Go Pro · £4.99/month</button>
+        <form class="wl subs-off" data-waitlist novalidate>
+          <p class="wl-head" data-i18n="wlHead"><b>SimilarSounds Pro</b> is coming, with unlimited searches. Sign up now and get it for <b>£3.99/month</b> for your first 3 months.</p>
+          <div class="wl-row"><input type="email" name="email" autocomplete="email" inputmode="email" placeholder="Your email" aria-label="Your email" maxlength="254" required><button class="primary" type="submit">Tell me when it's ready</button></div>
+          <p class="acct-fine">We'll email you once, when Pro launches. Nothing else, and you can ask us to remove it any time.</p>
+          <p class="acct-msg" role="status" aria-live="polite"></p>
+        </form>
+        <p class="acct-links subs-off"><a href="#" data-pw-close>Got it</a></p>
         <p class="acct-links subs-on"><a href="#" data-pw-close>Not now</a></p>
       </div>
       <div data-pw="account" hidden>
         <h2>You have used all your credits</h2>
         <div class="refresh-box"><span class="rb-label">Your 2 free searches refresh in</span><b class="countdown" data-countdown data-no-i18n>24:00:00</b></div>
         <p class="acct-sub refreshed" hidden>Your free searches have refreshed. Close this and search away!</p>
-        <p class="acct-sub" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Unlimited</b>.</p>
-        <div class="plan"><div class="plan-price">£4.99<span>/month</span></div>
+        <p class="acct-sub subs-on" data-i18n="pwGet">Can't wait? Get unlimited searches with <b>SimilarSounds Pro</b>.</p>
+        <div class="plan subs-on"><div class="plan-price">£4.99<span>/month</span></div>
           <ul><li>Unlimited searches and "Similar" finds</li><li>Build and share as many sets as you like</li><li>Cancel anytime</li></ul></div>
-        <button type="button" class="primary subs-on" data-go-unlimited>Go Unlimited · £4.99/month</button>
+        <button type="button" class="primary subs-on" data-go-unlimited>Go Pro · £4.99/month</button>
         <p class="acct-fine subs-on">Secure payment by Stripe. Cancel anytime from your account.</p>
-        <button type="button" class="primary subs-off" disabled>Subscriptions coming soon</button>
-        <p class="acct-fine subs-off">We're putting the finishing touches on subscriptions. Your saved set is safe in your account in the meantime.</p>
+        <form class="wl subs-off" data-waitlist novalidate>
+          <p class="wl-head" data-i18n="wlHead"><b>SimilarSounds Pro</b> is coming, with unlimited searches. Sign up now and get it for <b>£3.99/month</b> for your first 3 months.</p>
+          <div class="wl-row"><input type="email" name="email" autocomplete="email" inputmode="email" placeholder="Your email" aria-label="Your email" maxlength="254" required><button class="primary" type="submit">Tell me when it's ready</button></div>
+          <p class="acct-fine">We'll email you once, when Pro launches. Nothing else, and you can ask us to remove it any time.</p>
+          <p class="acct-msg" role="status" aria-live="polite"></p>
+        </form>
         <p class="acct-msg" data-pw-msg role="alert"></p>
       </div>
     </div>
@@ -2906,8 +2927,37 @@ document.addEventListener("click", e => { const b = e.target.closest("[data-go-u
 { const u = new URL(location.href), v = u.searchParams.get("unlimited");
   if (v !== null) {
     u.searchParams.delete("unlimited"); history.replaceState(null, "", u.pathname + u.search + u.hash);
-    if (v === "1") { setTimeout(() => toast("Welcome to SimilarSounds Unlimited!"), 600); [2000, 6000].forEach(ms => setTimeout(refreshTokens, ms)); }
+    if (v === "1") { setTimeout(() => toast("Welcome to SimilarSounds Pro!"), 600); [2000, 6000].forEach(ms => setTimeout(refreshTokens, ms)); }
   } }
+
+/* ================= "Tell me when Pro is ready": email sign-up list (£3.99/month for the first 3 months) ================= */
+const WL_DONE = "You're on the list! We'll email you when SimilarSounds Pro launches, with your £3.99 price.";
+function wlJoined() { try { return localStorage.getItem("ss_waitlist") === "1"; } catch { return false; } }
+function wlPaint() {
+  const email = ($("#acct-email")?.textContent || "").trim();
+  document.querySelectorAll("[data-waitlist]").forEach(f => {
+    if (wlJoined()) { f.classList.add("done"); const m = f.querySelector(".acct-msg"); m.textContent = WL_DONE; m.className = "acct-msg ok"; }
+    else if (email && !f.email.value) f.email.value = email;          // signed in: their account email, ready to go
+  });
+}
+document.addEventListener("submit", async e => {
+  const f = e.target.closest("[data-waitlist]"); if (!f) return;
+  e.preventDefault();
+  const msg = f.querySelector(".acct-msg"), btn = f.querySelector("button"), email = f.email.value.trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { msg.textContent = "That email address doesn't look right."; msg.className = "acct-msg err"; f.email.focus(); return; }
+  btn.disabled = true; msg.textContent = ""; msg.className = "acct-msg";
+  try {
+    const r = await fetch("/api/waitlist", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, lang: window.SSi18n?.lang || "en" }) });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(d.detail || "");
+    try { localStorage.setItem("ss_waitlist", "1"); } catch {}
+    wlPaint();
+  } catch (err) { msg.textContent = err.message || "Couldn't sign you up just now. Please try again."; msg.className = "acct-msg err"; }
+  finally { btn.disabled = false; }
+});
+wlPaint();
+new MutationObserver(wlPaint).observe($("#acct-email") || document.body, { childList: true, characterData: true, subtree: true });
 
 /* ================= Thumbs up / down: every vote is a DJ's judgement we can learn from ================= */
 function votes() { try { return JSON.parse(localStorage.getItem("ss_votes") || "{}"); } catch { return {}; } }

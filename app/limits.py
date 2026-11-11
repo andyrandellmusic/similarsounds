@@ -32,6 +32,7 @@ class RateLimit:
 # brand-new tracks analysed without a search credit (opening a shared set, "fix this gap"): plenty for real use
 free_analysis = RateLimit(limit=15, window=3600)
 reviews_per_visitor = RateLimit(limit=5, window=3600)
+waitlist_per_visitor = RateLimit(limit=5, window=3600)
 reviews_total = RateLimit(limit=60, window=3600)
 # "Most played": one play per visitor per track every 30 minutes, and no more than 200 plays an hour each
 play_repeat = RateLimit(limit=1, window=1800, max_keys=20000)

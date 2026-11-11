@@ -122,6 +122,27 @@ async def subscribe(request: Request):
         raise HTTPException(502, "Couldn't open the payment page. Please try again.")
 
 
+_EMAIL = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+@app.post("/api/waitlist")
+async def waitlist(request: Request):
+    """'Tell me when Pro is ready': an email for one launch email (and £3.99/month for the first 3 months)."""
+    try:
+        body = await request.json()
+        email = str(body.get("email") or "").strip().lower()
+    except (ValueError, AttributeError):
+        raise HTTPException(400, "Bad request")
+    if not 6 <= len(email) <= 254 or not _EMAIL.match(email):
+        raise HTTPException(400, "That email address doesn't look right")
+    if not limits.waitlist_per_visitor.allow(tokens.client_ip(request)):
+        raise HTTPException(429, "Too many tries - please wait a little and try again")
+    lang = body.get("lang") if body.get("lang") in LANG_CODES else "en"
+    if not await run_in_threadpool(tokens.join_waitlist, email, lang):
+        raise HTTPException(503, "Couldn't sign you up just now - please try again later")
+    return {"ok": True}
+
+
 @app.post("/api/billing-portal")
 async def billing_portal(request: Request):
     """Stripe's page to cancel SimilarSounds Unlimited or change the card."""
