@@ -4,7 +4,7 @@ Each artist gets one "sound fingerprint": the average of their tracks' sound fin
 Artists are compared by how close those averages are."""
 
 import re
-from collections import defaultdict
+from collections import Counter, defaultdict
 
 import numpy as np
 
@@ -21,12 +21,22 @@ class Artists:
         self.rebuild()
 
     def rebuild(self):
-        groups: dict[str, list[int]] = defaultdict(list)
+        from app.pages import artist_slug
+        # one artist per page address: spellings that share an address ("ZHU" / "Zhu", "Ultra Nate" / "Ultra
+        # Naté") are one artist, shown under the spelling used on most of their tracks
+        by_slug: dict[str, list[int]] = defaultdict(list)
+        spellings: dict[str, Counter] = defaultdict(Counter)
         for i, r in enumerate(self.index.rows):
-            groups[main_artist(r["artist"])].append(i)
+            n = main_artist(r["artist"])
+            s = artist_slug(n)
+            by_slug[s].append(i)
+            spellings[s][n] += 1
+        display = {s: min(c, key=lambda n: (-c[n], n)) for s, c in spellings.items()}
+        groups = {display[s]: rows for s, rows in by_slug.items()}
         self.names = sorted(groups)
         self.rows_of = {n: groups[n] for n in self.names}
-        self.by_key = {n.lower(): n for n in self.names}
+        self.by_slug = {s: display[s] for s in by_slug}
+        self.by_key = {v.lower(): display[s] for s, c in spellings.items() for v in c}
         if not self.names:
             self.centroids = np.zeros((0, 1), dtype="float32")
             return

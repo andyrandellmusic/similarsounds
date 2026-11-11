@@ -112,15 +112,15 @@ GUIDES = [
         "intro": "House music usually sits between 118 and 130 BPM. Each style has its own sweet spot, and knowing it helps you plan a set that builds instead of lurching.",
         "body": """
 <h2>Typical tempos by style</h2>
-<p>These ranges come from the <b>6,600+ house releases</b> in the SimilarSounds catalogue. The middle half of each style falls in the range shown, with the most common tempo in the last column.</p>
+<p>These ranges come from the <b>22,000+ house releases</b> in the SimilarSounds catalogue. The middle half of each style falls in the range shown, with the most common tempo in the last column.</p>
 <div class="tbl"><table>
 <thead><tr><th>Style</th><th>Most tracks</th><th>Typical</th></tr></thead>
 <tbody>
-<tr><td><a href="/similar-to/genre/deep-house">Deep House</a></td><td>120–125 BPM</td><td>123</td></tr>
-<tr><td><a href="/similar-to/genre/funky-disco-house">Funky / Disco House</a></td><td>120–126 BPM</td><td>123</td></tr>
-<tr><td><a href="/similar-to/genre/house">House</a></td><td>122–127 BPM</td><td>124</td></tr>
-<tr><td><a href="/similar-to/genre/tech-house">Tech House</a></td><td>124–128 BPM</td><td>126</td></tr>
-<tr><td><a href="/similar-to/genre/minimal-deep-tech">Minimal / Deep Tech</a></td><td>123–129 BPM</td><td>126</td></tr>
+<tr><td><a href="/similar-to/genre/deep-house">Deep House</a></td><td>120–126 BPM</td><td>122</td></tr>
+<tr><td><a href="/similar-to/genre/funky-disco-house">Funky / Disco House</a></td><td>121–126 BPM</td><td>124</td></tr>
+<tr><td><a href="/similar-to/genre/house">House</a></td><td>122–128 BPM</td><td>128</td></tr>
+<tr><td><a href="/similar-to/genre/tech-house">Tech House</a></td><td>124–129 BPM</td><td>128</td></tr>
+<tr><td><a href="/similar-to/genre/minimal-deep-tech">Minimal / Deep Tech</a></td><td>123–130 BPM</td><td>130</td></tr>
 </tbody></table></div>
 
 <h2>How DJs use tempo in a set</h2>

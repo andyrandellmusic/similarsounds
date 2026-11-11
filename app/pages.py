@@ -2,6 +2,7 @@
 pages by sub-genre and BPM, a sitemap and robots.txt. Plain server-rendered HTML so search
 engines can read them; the interactive app stays at /."""
 
+import hashlib
 import re
 import unicodedata
 from collections import Counter
@@ -302,8 +303,15 @@ def bpm_page(index, lo: int, hi: int, page_no: int) -> str:
                      f"/similar-to/bpm/{lo}-{hi}", f"{lo}-{hi} BPM", page_no)
 
 
+def artist_slug(name: str) -> str:
+    s = slugify(name)
+    if s == "track":       # no Latin letters at all (e.g. Cyrillic or Arabic): a stable code instead
+        s = "a-" + hashlib.md5(name.encode()).hexdigest()[:8]
+    return s
+
+
 def artist_path(name: str) -> str:
-    return f"/artists-like/{slugify(name)}"
+    return f"/artists-like/{artist_slug(name)}"
 
 
 def artist_page(artists, name: str) -> str:
@@ -322,7 +330,7 @@ def artist_page(artists, name: str) -> str:
     desc = f"House artists who sound like {name}" + (f", such as {names}" if names else "") + ", measured from the music itself."
     body = f"""<nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/artists-like">Artists like…</a> / {escape(name)}</nav>
   <h1>Artists that sound like {escape(name)}</h1>
-  <p class="summary">We averaged the sound of {name}'s tracks in our catalogue and compared it with every other house artist. These sound closest. Tap an artist to see who sounds like them, or open a track below to find tracks that mix with it.</p>
+  <p class="summary">We averaged the sound of {escape(name)}'s tracks in our catalogue and compared it with every other house artist. These sound closest. Tap an artist to see who sounds like them, or open a track below to find tracks that mix with it.</p>
   <ol class="list">{"".join(items)}</ol>
   <h2>{escape(name)} tracks in our catalogue</h2>{track_list(own[:30], date.today())}"""
     return page(f"Artists like {name} | SimilarSounds", desc, artist_path(name), body)
@@ -361,20 +369,41 @@ def artists_hub(artists) -> str:
                 "Find house artists who sound like the ones you love, measured from the music itself.", "/artists-like", body)
 
 
-def sitemap(index, artists=None) -> str:
+SITEMAP_CHUNK = 10_000     # Google's limit is 50,000 URLs per file; the catalogue grows by ~500 tracks a day
+
+
+def sitemaps(index, artists=None) -> dict[str, str]:
+    """{file name: xml}. /sitemap.xml is an index pointing at the others, so the site can keep growing
+    past Google's 50,000-URLs-per-file limit. Track pages carry the day they were added as their lastmod
+    (Google ignores lastmod when every page claims to have changed today)."""
     today = date.today().isoformat()
-    urls = [f"{SITE}/", f"{SITE}/similar-to"]
-    urls += [SITE + style_path(s) for s in sorted({r["style"] for r in index.rows if r["style"]})]
-    urls += [f"{SITE}/similar-to/bpm/{lo}-{hi}" for lo, hi in BPM_WINDOWS]
-    urls += [SITE + track_path(r) for r in index.rows]
+    pages_ = [f"{SITE}/", f"{SITE}/similar-to"]
+    pages_ += [SITE + style_path(s) for s in sorted({r["style"] for r in index.rows if r["style"]})]
+    pages_ += [f"{SITE}/similar-to/bpm/{lo}-{hi}" for lo, hi in BPM_WINDOWS]
+    from app import guides, info_pages
+    pages_ += guides.sitemap_urls() + info_pages.sitemap_urls()
     if artists:
-        urls += [f"{SITE}/artists-like"] + [SITE + artist_path(n) for n in artists.names]
-    from app import guides
-    urls += guides.sitemap_urls()
-    from app import info_pages
-    urls += info_pages.sitemap_urls()
-    body = "".join(f"<url><loc>{escape(u)}</loc><lastmod>{today}</lastmod></url>" for u in urls)
-    return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
+        pages_.append(f"{SITE}/artists-like")
+    groups = {"pages": [(u, today) for u in pages_],
+              "tracks": [(SITE + track_path(r), (r.get("added_at") or today)[:10]) for r in index.rows],
+              "artists": [(SITE + artist_path(n), today) for n in artists.names] if artists else []}
+
+    def urlset(items):
+        body = "".join(f"<url><loc>{escape(u)}</loc><lastmod>{m}</lastmod></url>" for u, m in items)
+        return f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{body}</urlset>'
+
+    files: dict[str, str] = {}
+    for kind, items in groups.items():
+        seen, uniq = set(), []
+        for u, m in items:
+            if u not in seen:
+                seen.add(u); uniq.append((u, m))
+        for n, i in enumerate(range(0, len(uniq), SITEMAP_CHUNK), 1):
+            files[f"sitemap-{kind}-{n}.xml"] = urlset(uniq[i:i + SITEMAP_CHUNK])
+    index_body = "".join(f"<sitemap><loc>{SITE}/{name}</loc><lastmod>{today}</lastmod></sitemap>" for name in files)
+    files["sitemap.xml"] = ('<?xml version="1.0" encoding="UTF-8"?><sitemapindex '
+                            f'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{index_body}</sitemapindex>')
+    return files
 
 
 # AI search and assistant crawlers are welcome too (ChatGPT, Claude, Perplexity, Google's AI, Bing/Copilot)
@@ -397,7 +426,7 @@ LLMS = f"""# SimilarSounds
 > mix with it, matched on sound, musical key (Camelot), BPM and energy, newest releases first.
 
 SimilarSounds ({SITE}) covers house music only: House, Deep House, Tech House, Minimal / Deep Tech and
-Funky / Disco House. Around 6,600 releases, updated daily. Every match is marked green (mixes well),
+Funky / Disco House. Around __TRACKS__ releases, updated daily. Every match is marked green (mixes well),
 amber (workable) or red (will clash). It also has a free set builder that checks every transition and can
 order a set for the smoothest mixes. Free to use; a free account adds more searches.
 

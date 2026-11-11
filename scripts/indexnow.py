@@ -20,9 +20,11 @@ DB = "data/catalogue.db"
 
 
 def all_urls() -> list[str]:
-    xml = httpx.get(f"{SITE}/sitemap.xml", timeout=60).text
+    # /sitemap.xml is an index of smaller sitemaps (Google allows 50,000 URLs per file)
     ns = {"s": "http://www.sitemaps.org/schemas/sitemap/0.9"}
-    return [e.text for e in ET.fromstring(xml).findall("s:url/s:loc", ns)]
+    root = ET.fromstring(httpx.get(f"{SITE}/sitemap.xml", timeout=60).text)
+    files = [e.text for e in root.findall("s:sitemap/s:loc", ns)] or [f"{SITE}/sitemap.xml"]
+    return [e.text for f in files for e in ET.fromstring(httpx.get(f, timeout=60).text).findall("s:url/s:loc", ns)]
 
 
 def new_urls(since: str) -> list[str]:

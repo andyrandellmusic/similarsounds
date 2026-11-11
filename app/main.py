@@ -18,7 +18,7 @@ from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 
-from app import billing, guides, house, info_pages, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
+from app import billing, guides, house, info_pages, limits, pages, reviews, sources, tokens, tracklist, mixprev, describe, planner, fresh
 from app.artists import Artists, main_artist
 from app.analysis import analyse
 from app.catalogue import DB_PATH, Index, energy_vector
@@ -35,7 +35,8 @@ if not DB_PATH.exists():                 # normally downloaded during the build;
 index = Index()
 suggester = Suggester(index)
 artists = Artists(index)
-_query_cache: dict[int, dict] = {}
+_query_cache: dict[int, dict] = {}        # analysed tracks that aren't in the catalogue (pasted links)
+QUERY_CACHE_MAX = 500                       # ~6 KB each, ~3 MB: it used to grow until the next restart
 _analysis_lock = threading.Lock()
 
 # CANONICAL_HOST (www.similarsounds.com on Render): every other
@@ -70,6 +71,11 @@ async def redirect_to_canonical(request: Request, call_next):
     # so a new release shows up on the next visit instead of an old saved copy.
     elif "text/html" in response.headers.get("content-type", "") and "Cache-Control" not in response.headers:
         response.headers["Cache-Control"] = "no-cache"
+    # basic browser protections on every answer (no effect on how the site looks or works)
+    response.headers.setdefault("Strict-Transport-Security", "max-age=31536000")
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
+    response.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
     return response
 
 
@@ -186,6 +192,11 @@ def analyse_query(deezer_id: int) -> dict:
          "release_date": t.get("release_date"), "deezer_id": deezer_id, "in_catalogue": False,
          "house_check": house.check(house.house_features(feats, index, genres))}
     _query_cache[deezer_id] = q
+    while len(_query_cache) > QUERY_CACHE_MAX:          # oldest first (dicts keep insertion order)
+        try:
+            _query_cache.pop(next(iter(_query_cache)), None)
+        except (StopIteration, RuntimeError):
+            break
     return q
 
 
@@ -350,8 +361,11 @@ async def mix_clip(deezer_id: int, request: Request):
 
 
 @app.get("/api/bridge")
-async def bridge(a: int, b: int, exclude: str = Query("", max_length=2000)):
+async def bridge(request: Request, a: int, b: int, exclude: str = Query("", max_length=2000)):
     """Tracks to put between two set tracks so the transition works: they mix with both."""
+    new = sum(1 for d in {a, b} if _needs_analysis(d))
+    if new and not limits.free_analysis.allow(tokens.client_ip(request), new):
+        raise HTTPException(429, "Too many new tracks analysed - try again in a little while")
     try:
         qa = await run_in_threadpool(analyse_query, a)
         qb = await run_in_threadpool(analyse_query, b)
@@ -404,6 +418,10 @@ async def prefetch(deezer_id: int):
     return {"ok": True}
 
 
+def _needs_analysis(deezer_id: int) -> bool:
+    return deezer_id not in index.ids and deezer_id not in _query_cache
+
+
 def _safe(fn, *a):
     try:
         fn(*a)
@@ -412,11 +430,15 @@ def _safe(fn, *a):
 
 
 @app.get("/api/tracks")
-async def tracks(ids: str = Query(..., max_length=400)):
-    """Key/BPM/energy for a list of Deezer ids (used to open a shared set)."""
+async def tracks(request: Request, ids: str = Query(..., max_length=400)):
+    """Key/BPM/energy for a list of Deezer ids (used to open a shared set). Tracks we already know are free;
+    brand-new ones need a full analysis, so they're capped per visitor (limits.free_analysis)."""
     out = []
+    ip = tokens.client_ip(request)
     for raw in ids.split(",")[:30]:
         if not raw.strip().isdigit():
+            continue
+        if _needs_analysis(int(raw)) and not limits.free_analysis.allow(ip):
             continue
         try:
             q = await run_in_threadpool(analyse_query, int(raw))
@@ -506,6 +528,9 @@ async def play(request: Request):
         raise HTTPException(400, "Bad track id")
     if did not in index.ids:
         return {"ok": False}
+    ip = tokens.client_ip(request)        # keeps "Most played" honest: replays and scripted plays don't count
+    if not limits.play_repeat.allow(f"{ip}:{did}") or not limits.plays_per_visitor.allow(ip):
+        return {"ok": False}
     return {"ok": await run_in_threadpool(tokens.count_play, did)}
 
 
@@ -525,6 +550,9 @@ async def review(request: Request):
     lang = body.get("lang") if body.get("lang") in LANG_CODES else "en"
     comment = str(body.get("comment") or "").strip()[:1000]
     source = "page" if body.get("source") == "page" else "popup"
+    # each review rewrites reviews.csv in the GitHub repo: a few per visitor, and a ceiling for everyone
+    if not limits.reviews_per_visitor.allow(tokens.client_ip(request)) or not limits.reviews_total.allow("all"):
+        raise HTTPException(429, "Thanks - we've already got your review")
     await run_in_threadpool(reviews.save, stars, lang, plays, comment, source)
     return {"ok": True}
 
@@ -629,7 +657,7 @@ def artists_hub():
 
 @app.get("/artists-like/{slug}", response_class=HTMLResponse)
 def artists_like(slug: str):
-    name = next((n for n in artists.names if pages.slugify(n) == slug), None)
+    name = artists.by_slug.get(slug)
     if not name:
         raise HTTPException(404, "We don't have that artist yet")
     return pages.artist_page(artists, name)
@@ -666,9 +694,25 @@ def guide(slug: str):
     return html
 
 
+_sitemaps: dict = {"key": None, "files": {}}    # built once per catalogue per day (~4 MB of text, ~1 s to build)
+
+
 @app.get("/sitemap.xml")
-def sitemap():
-    return Response(pages.sitemap(index, artists), media_type="application/xml")
+@app.get("/sitemap-{name}.xml")
+def sitemap(name: str = ""):
+    key = (id(index.rows), len(index.rows), date.today())
+    if _sitemaps["key"] != key:
+        _sitemaps["files"], _sitemaps["key"] = pages.sitemaps(index, artists), key
+    xml = _sitemaps["files"].get(f"sitemap-{name}.xml" if name else "sitemap.xml")
+    if xml is None:
+        raise HTTPException(404, "No such sitemap")
+    return Response(xml, media_type="application/xml")
+
+
+@app.get("/favicon.ico", include_in_schema=False)
+def favicon():
+    # browsers and Google ask for this address; Google can't use the home page's inline (data:) icon
+    return FileResponse(STATIC / "favicon.ico", media_type="image/x-icon", headers={"Cache-Control": "public, max-age=604800"})
 
 
 @app.get("/robots.txt", response_class=PlainTextResponse)
@@ -678,7 +722,7 @@ def robots():
 
 @app.get("/llms.txt", response_class=PlainTextResponse)
 def llms():
-    return pages.LLMS
+    return pages.LLMS.replace("__TRACKS__", f"{len(index.rows) // 1000 * 1000:,}")
 
 
 @app.get(f"/{pages.INDEXNOW_KEY}.txt", response_class=PlainTextResponse, include_in_schema=False)

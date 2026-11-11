@@ -125,3 +125,64 @@ What stands between 8.4 and 10:
 - Catalogue 8: owner decision on the "No Reclaim" label (438 tracks, likely a mass-upload farm).
 - Reliability 8.5: the Discogs key on GitHub needs pasting again (it's 46 characters, the real key is 40), and
   memory headroom on the free 512 MB plan is tight (the $7 Starter plan fixes it for good).
+
+---
+
+# Clean-up rounds, part 2 (11 Nov 2026)
+
+Same rubric. The catalogue has grown from 14,700 to 22,383 tracks since part 1.
+
+### Baseline: 8.0
+Bugs 8 · Content 8.5 · Catalogue 8.5 · SEO 7 · Speed 7.5 · Reliability 8 · Mobile 9 · Tidiness 7.5
+- Live: no browser errors; 56 sampled pages and 400 internal links all 200; every canonical matches; daily
+  pulls and keep-awake all succeeding. "No Reclaim" is gone (removed 28 Oct).
+- Sitemap: one 3.8 MB file with 30,581 URLs, growing ~700 a day. Google rejects a sitemap over 50,000 URLs,
+  so in ~4 weeks it would have stopped reading it. Every URL claimed it changed today, so Google ignores the
+  dates. 28 URLs were listed twice, and the sitemap was rebuilt from scratch on every request.
+- 26 artist addresses were shared by two spellings ("ZHU" / "Zhu", "Ultra Nate" / "Ultra Naté"). Only one of
+  each could ever be shown, and 4 non-Latin artists all landed on /artists-like/track.
+- /favicon.ico was 404, and the home page's icon is inline (data:), which Google can't use for search results.
+- Content: llms.txt and the BPM guide said "6,600 releases" (the BPM table was from that old catalogue).
+- Abuse: /api/tracks (open a shared set) and /api/bridge (fix this gap) would analyse any brand-new track with no
+  credit and no limit. One request with 30 made-up ids held the analysis lock for minutes, so every real
+  search waited. /api/review rewrote reviews.csv on GitHub for every request (spammable), and /api/play could
+  be looped to push a track up "Most played". The cache of analysed tracks grew until the next restart.
+- No basic security headers (HSTS, nosniff, referrer policy, framing).
+
+### Round 11: 8.0 → 8.1 (kept)
+- /sitemap.xml is now a sitemap index: pages, tracks in files of 10,000, and artists. Track lastmod is the day
+  the track was added. No duplicates. Built once per catalogue per day, then served from memory (~2 ms).
+  scripts/indexnow.py follows the index.
+- Artists are grouped by page address and shown under their most-used spelling (8,165 → 8,140 artists, every
+  page reachable). Non-Latin names get a stable code address (/artists-like/a-1a2b3c4d). The page lookup is a
+  dict instead of scanning 8,000 names, and the artist name in the page summary is now HTML-escaped.
+Bugs 8.5 · Content 8.5 · Catalogue 8.5 · SEO 7.5 · Speed 7.5 · Reliability 8 · Mobile 9 · Tidiness 7.5
+
+### Round 12: 8.1 → 8.3 (kept)
+- app/limits.py adds small in-memory limits:
+  - Brand-new tracks analysed without a credit: 15 an hour per visitor. Catalogue and already-analysed tracks
+    stay free and unlimited.
+  - Reviews: 5 an hour per visitor and 60 an hour in total.
+  - Plays: one per visitor per track every 30 min, and 200 an hour each.
+- The analysed-tracks cache is capped at the 500 most recent (~3 MB).
+- Tested with a stubbed analyser: a 20-new-track set gets 15, the next request gets 0, catalogue tracks still
+  open, and a gap fix after the limit gets 429. The 6th review in an hour gets 429.
+Bugs 8.5 · Content 8.5 · Catalogue 8.5 · SEO 7.5 · Speed 7.5 · Reliability 8.5 · Mobile 9 · Tidiness 8.5
+
+### Round 13: 8.3 → 8.4 (kept)
+- The BPM guide table is recomputed from the 22,383-track catalogue ("22,000+ releases"). llms.txt shows the
+  live catalogue size, rounded down to the thousand.
+Bugs 8.5 · Content 9 · Catalogue 8.5 · SEO 7.5 · Speed 7.5 · Reliability 8.5 · Mobile 9 · Tidiness 8.5
+
+### Round 14: 8.4 → 8.5 (kept)
+- A real /favicon.ico (16/32/48 px, from the site icon), linked from the home page, so Google can show the logo
+  in search results.
+- Security headers on every response: Strict-Transport-Security (1 year, this host only), X-Content-Type-Options
+  nosniff, Referrer-Policy strict-origin-when-cross-origin, X-Frame-Options SAMEORIGIN. The Deezer player
+  iframe is unaffected (we frame them, not the other way round). No console errors on home or artist pages.
+Bugs 9 · Content 9 · Catalogue 8.5 · SEO 8 · Speed 7.5 · Reliability 8.5 · Mobile 9 · Tidiness 8.5
+
+## Where part 2 ended: 8.0 → 8.5
+- SEO 8: after this deploys, resubmit /sitemap.xml in Search Console (same address, now an index).
+- Speed 7.5: the home page is still one 375 KB file.
+- Catalogue 8.5 / Reliability 8.5: the licensed data source (Beatport etc.) and the paid Render plan.
