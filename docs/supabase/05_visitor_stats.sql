@@ -30,7 +30,7 @@ $$;
 revoke all on function public.log_visit(uuid) from public;
 grant execute on function public.log_visit(uuid) to anon, authenticated;
 
--- Star reviews from the pop-up (also kept in reviews.csv). Added by the server only.
+-- Star reviews from the pop-up and the bottom box. Added by the server only.
 create table if not exists public.site_reviews (
   id bigserial primary key,
   at timestamptz not null default now(),

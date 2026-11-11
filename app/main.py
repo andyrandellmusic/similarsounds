@@ -550,7 +550,7 @@ async def review(request: Request):
     lang = body.get("lang") if body.get("lang") in LANG_CODES else "en"
     comment = str(body.get("comment") or "").strip()[:1000]
     source = "page" if body.get("source") == "page" else "popup"
-    # each review rewrites reviews.csv in the GitHub repo: a few per visitor, and a ceiling for everyone
+    # a few per visitor, and a ceiling for everyone (stops the stats page filling with spam)
     if not limits.reviews_per_visitor.allow(tokens.client_ip(request)) or not limits.reviews_total.allow("all"):
         raise HTTPException(429, "Thanks - we've already got your review")
     await run_in_threadpool(reviews.save, stars, lang, plays, comment, source)
